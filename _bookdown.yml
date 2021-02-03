@@ -1,0 +1,7 @@
+book_filename: "crime_mapping_textbook"
+language:
+  ui:
+    chapter_name: "Chapter "
+delete_merged_file: true
+always_allow_html: yes
+output_dir: "docs"

@@ -149,7 +149,7 @@ When you have typed this, you will have typed your first bit of code. Yet nothin
 You can do this by highlighting the code you wish to run, and clicking on 'run' in the top right hand corner: 
 
 
-```{r, out.width = "400px"}
+```{r, out.width = "400px", echo = FALSE}
 
 knitr::include_graphics('img/run_hello_world.gif')
 
@@ -296,7 +296,7 @@ Let us create an object called 'plates'. To do this, you go to your script, and 
 
 But if you run this code, you will get an error. Let's see: 
 
-```{r, out.width = "400px"}
+```{r, out.width = "400px", echo = FALSE}
 
 knitr::include_graphics('img/error_no_plates.gif')
 
@@ -319,7 +319,7 @@ plates <- "yellow plate"
 
 Now if we run this, we will see no error message, but instead, we will see the `plates` object appear in our *environment pane*: 
 
-```{r, out.width = "400px"}
+```{r, out.width = "400px", echo = FALSE}
 
 knitr::include_graphics('img/assign_plates.gif')
 

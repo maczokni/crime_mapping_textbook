@@ -24,7 +24,7 @@
 <meta name="author" content="Reka Solymosi and Juanjo Medina" />
 
 
-<meta name="date" content="2021-02-03" />
+<meta name="date" content="2021-02-08" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -372,7 +372,7 @@ As indicated above, the window in the bottom left corner is the main <strong>con
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="a-first-lesson-about-r.html#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Instead, it should be:</span></span>
 <span id="cb12-2"><a href="a-first-lesson-about-r.html#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">log</span>(<span class="dv">100</span>)</span></code></pre></div>
 <pre><code>## [1] 4.60517</code></pre>
-<p>Okay, now you know these, the answer to Activity 6 was…</p>
+<p>Okay, now you know these, the answer to Activity 5 was…</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="a-first-lesson-about-r.html#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">median</span>(<span class="dv">10</span>, <span class="dv">34</span>, <span class="dv">5</span>, <span class="dv">3</span>, <span class="dv">77</span>)</span></code></pre></div>
 <pre><code>## [1] 10</code></pre>
 <p>Now let us move on to our second key topic: objects!</p>
@@ -501,7 +501,7 @@ As indicated above, the window in the bottom left corner is the main <strong>con
 <p>On <em>masking</em>: sometimes packages introduce functions that have the same name as those that are already loaded into your session. When that happens, the newly loaded ones will override the previous ones. You can still use them but you will have to refer to them explicitly by bringing them up by specifying to which package they belong with <code>library()</code>.</p>
 <p>How do you find out what a package does? You look at the relevant documentation. In the Packages window scroll down until you find the new package we installed listed. Here you will see the name of the package (dplyr), a brief description of what the program is about, and the version you have installed (an indication that a package is a good package is that it has gone through several versions, that means that someone is making sure the package gets regular updates and improvements).</p>
 <p>Click in the name <em>dplyr</em>. You will see that R Studio has now brought you to the Help tab. Here is where you find the help files for this package, including all the available documentation.</p>
-<p>Every beginner in R will find these help files a bit confusing. But after a while, their format and structure will begin to make sense to you. Click where it says <em>User guides, package vignettes, and other documentation</em>. Documentation in R has become much better since people started to write <strong>vignettes</strong> for their packages. They are little tutorials that explain with examples what each package does. Click in the <em>cowsay::cowsay_tutorial</em> that you see listed here (the html link). What you will find there is an html file that gives you a detailed tutorial on this package. You don’t need to read it now, but remember that this is one way to find help when using R. You will learn to love vignettes.</p>
+<p>Every beginner in R will find these help files a bit confusing. But after a while, their format and structure will begin to make sense to you. Click where it says <em>User guides, package vignettes, and other documentation</em>. Documentation in R has become much better since people started to write <strong>vignettes</strong> for their packages. They are little tutorials that explain with examples what each package does. Click in the <em>dplyr::dplyr</em> vignette that you see listed here (the html link). What you will find there is an html file that gives you a detailed tutorial on this package. You don’t need to read it now, but remember that this is one way to find help when using R. You will learn to love vignettes.</p>
 </div>
 <div id="exploring-data" class="section level2" number="1.5">
 <h2><span class="header-section-number">1.5</span> Exploring data</h2>

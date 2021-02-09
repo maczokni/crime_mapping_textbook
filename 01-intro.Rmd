@@ -187,7 +187,7 @@ For example, you may choose a darker theme like 'tomorrow night bright'.
 ![](img/appearance_choose_tomorrow_night_bright.png)
 
 ![](img/consoleresults.png)
-As indicated above, the window in the bottom left corner is the main **console**.You will see that the words "I love maps" appear printed there.  If rather than using R Studio you were working directly from R, that's all you would get: the main console where you can write code interactively (rather than all the different windows you see in R Studio). You can write your code directly in the main console and execute it line by line in an interactive fashion. However, we will be running code from scripts, so that you get used to the idea of properly documenting all the steps you take,
+As indicated above, the window in the bottom left corner is the main **console**.You will see that the words "I hate computers" appear printed there.  If rather than using R Studio you were working directly from R, that's all you would get: the main console where you can write code interactively (rather than all the different windows you see in R Studio). You can write your code directly in the main console and execute it line by line in an interactive fashion. However, we will be running code from scripts, so that you get used to the idea of properly documenting all the steps you take,
 
 
 ### Functions

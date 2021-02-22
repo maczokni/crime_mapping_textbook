@@ -297,14 +297,14 @@ Now you will need to practice navigating the Infuse system to generate a data ta
 
 Once you have those fields click next to get the data and download the file. Unzip them and see you have your .csv file. Save this into your data subfolder in your project directory. Use `read_csv()` function from the `readr` package to import this data.
 
-```{r, message=FALSE, warnings=FALSE, echo=FALSE}
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
 library(readr)
 census_lsoa_m <- read_csv("https://www.dropbox.com/s/e4nkqmefovlsvib/Data_AGE_APPSOCG_DAYPOP_UNIT_URESPOP.csv?dl=1")
 ```
 
 ```{r, message=FALSE, warnings=FALSE, eval=FALSE}
 library(readr)
-census_lsoa_m <- read_csv("data/Data_AGE_APPSOCG_DAYPOP_UNIT_URESPOP.csv?dl=1")
+census_lsoa_m <- read_csv("data/Data_AGE_APPSOCG_DAYPOP_UNIT_URESPOP.csv")
 ```
 
 Notice that even all the variables that begin with "f" are numbers they have been read into R as characters. This is to do with the fact the first two lines do not represent cases and do have characters. R is coercing everything into character vectors. Let's clean this a bit.

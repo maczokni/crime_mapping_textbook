@@ -24,7 +24,7 @@
 <meta name="author" content="Reka Solymosi and Juanjo Medina" />
 
 
-<meta name="date" content="2021-02-22" />
+<meta name="date" content="2021-03-02" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,7 +33,7 @@
   
 <link rel="prev" href="making-maps-in-r.html"/>
 <link rel="next" href="performing-spatial-operations-in-r.html"/>
-<script src="libs/header-attrs-2.6/header-attrs.js"></script>
+<script src="libs/header-attrs-2.7.2/header-attrs.js"></script>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -444,14 +444,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h4><span class="header-section-number">3.5.0.2</span> Activity 4: Computing crime rates</h4>
 <p>Ok, so now we have a field that provides us with the number of crimes and two alternative counts of population for each LSOA in Manchester in the same dataframe. We could compute the rate of crime in each using the population counts as our denominator. Let’s see how the maps may compare using these different denominators.</p>
 <p>But first we need to create new variables. For this we can use the <code>mutate()</code> function from the <code>dplyr</code> package. This is a very helpful function to create new variables in a dataframe based on transformations or mathematical operations performed in other variables within the dataframe. In this function, the first argument is the name of the data frame, and then we can pass as arguments all new variables we want to create as well as the instructions as to how we are creating those variables.</p>
-<p>First we want to create a rate using the usual residents, since crime rates are often expressed by 100,000 inhabitants we will multiply the division of the number of crimes by the number of usual residents by 100,000. We will then create another variable, <em>crimr2</em>, using the workday population as the denominator. We will store this new variables in our existing <em>manchester_lsoa</em> dataset. You can see that below then I specify the name of a new variable <em>crimr1</em> and then I tell the function I want that variable to equal (for each case) the division of the values in the variable <em>count</em> (number of crimes) by the variable <em>respop</em> (number of people residing in the area) and then we multiply the result of this division by 100,000 to obtain a rate expressed in those terms. Then we do likewise for the alternative measure of crime.</p>
-<div class="sourceCode" id="cb141"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb141-1"><a href="thematic-maps-in-r.html#cb141-1" aria-hidden="true" tabindex="-1"></a>manchester_crime_lsoa <span class="ot">&lt;-</span> <span class="fu">mutate</span>(manchester_crime_lsoa, <span class="at">crimr1 =</span> (count<span class="sc">/</span>respop)<span class="sc">*</span><span class="dv">100000</span>, <span class="at">crimr2 =</span> (count<span class="sc">/</span>wkdpop)<span class="sc">*</span><span class="dv">100000</span>)</span></code></pre></div>
-<p>And now we have two new variables, one for crime rate with residential population as a denominator, and another with workplace population as a denominator.</p>
+<p>First we want to create a rate using the usual residents, since crime rates are often expressed by 100,000 inhabitants we will multiply the division of the number of crimes by the number of usual residents by 100,000. We will store this new variables in our existing <em>manchester_lsoa</em> dataset. You can see that below then I specify the name of a new variable <em>crimr1</em> and then I tell the function I want that variable to equal (for each case) the division of the values in the variable <em>count</em> (number of crimes) by the variable <em>respop</em> (number of people residing in the area) and then we multiply the result of this division by 100,000 to obtain a rate expressed in those terms.</p>
+<div class="sourceCode" id="cb141"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb141-1"><a href="thematic-maps-in-r.html#cb141-1" aria-hidden="true" tabindex="-1"></a>manchester_crime_lsoa <span class="ot">&lt;-</span> <span class="fu">mutate</span>(manchester_crime_lsoa, <span class="at">crimr1 =</span> (count<span class="sc">/</span>respop)<span class="sc">*</span><span class="dv">100000</span>)</span></code></pre></div>
+<p>And now we have two new variables, one for crime rate with residential population as a denominator.</p>
 </div>
 <div id="activity-5-mapping-crime-rates" class="section level4" number="3.5.0.3">
 <h4><span class="header-section-number">3.5.0.3</span> Activity 5: Mapping crime rates</h4>
 <p>Now that we have our variables for crime rate per population, we can use this to produce our crime maps!</p>
-<p>Let’s first map crime count, next to residential population, and then the crime rate. We can do this by creating two maps, and then using our trusty <code>tmap_arrange()</code> to put them next to one another.</p>
+<p>Let’s first map crime count, next to residential population, and then the crime rate. We can do this by creating individual maps, and then using our trusty <code>tmap_arrange()</code> to put them next to one another.</p>
 <p>Let’s also use a different palette for each map, that is a different fill colour. To change the colours for the fill of the polygons you can use the palette argument within the <code>tm_fill()</code> function. You can explore different palettes running the following code:</p>
 <div class="sourceCode" id="cb142"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb142-1"><a href="thematic-maps-in-r.html#cb142-1" aria-hidden="true" tabindex="-1"></a>tmaptools<span class="sc">::</span><span class="fu">palette_explorer</span>()</span></code></pre></div>
 <p>Pick the ones you like, and use them. Here I will use Blues, Greens and Reds</p>

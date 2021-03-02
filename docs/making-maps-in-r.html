@@ -24,7 +24,7 @@
 <meta name="author" content="Reka Solymosi and Juanjo Medina" />
 
 
-<meta name="date" content="2021-02-22" />
+<meta name="date" content="2021-03-02" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,7 +33,7 @@
   
 <link rel="prev" href="a-first-lesson-about-r.html"/>
 <link rel="next" href="thematic-maps-in-r.html"/>
-<script src="libs/header-attrs-2.6/header-attrs.js"></script>
+<script src="libs/header-attrs-2.7.2/header-attrs.js"></script>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -393,18 +393,18 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb60-2"><a href="making-maps-in-r.html#cb60-2" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(crimes)</span></code></pre></div>
 <pre><code>## Rows: 32,058
 ## Columns: 12
-## $ `Crime ID`              &lt;chr&gt; NA, &quot;aa1cc4cb0c436f463635890bcb4ff2cba08f5992…
-## $ Month                   &lt;chr&gt; &quot;2019-06&quot;, &quot;2019-06&quot;, &quot;2019-06&quot;, &quot;2019-06&quot;, &quot;…
-## $ `Reported by`           &lt;chr&gt; &quot;Greater Manchester Police&quot;, &quot;Greater Manches…
-## $ `Falls within`          &lt;chr&gt; &quot;Greater Manchester Police&quot;, &quot;Greater Manches…
-## $ Longitude               &lt;dbl&gt; -2.464422, -2.441166, -2.444807, -2.444807, -…
-## $ Latitude                &lt;dbl&gt; 53.61250, 53.61604, 53.61151, 53.61151, 53.60…
-## $ Location                &lt;chr&gt; &quot;On or near Parking Area&quot;, &quot;On or near Pitcom…
-## $ `LSOA code`             &lt;chr&gt; &quot;E01004768&quot;, &quot;E01004768&quot;, &quot;E01004768&quot;, &quot;E0100…
-## $ `LSOA name`             &lt;chr&gt; &quot;Bolton 001A&quot;, &quot;Bolton 001A&quot;, &quot;Bolton 001A&quot;, …
-## $ `Crime type`            &lt;chr&gt; &quot;Anti-social behaviour&quot;, &quot;Violence and sexual…
-## $ `Last outcome category` &lt;chr&gt; NA, &quot;Unable to prosecute suspect&quot;, &quot;Unable to…
-## $ Context                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…</code></pre>
+## $ `Crime ID`              &lt;chr&gt; NA, &quot;aa1cc4cb0c436f463635890bcb4ff2cba08f59925…
+## $ Month                   &lt;chr&gt; &quot;2019-06&quot;, &quot;2019-06&quot;, &quot;2019-06&quot;, &quot;2019-06&quot;, &quot;2…
+## $ `Reported by`           &lt;chr&gt; &quot;Greater Manchester Police&quot;, &quot;Greater Manchest…
+## $ `Falls within`          &lt;chr&gt; &quot;Greater Manchester Police&quot;, &quot;Greater Manchest…
+## $ Longitude               &lt;dbl&gt; -2.464422, -2.441166, -2.444807, -2.444807, -2…
+## $ Latitude                &lt;dbl&gt; 53.61250, 53.61604, 53.61151, 53.61151, 53.606…
+## $ Location                &lt;chr&gt; &quot;On or near Parking Area&quot;, &quot;On or near Pitcomb…
+## $ `LSOA code`             &lt;chr&gt; &quot;E01004768&quot;, &quot;E01004768&quot;, &quot;E01004768&quot;, &quot;E01004…
+## $ `LSOA name`             &lt;chr&gt; &quot;Bolton 001A&quot;, &quot;Bolton 001A&quot;, &quot;Bolton 001A&quot;, &quot;…
+## $ `Crime type`            &lt;chr&gt; &quot;Anti-social behaviour&quot;, &quot;Violence and sexual …
+## $ `Last outcome category` &lt;chr&gt; NA, &quot;Unable to prosecute suspect&quot;, &quot;Unable to …
+## $ Context                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…</code></pre>
 <p>You may notice that a lot of the variable names are messy in that they have a space in them - this can cause issues, so before playing around too much with the data we want to clean this up.</p>
 <p>Luckily there is a very handy package you can use for this called <code>janitor</code> which contains the function <code>clean_names()</code>.</p>
 <div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="making-maps-in-r.html#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(janitor)</span></code></pre></div>
@@ -437,9 +437,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>First, and possibly most obvious, are the coordinates provided with each crime incident recorded. You can find this in the two columns - Longitude and Latitude. These two column help put each crime incident on a specific point on a map. For example, let’s take the very first crime incident. Here we use the head() function and specify that we want the first 1 rows only with <code>n=1</code> parameter.</p>
 <div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb68-1"><a href="making-maps-in-r.html#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(crimes, <span class="at">n =</span> <span class="dv">1</span>)</span></code></pre></div>
 <pre><code>## # A tibble: 1 x 12
-##   crime_id month reported_by falls_within longitude latitude location lsoa_code
-##   &lt;chr&gt;    &lt;chr&gt; &lt;chr&gt;       &lt;chr&gt;            &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;    
-## 1 &lt;NA&gt;     2019… Greater Ma… Greater Man…     -2.46     53.6 On or n… E01004768
+##   crime_id month  reported_by falls_within longitude latitude location lsoa_code
+##   &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;       &lt;chr&gt;            &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;    
+## 1 &lt;NA&gt;     2019-… Greater Ma… Greater Man…     -2.46     53.6 On or n… E01004768
 ## # … with 4 more variables: lsoa_name &lt;chr&gt;, crime_type &lt;chr&gt;,
 ## #   last_outcome_category &lt;chr&gt;, context &lt;lgl&gt;</code></pre>
 <p>You can see that the values are for Longitude and for Latitude. These two numbers allow us to put this point on a map.</p>
@@ -449,17 +449,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Another column which contains information about <em>where</em> the crime happened is the aptly named <code>location</code> variable. This shows you a list of locations related to where the crimes happened. You may see a few values such as on or near XYZ street. Let’s look again at the first entry.</p>
 <div class="sourceCode" id="cb70"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb70-1"><a href="making-maps-in-r.html#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(crimes, <span class="at">n =</span> <span class="dv">1</span>)</span></code></pre></div>
 <pre><code>## # A tibble: 1 x 12
-##   crime_id month reported_by falls_within longitude latitude location lsoa_code
-##   &lt;chr&gt;    &lt;chr&gt; &lt;chr&gt;       &lt;chr&gt;            &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;    
-## 1 &lt;NA&gt;     2019… Greater Ma… Greater Man…     -2.46     53.6 On or n… E01004768
+##   crime_id month  reported_by falls_within longitude latitude location lsoa_code
+##   &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;       &lt;chr&gt;            &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;    
+## 1 &lt;NA&gt;     2019-… Greater Ma… Greater Man…     -2.46     53.6 On or n… E01004768
 ## # … with 4 more variables: lsoa_name &lt;chr&gt;, crime_type &lt;chr&gt;,
 ## #   last_outcome_category &lt;chr&gt;, context &lt;lgl&gt;</code></pre>
 <p>You can see that the value is this isn’t great, as we might struggle to identify <em>which</em> parking area… Some other ones are more useful, let’s look at the last entry for example with the <code>tail()</code> function.</p>
 <div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb72-1"><a href="making-maps-in-r.html#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tail</span>(crimes, <span class="at">n =</span> <span class="dv">1</span>)</span></code></pre></div>
 <pre><code>## # A tibble: 1 x 12
-##   crime_id month reported_by falls_within longitude latitude location lsoa_code
-##   &lt;chr&gt;    &lt;chr&gt; &lt;chr&gt;       &lt;chr&gt;            &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;    
-## 1 75e215f… 2019… Greater Ma… Greater Man…     -2.57     53.5 On or n… E01006347
+##   crime_id  month reported_by falls_within longitude latitude location lsoa_code
+##   &lt;chr&gt;     &lt;chr&gt; &lt;chr&gt;       &lt;chr&gt;            &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;    
+## 1 75e215f9… 2019… Greater Ma… Greater Man…     -2.57     53.5 On or n… E01006347
 ## # … with 4 more variables: lsoa_name &lt;chr&gt;, crime_type &lt;chr&gt;,
 ## #   last_outcome_category &lt;chr&gt;, context &lt;lgl&gt;</code></pre>
 <p>You can see that the value is . This makes our crime much easier to find, we just need to locate where is . We might have a shapefile of lines of all the roads of Manchester, and if we did, we can link the crime to that particular road, in order to map it.</p>
@@ -469,9 +469,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>What more? You may also have seen the column <code>lsao_name</code> seems to have some spatial component, Let’s have a look at the first crime again.</p>
 <div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb74-1"><a href="making-maps-in-r.html#cb74-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(crimes, <span class="at">n =</span> <span class="dv">1</span>)</span></code></pre></div>
 <pre><code>## # A tibble: 1 x 12
-##   crime_id month reported_by falls_within longitude latitude location lsoa_code
-##   &lt;chr&gt;    &lt;chr&gt; &lt;chr&gt;       &lt;chr&gt;            &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;    
-## 1 &lt;NA&gt;     2019… Greater Ma… Greater Man…     -2.46     53.6 On or n… E01004768
+##   crime_id month  reported_by falls_within longitude latitude location lsoa_code
+##   &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;       &lt;chr&gt;            &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;    
+## 1 &lt;NA&gt;     2019-… Greater Ma… Greater Man…     -2.46     53.6 On or n… E01004768
 ## # … with 4 more variables: lsoa_name &lt;chr&gt;, crime_type &lt;chr&gt;,
 ## #   last_outcome_category &lt;chr&gt;, context &lt;lgl&gt;</code></pre>
 <p>You see the value for LSOA name is - Bolton we know is a Borough of Greater Manchester, but what is the 001 for ?</p>
@@ -662,10 +662,10 @@ Contains OS data © Crown copyright [and database right] (year)”</p>
 <div class="sourceCode" id="cb94"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb94-1"><a href="making-maps-in-r.html#cb94-1" aria-hidden="true" tabindex="-1"></a><span class="fu">View</span>(manchester_lsoa)</span></code></pre></div>
 <pre><code>## Rows: 282
 ## Columns: 4
-## $ label    &lt;chr&gt; &quot;E08000003E02001062E01005066&quot;, &quot;E08000003E02001092E01005073&quot;…
-## $ name     &lt;chr&gt; &quot;Manchester 018E&quot;, &quot;Manchester 048C&quot;, &quot;Manchester 018A&quot;, &quot;Ma…
-## $ code     &lt;chr&gt; &quot;E01005066&quot;, &quot;E01005073&quot;, &quot;E01005061&quot;, &quot;E01005062&quot;, &quot;E010050…
-## $ geometry &lt;POLYGON [m]&gt; POLYGON ((384850 397432, 38..., POLYGON ((382221.1 3…</code></pre>
+## $ label    &lt;chr&gt; &quot;E08000003E02001062E01005066&quot;, &quot;E08000003E02001092E01005073&quot;,…
+## $ name     &lt;chr&gt; &quot;Manchester 018E&quot;, &quot;Manchester 048C&quot;, &quot;Manchester 018A&quot;, &quot;Man…
+## $ code     &lt;chr&gt; &quot;E01005066&quot;, &quot;E01005073&quot;, &quot;E01005061&quot;, &quot;E01005062&quot;, &quot;E0100506…
+## $ geometry &lt;POLYGON [m]&gt; POLYGON ((384850 397432, 38..., POLYGON ((382221.1 38…</code></pre>
 <p>And of course, since it’s spatial data, you can map it using the geom_sf() function, as we did with our points:</p>
 <div class="sourceCode" id="cb96"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb96-1"><a href="making-maps-in-r.html#cb96-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span> </span>
 <span id="cb96-2"><a href="making-maps-in-r.html#cb96-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> manchester_lsoa)</span></code></pre></div>

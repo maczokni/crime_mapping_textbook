@@ -248,7 +248,7 @@ geocode_result
 Ahh it contains all the information we saw earlier in the browser. How nice!
 
 
-This is great for one postcode at a time, but remember what I said about being lazy, and automating. We want the computer to do the work for us. To do this, we need to set up our query (the url) in a way that lets us give many postcodes in, and get many results out.  For that we can use the `paste0()` function and the `gsub()` function. `paste0()` can be used to paste together different bits of text, while `gsub()` sustituse certain characters (in this case spaces) for other characters (in this case +). So to get from M13 9PL to M13+9PL we use `gsub(" ", "+", "M13 9PL")`, first saying what to replace, then what to replace it with, and finally in what object (or character string). 
+This is great for one postcode at a time, but remember what I said about being lazy, and automating. We want the computer to do the work for us. To do this, we need to set up our query (the url) in a way that lets us give many postcodes in, and get many results out.  For that we can use the `paste0()` function and the `gsub()` function. `paste0()` can be used to paste together different bits of text, while `gsub()` substitutes certain characters (in this case spaces) for other characters (in this case +). So to get from M13 9PL to M13+9PL we use `gsub(" ", "+", "M13 9PL")`, first saying what to replace, then what to replace it with, and finally in what object (or character string). 
 
 
 So let's say we assign our postcode to an object called "address": 

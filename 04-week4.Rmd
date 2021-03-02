@@ -27,7 +27,7 @@ The packages we will use today are:
 - `readr`
 - `dplyr`
 - `rjson`
-- `purr`
+- `purrr`
 - `leaflet`
 - `RColorBrewer`
 - `sf`
@@ -804,7 +804,7 @@ OKAY, so some crimes fall inside some buffers, others not so much. Well, let's g
 When you have a polygon layer and a point layer - and want to know how many or which of the points fall within the bounds of each polygon, you can use this method of analysis. In computational geometry, the point-in-polygon (PIP) problem asks whether a given point in the plane lies inside, outside, or on the boundary of a polygon. As you can see, this is quite relevant to our problem, wanting to count how many crimes (points) fall within 100 meters of our licensed premises (our buffer polygons). 
 
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 crimes_per_prem <- violent_spatial %>% 
   st_join(buffer_WGS84, ., left = FALSE) %>% 
   count(PREMISESNAME)

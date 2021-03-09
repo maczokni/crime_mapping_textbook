@@ -149,7 +149,7 @@ When you have typed this, you will have typed your first bit of code. Yet nothin
 You can do this by highlighting the code you wish to run, and clicking on 'run' in the top right hand corner: 
 
 
-```{r, out.width = "400px", echo = FALSE}
+```{r, out.width = "400px"}
 
 knitr::include_graphics('img/run_hello_world.gif')
 
@@ -187,7 +187,7 @@ For example, you may choose a darker theme like 'tomorrow night bright'.
 ![](img/appearance_choose_tomorrow_night_bright.png)
 
 ![](img/consoleresults.png)
-As indicated above, the window in the bottom left corner is the main **console**.You will see that the words "I hate computers" appear printed there.  If rather than using R Studio you were working directly from R, that's all you would get: the main console where you can write code interactively (rather than all the different windows you see in R Studio). You can write your code directly in the main console and execute it line by line in an interactive fashion. However, we will be running code from scripts, so that you get used to the idea of properly documenting all the steps you take,
+As indicated above, the window in the bottom left corner is the main **console**.You will see that the words "I love maps" appear printed there.  If rather than using R Studio you were working directly from R, that's all you would get: the main console where you can write code interactively (rather than all the different windows you see in R Studio). You can write your code directly in the main console and execute it line by line in an interactive fashion. However, we will be running code from scripts, so that you get used to the idea of properly documenting all the steps you take,
 
 
 ### Functions
@@ -263,7 +263,7 @@ log(100)
 
 
 
- Okay, now you know these, the answer to Activity 5 was...
+ Okay, now you know these, the answer to Activity 6 was...
  
  
  
@@ -296,7 +296,7 @@ Let us create an object called 'plates'. To do this, you go to your script, and 
 
 But if you run this code, you will get an error. Let's see: 
 
-```{r, out.width = "400px", echo = FALSE}
+```{r, out.width = "400px"}
 
 knitr::include_graphics('img/error_no_plates.gif')
 
@@ -319,7 +319,7 @@ plates <- "yellow plate"
 
 Now if we run this, we will see no error message, but instead, we will see the `plates` object appear in our *environment pane*: 
 
-```{r, out.width = "400px", echo = FALSE}
+```{r, out.width = "400px"}
 
 knitr::include_graphics('img/assign_plates.gif')
 
@@ -571,6 +571,8 @@ On *masking*:  sometimes packages introduce functions that have the same name as
 How do you find out what a package does? You look at the relevant documentation. In the Packages window scroll down until you find the new package we installed listed. Here you will see the name of the package (dplyr), a brief description of what the program is about, and the version you have installed (an indication that a package is a good package is that it has gone through several versions, that means that someone is making sure the package gets regular updates and improvements). 
 
 Click in the name *dplyr*. You will see that R Studio has now brought you to the Help tab. Here is where you find the help files for this package, including all the available documentation.
+
+Every beginner in R will find these help files a bit confusing. But after a while, their format and structure will begin to make sense to you. Click where it says *User guides, package vignettes, and other documentation*. Documentation in R has become much better since people started to write **vignettes** for their packages. They are little tutorials that explain with examples what each package does. Click in the *cowsay::cowsay_tutorial* that you see listed here (the html link). What you will find there is an html file that gives you a detailed tutorial on this package. You don't need to read it now, but remember that this is one way to find help when using R. You will learn to love vignettes.
 
 
 ## Exploring data

@@ -297,7 +297,7 @@ Now you will need to practice navigating the Infuse system to generate a data ta
 
 Once you have those fields click next to get the data and download the file. Unzip them and see you have your .csv file. Save this into your data subfolder in your project directory. Use `read_csv()` function from the `readr` package to import this data.
 
-```{r, message=FALSE, warning=FALSE, echo=FALSE}
+```{r, message=FALSE, warnings=FALSE, echo=FALSE}
 library(readr)
 census_lsoa_m <- read_csv("https://www.dropbox.com/s/e4nkqmefovlsvib/Data_AGE_APPSOCG_DAYPOP_UNIT_URESPOP.csv?dl=1")
 ```
@@ -354,21 +354,21 @@ Ok, so now we have a field that provides us with the number of crimes and two al
 
 But first we need to create new variables. For this we can use the `mutate()` function from the `dplyr` package. This is a very helpful function to create new variables in a dataframe based on transformations or mathematical operations performed in other variables within the dataframe. In this function, the first argument is the name of the data frame, and then we can pass as arguments all new variables we want to create as well as the instructions as to how we are creating those variables. 
 
-First we want to create a rate using the usual residents, since crime rates are often expressed by 100,000 inhabitants we will multiply the division of the number of crimes by the number of usual residents by 100,000.  We will store this new variables in our existing *manchester_lsoa* dataset. You can see that below then I specify the name of a new variable *crimr1* and then I tell the function I want that variable to equal (for each case) the division of the values in the variable *count* (number of crimes) by the variable *respop* (number of people residing in the area) and then we multiply the result of this division by 100,000 to obtain a rate expressed in those terms. 
+First we want to create a rate using the usual residents, since crime rates are often expressed by 100,000 inhabitants we will multiply the division of the number of crimes by the number of usual residents by 100,000. We will then create another variable, *crimr2*, using the workday population as the denominator. We will store this new variables in our existing *manchester_lsoa* dataset. You can see that below then I specify the name of a new variable *crimr1* and then I tell the function I want that variable to equal (for each case) the division of the values in the variable *count* (number of crimes) by the variable *respop* (number of people residing in the area) and then we multiply the result of this division by 100,000 to obtain a rate expressed in those terms. Then we do likewise for the alternative measure of crime.
 
 ```{r}
-manchester_crime_lsoa <- mutate(manchester_crime_lsoa, crimr1 = (count/respop)*100000)
+manchester_crime_lsoa <- mutate(manchester_crime_lsoa, crimr1 = (count/respop)*100000, crimr2 = (count/wkdpop)*100000)
 ```
 
 
-And now we have two new variables, one for crime rate with residential population as a denominator. 
+And now we have two new variables, one for crime rate with residential population as a denominator, and another with workplace population as a denominator. 
 
 
 #### Activity 5: Mapping crime rates
 
 Now that we have our variables for crime rate per population, we can use this to produce our crime maps!
 
-Let's first map crime count, next to residential population, and then the crime rate. We can do this by creating individual maps, and then using our trusty `tmap_arrange()` to put them next to one another. 
+Let's first map crime count, next to residential population, and then the crime rate. We can do this by creating two maps, and then using our trusty `tmap_arrange()` to put them next to one another. 
 
 Let's also use a different palette for each map, that is a different fill colour. To change the colours for the fill of the polygons you can use the palette argument within the `tm_fill()` function. You can explore different palettes running the following code:
 

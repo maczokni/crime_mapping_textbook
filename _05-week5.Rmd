@@ -19,6 +19,7 @@ library(cartogram)
 library(ggmap)
 library(ggplot2)
 library(dplyr)
+library(readxl)
 ```
 
 
@@ -70,12 +71,17 @@ You'll notice that there are different shapefiles there, download them all for n
 
 One way of deciding is to match each shapefile up with our data (like we did for crime in Manchester before) and checking which shapefile has the most matching district and state names with the dataset. So we'll start by downloading the dataset.
 
-There's an amazing dataset called VDSA (Village Dynamics in South Asia) which covers much of India, containing both agricultural and socio-economic information. Unfortunately, the website interface isn't great and downloading the data requires you to make a free account and download individual files for each state, which is a massive faff. So instead, I've already downloaded the crop production data for one state, Bihar, and you can download it here: 
+There's an amazing dataset called VDSA (Village Dynamics in South Asia) which covers much of India, containing both agricultural and socio-economic information. Unfortunately, the website interface isn't great and downloading the data requires you to make a free account and download individual files for each state, which is a massive faff. So instead, I've already downloaded the crop production data for one state, Bihar, and you can download it here: https://www.dropbox.com/sh/mdwuut7mtqafnyt/AAAiqzYm9eK2A8KAwlU4F93-a?dl=0
 
 Great, now let's read that data into R and have a look!
 
+Just like we read '.csv' files with read.csv, we can read '.xlsx' (Excel) files with read_xlsx from the 'readxl' package:
 
 
+```{r, eval=FALSE}
+yield_data <- read_xlsx('data/Bihar.xlsx')
+
+```
 
 
 Then we will bring back data about homicide across US counties. Some of you that have taken previous classes with us may be familiar with this dataset. The dataset was used as the basis for [this study](https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1745-9125.2001.tb00933.x). We will be using it also later on in the semester. It contains data on homicide counts and rates for various decades across the US as well as information on structural factors often thought to be associated with violence.

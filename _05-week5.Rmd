@@ -5,9 +5,7 @@
 
 ## Introduction
 
-# Quick first change test
-
-In this session we are going to discuss some additional features around thematic maps we did not cover in week 3. We are going to discuss how to address some of the problems we confront when we are trying to use use choropleth maps, as well as some alternatives to point based maps. We will also introduce the modifieable area unit problem.
+In this session we are going to discuss some additional features around thematic maps we did not cover in week 3. We are going to discuss how to address some of the problems we confront when we are trying to use use choropleth maps, as well as some alternatives to point based maps. We will also introduce the modifiable area unit problem.
 
 Before we do any of this, we need to load the libraries we will use today:
 
@@ -61,6 +59,25 @@ As you can see if you read through the comments there, this bit of code checks e
 
 ### Data
 
+This week, we're going to leave behind the neat and easy-to-access data typical of 'western' countries. Instead, we're going to look at some data from India! We'll be using two datasets:
+
+* A shapefile of India (including boundaries of 'states' and 'districts')
+* District-level data on households and crop yields
+
+First of all, a number of the big universities in the US have repositories (online collections) of GIS data (like shapefiles). There are a few of them that have India shapefiles (Harvard https://gis2.harvard.edu/resources/data/india-gis-data, Stanford https://geodata.mit.edu/?f%5Bdc_format_s%5D%5B%5D=Shapefile&f%5Bdct_provenance_s%5D%5B%5D=Stanford&per_page=50&q=india) but you need to request access to them for research purposes. If you're doing your own research and need the shapefile of a country, it's worth looking on these repositories for it. You can then email them to request access and usually they'll give access no problem if you're using it for research. But for now, I've already requested access and downloaded the India shapefiles, but please note that these shapefiles are for the purposes of this workshop only. Here's the link to download the shapefiles: https://www.dropbox.com/sh/6b1wiz3k7v1nl80/AABjYJdC0ETcCNVdbOqbcZxPa?dl=0. 
+
+You'll notice that there are different shapefiles there, download them all for now. This is a good example of the problems you encounter when researching countries with less infrastructure. The UK has these 'LSOA's we covered previously, which are areas that don't change over time. In India, districts (like counties) are merged and split quite frequently and entire states (collections of districts) can merge and split too! So each shapefile we've downloaded will have different boundaries and even different names for states and districts - so which one do we use?!
+
+One way of deciding is to match each shapefile up with our data (like we did for crime in Manchester before) and checking which shapefile has the most matching district and state names with the dataset. So we'll start by downloading the dataset.
+
+There's an amazing dataset called VDSA (Village Dynamics in South Asia) which covers much of India, containing both agricultural and socio-economic information. Unfortunately, the website interface isn't great and downloading the data requires you to make a free account and download individual files for each state, which is a massive faff. So instead, I've already downloaded the crop production data for one state, Bihar, and you can download it here: 
+
+Great, now let's read that data into R and have a look!
+
+
+
+
+
 Then we will bring back data about homicide across US counties. Some of you that have taken previous classes with us may be familiar with this dataset. The dataset was used as the basis for [this study](https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1745-9125.2001.tb00933.x). We will be using it also later on in the semester. It contains data on homicide counts and rates for various decades across the US as well as information on structural factors often thought to be associated with violence.
 
 ```{r, eval=FALSE}
@@ -81,7 +98,7 @@ ncovr_sf <- st_read(shp_name)
 
 ## Mapping rates, learning from disease mapping
 
-In previous sessions we discussed how to map rates. It seems a fairly straightoforward issue, you calculate a rate by dividing your numerator (eg: number of crimes) by your demoninator (eg: daytime population). You get your variable with the relevant rate and you map it using a choropleth map. However, things are not always that simple. Rates are funny animals. Let's look at the ncvor data. 
+In previous sessions we discussed how to map rates. It seems a fairly straightforward issue, you calculate a rate by dividing your numerator (eg: number of crimes) by your denominator (eg: daytime population). You get your variable with the relevant rate and you map it using a choropleth map. However, things are not always that simple. Rates are funny animals. Let's look at the ncvor data. 
 
 ```{r}
 summary(ncovr_sf$HR60)

@@ -93,24 +93,6 @@ yield_data <- yield_data %>%
 
 ```
 
-Then we will bring back data about homicide across US counties. Some of you that have taken previous classes with us may be familiar with this dataset. The dataset was used as the basis for [this study](https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1745-9125.2001.tb00933.x). We will be using it also later on in the semester. It contains data on homicide counts and rates for various decades across the US as well as information on structural factors often thought to be associated with violence.
-
-```{r, eval=FALSE}
-##R in Windows have some problems with https addresses, that's why we need to do this first:
-urlfile<-'https://s3.amazonaws.com/geoda/data/ncovr.zip'
-download.file(urlfile, 'ncovr.zip')
-#Let's unzip and create a new directory (ncovr) in our working directory to place the files
-unzip('ncovr.zip', exdir = 'ncovr')
-
-```
-
-Remember that to treat the data as spatial we need to load the shapefile. With that we can create a spatial object:
-
-```{r}
-shp_name <- "ncovr/ncovr/NAT.shp"
-ncovr_sf <- st_read(shp_name)
-```
-
 ## Mapping rates, learning from disease mapping
 
 In previous sessions we discussed how to map rates. It seems a fairly straightforward issue, you calculate a rate by dividing your numerator (eg: number of crimes) by your denominator (eg: daytime population). You get your variable with the relevant rate and you map it using a choropleth map. However, things are not always that simple. Rates are funny animals. Let's look at the ncvor data. 

@@ -67,6 +67,9 @@ This week, we're going to leave behind the neat and easy-to-access data typical 
 
 First of all, a number of the big universities in the US have repositories (online collections) of GIS data (like shapefiles). There are a few of them that have India shapefiles (Harvard https://gis2.harvard.edu/resources/data/india-gis-data, Stanford https://geodata.mit.edu/?f%5Bdc_format_s%5D%5B%5D=Shapefile&f%5Bdct_provenance_s%5D%5B%5D=Stanford&per_page=50&q=india) but you need to request access to them for research purposes. If you're doing your own research and need the shapefile of a country, it's worth looking on these repositories for it. You can then email them to request access and usually they'll give access no problem if you're using it for research. But for now, I've already requested access and downloaded the India shapefiles, but please note that these shapefiles are for the purposes of this workshop only. Here's the link to download the shapefiles: https://www.dropbox.com/sh/6b1wiz3k7v1nl80/AABjYJdC0ETcCNVdbOqbcZxPa?dl=0. 
 
+TIP: Use this button to select all files at once, then just hit 'Download'!
+![](img/select_all.png)
+
 You'll notice that there are different shapefiles there, download them all for now. This is a good example of the problems you encounter when researching countries with less infrastructure. The UK has these 'LSOA's we covered previously, which are areas that don't change over time. In India, districts (like counties) are merged and split quite frequently and entire states (collections of districts) can merge and split too! So each shapefile we've downloaded will have different boundaries and even different names for states and districts - so which one do we use?!
 
 One way of deciding is to match each shapefile up with our data (like we did for crime in Manchester before) and checking which shapefile has the most matching district and state names with the dataset. So we'll start by downloading the dataset.

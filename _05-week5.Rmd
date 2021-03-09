@@ -81,8 +81,17 @@ Just like we read '.csv' files with read.csv, we can read '.xlsx' (Excel) files 
 ```{r, eval=FALSE}
 yield_data <- read_xlsx('data/Bihar.xlsx')
 
+glimpse(yield_data)
+
 ```
 
+After looking at the yield data, you can see it's quite massive! Each column represents the production in weight (_TQ columns) and the area farmed (_TA columns) for each crop, per district, per year. That's too much information for us! We just want rice production and area, so we'll use the 'select' function to just pick the columns we want:
+
+```{r, eval=FALSE}
+yield_data <- yield_data %>%
+  dplyr::select(STNAME, DISTNAME, YEAR, RICE_TA, RICE_TQ)
+
+```
 
 Then we will bring back data about homicide across US counties. Some of you that have taken previous classes with us may be familiar with this dataset. The dataset was used as the basis for [this study](https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1745-9125.2001.tb00933.x). We will be using it also later on in the semester. It contains data on homicide counts and rates for various decades across the US as well as information on structural factors often thought to be associated with violence.
 

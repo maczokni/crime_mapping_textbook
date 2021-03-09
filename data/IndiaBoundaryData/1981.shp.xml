@@ -1,0 +1,3 @@
+<?xml version="1.0"?>
+<!--<!DOCTYPE metadata SYSTEM "http://www.esri.com/metadata/esriprof80.dtd">-->
+<metadata xml:lang="en"><Esri><MetaID>{71C6CF1C-9AC1-4B07-A67B-71CCEF534AB8}</MetaID><CreaDate>20150326</CreaDate><CreaTime>12142800</CreaTime><SyncOnce>TRUE</SyncOnce><DataProperties><lineage><Process ToolSource="C:\Program Files\ArcGIS\ArcToolbox\Toolboxes\Data Management Tools.tbx\DeleteField" Date="20150326" Time="121428">DeleteField "Z:\FOR DATA SHARING\SASWATI\1951_2001\MAP DATA\1981.shp" DIST_CODE;OID_;C_CODE81_1;NAME1;STATE_UT1;DIST_CODE1 "Z:\FOR DATA SHARING\SASWATI\1951_2001\MAP DATA\1981.shp"</Process></lineage></DataProperties></Esri></metadata>

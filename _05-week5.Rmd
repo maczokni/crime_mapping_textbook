@@ -20,6 +20,7 @@ library(ggmap)
 library(ggplot2)
 library(dplyr)
 library(readxl)
+library(janitor)
 ```
 
 
@@ -70,11 +71,11 @@ First of all, a number of the big universities in the US have repositories (onli
 TIP: Use this button to select all files at once, then just hit 'Download'!
 ![](img/select_all.png)
 
-You'll notice that there are different shapefiles there, download them all for now. This is a good example of the problems you encounter when researching countries with less infrastructure. The UK has these 'LSOA's we covered previously, which are areas that don't change over time. In India, districts (like counties) are merged and split quite frequently and entire states (collections of districts) can merge and split too! So each shapefile we've downloaded will have different boundaries and even different names for states and districts - so which one do we use?!
+You'll notice that there are different shapefiles there, download them all for now. This is a good example of the problems you encounter when researching countries with less infrastructure. The UK has these 'LSOA's we covered previously, which are areas that don't change over time. In India, districts (like counties) are merged and split quite frequently and entire states (collections of districts) can merge and split too! So each shapefile we've downloaded will have different boundaries and different names for districts - so which one do we use?!
 
 One way of deciding is to match each shapefile up with our data (like we did for crime in Manchester before) and checking which shapefile has the most matching district and state names with the dataset. So we'll start by downloading the dataset.
 
-There's an amazing dataset called VDSA (Village Dynamics in South Asia) which covers much of India, containing both agricultural and socio-economic information. Unfortunately, the website interface isn't great and downloading the data requires you to make a free account and download individual files for each state, which is a massive faff. So instead, I've already downloaded the crop production data for one state, Bihar, and you can download it here: https://www.dropbox.com/sh/mdwuut7mtqafnyt/AAAiqzYm9eK2A8KAwlU4F93-a?dl=0
+There's an amazing dataset called VDSA (Village Dynamics in South Asia) which covers much of India, containing both agricultural and socio-economic information. Unfortunately, the website interface isn't great and downloading the data requires you to make a free account and download individual files for each state, which is a massive faff. So instead, I've already downloaded the crop production data for just one state, **Bihar**, and you can download it here: https://www.dropbox.com/sh/mdwuut7mtqafnyt/AAAiqzYm9eK2A8KAwlU4F93-a?dl=0
 
 Great, now let's read that data into R and have a look!
 
@@ -88,7 +89,7 @@ glimpse(yield_data)
 
 ```
 
-After looking at the yield data, you can see it's quite massive! Each column represents the production in weight (_TQ columns) and the area farmed (_TA columns) for each crop, per district, per year. That's too much information for us! We just want rice production and area, so we'll use the 'select' function to just pick the columns we want:
+After looking at the yield data, you can see it's quite massive! Each column represents the production in weight ('_TQ' columns) and the area farmed ('_TA' columns) for each crop, per district, per year. That's too much information for us! We just want rice production and area, so we'll use the 'select' function to just pick the columns we want: names of states and districts, the year, and the rice information.
 
 ```{r, eval=FALSE}
 yield_data <- yield_data %>%
@@ -96,7 +97,70 @@ yield_data <- yield_data %>%
 
 ```
 
-## Mapping rates, learning from disease mapping
+### Comparing shapefiles
+
+Now we've read in our rice yield data, we can test which shapefile will work best with the district names in our yield data. For this, we'll use a basic 'for' loop which will test each shapefile (1951/61/71/81/91/2001) individually. This will show us which shapefile has the most matching district names (across India) with the yield data. Don't worry about loops in R, they're something you can learn if you're interested but otherwise you can copy + paste the code below - so long as you understand what it's doing overall. Chris' advanced R will cover loops this week. N.B. You may need to change 'shapefile_location <- ' to tell R where you have saved your shapefiles!
+
+```{r, eval=FALSE}
+# Make a list of years between 1951 and 2001 at intervals every 10 years and store them as
+# characters instead of numbers (so we can use them as names of files in the loop)
+shapefile_years <- lapply(seq(1951, 2001, 10), as.character)
+
+# Get a list of district names in the yield data to compare to each shapefile
+yield_dist_names <- make_clean_names(unique(yield_data$DISTNAME))
+
+# Prepare an output variable
+district_match_results <- tibble(shapefile_year = character(),
+                                 district_match_percent = numeric())
+
+# Loop through each item in the 'shapefile_years' list and call each item 'each_year'
+for (each_year in shapefile_years){
+  
+  # Change this if you need to, give the path to the directory with your shapefiles in
+  shapefile_location <- 'data/IndiaBoundaryData/'
+  
+  # Read in each shapefile
+  each_shapefile <- st_read(paste0(shapefile_location, each_year, '.shp'))
+  
+  # Get lists of each shapefile's district names
+  shpfile_dist_names <- make_clean_names(unique(each_shapefile$NAME))
+  
+  # Get the percentage of matching district names between yield data and each shpfile
+  dist_match <- round(length(dplyr::intersect(yield_dist_names, shpfile_dist_names))/length(yield_dist_names)*100, 0)
+  
+  # Store results in output variable
+  district_match_results <- bind_rows(district_match_results, tibble(shapefile_year = each_year, 
+                                                                     district_match_percent = dist_match))
+  
+}
+
+```
+
+And now to check the output to see which shapefile has the highest proportion of district name matches:
+
+```{r, eval=FALSE}
+
+print(district_match_results)
+
+# And plot it with ggplot
+ggplot(district_match_results) +
+  geom_line(aes(x = shapefile_year, y = district_match_percent, group = 1))
+
+```
+
+So, before continuing you should look at the table and graph you've just made and decide which shapefile we should use now.
+
+
+### Joining datasets
+One last thing before we can continue mapping - joining our yield and shapefile datasets together! Some name cleaning is required first, to make sure they match up.
+
+```{r, eval=FALSE}
+
+
+
+```
+
+## Mapping rates, learning from yield mapping
 
 In previous sessions we discussed how to map rates. It seems a fairly straightforward issue, you calculate a rate by dividing your numerator (eg: number of crimes) by your denominator (eg: daytime population). You get your variable with the relevant rate and you map it using a choropleth map. However, things are not always that simple. Rates are funny animals. Let's look at the ncvor data. 
 

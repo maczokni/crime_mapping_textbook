@@ -152,23 +152,45 @@ So, before continuing you should look at the table and graph you've just made an
 
 
 ### Joining datasets
-One last thing before we can continue mapping - joining our yield and shapefile datasets together! Some name cleaning is required first, to make sure they match up.
+One last thing before we can continue mapping - joining our yield and shapefile datasets together! Some name cleaning is required first, to make sure they match up. Hopefully you found before that the 1971 shapefile has the highest percentage of district name matches with our yield data - so we'll read that one in now:
 
 ```{r, eval=FALSE}
+# Read in the 1971 shapefile
+shapefile <- st_read('data/IndiaBoundaryData/1971.shp')
 
+# Filter the yield data to only include 1971 info
+yield_1971 <- filter(yield_data, YEAR == '1971')
+
+# Clean the shapefile state and district names
+shapefile$NAME <- make_clean_names(shapefile$NAME)
+shapefile$STATE_UT <- tolower(shapefile$STATE_UT)
+
+# Clean the yield data's state and district names in the same way
+yield_1971$DISTNAME <- make_clean_names(yield_1971$DISTNAME)
+yield_1971$STNAME <- tolower(yield_1971$STNAME)
+
+# Join the two datasets together, the 'by' argument in right_join describes which columns
+# are equivalent in each dataset
+district_yields <- shapefile %>%
+  right_join(yield_1971, by = c('NAME' = 'DISTNAME', 'STATE_UT' = 'STNAME')) %>%
+  select(NAME, STATE_UT, TOT_POP, RICE_TQ) %>% # 'select' only selects the columns we're interested in
+  mutate(rice_per_100k = RICE_TQ*1000/TOT_POP*100000) %>%
+  rename(district = NAME,
+         state = STATE_UT)
 
 
 ```
 
 ## Mapping rates, learning from yield mapping
 
-In previous sessions we discussed how to map rates. It seems a fairly straightforward issue, you calculate a rate by dividing your numerator (eg: number of crimes) by your denominator (eg: daytime population). You get your variable with the relevant rate and you map it using a choropleth map. However, things are not always that simple. Rates are funny animals. Let's look at the ncvor data. 
+In previous sessions we discussed how to map rates. It seems a fairly straightforward issue, you calculate a rate by dividing your numerator (eg: number of crimes or rice production) by your denominator (eg: population). You get your variable with the relevant rate and you map it using a choropleth map. However, things are not always that simple. Rates are funny animals. Let's look at our yield data. 
 
 ```{r}
-summary(ncovr_sf$HR60)
+summary(district_yields$rice_per_100k)
+
 ```
 
-We can see that the county with the highest homicide rate in the 1960s had a rate of 92.937 homicides per 100,000 individuals. That is very high. Just to put it into context in the UK is about 0.92. Where is that place? I can tell you is a place call Borden. Check it out:
+We can see that the district with the highest rice production rate in 1971 had a rate of 48,309 tonnes of rice per 100,000 individuals. That is very high. Just to put it into context in the UK is about 0.92. Where is that place? I can tell you is a place call Borden. Check it out:
 
 ```{r}
 borden <- subset(ncovr_sf, NAME == "Borden")

@@ -144,7 +144,7 @@ print(district_match_results)
 
 # And plot it with ggplot
 ggplot(district_match_results) +
-  geom_line(aes(x = shapefile_year, y = district_match_percent, group = 1))
+  geom_bar(aes(x = shapefile_year, y = district_match_percent), stat = 'identity')
 
 ```
 
@@ -158,76 +158,89 @@ One last thing before we can continue mapping - joining our yield and shapefile 
 # Read in the 1971 shapefile
 shapefile <- st_read('data/IndiaBoundaryData/1971.shp')
 
-# Filter the yield data to only include 1971 info
-yield_1971 <- filter(yield_data, YEAR == '1971')
-
 # Clean the shapefile state and district names
 shapefile$NAME <- make_clean_names(shapefile$NAME)
 shapefile$STATE_UT <- tolower(shapefile$STATE_UT)
 
 # Clean the yield data's state and district names in the same way
-yield_1971$DISTNAME <- make_clean_names(yield_1971$DISTNAME)
-yield_1971$STNAME <- tolower(yield_1971$STNAME)
+yield_data$DISTNAME <- gsub(' ', '_', tolower(yield_data$DISTNAME))
+yield_data$STNAME <- tolower(yield_data$STNAME)
 
 # Join the two datasets together, the 'by' argument in right_join describes which columns
 # are equivalent in each dataset
 district_yields <- shapefile %>%
-  right_join(yield_1971, by = c('NAME' = 'DISTNAME', 'STATE_UT' = 'STNAME')) %>%
-  select(NAME, STATE_UT, TOT_POP, RICE_TQ) %>% # 'select' only selects the columns we're interested in
-  mutate(rice_per_100k = RICE_TQ*1000/TOT_POP*100000) %>%
+  right_join(yield_data, by = c('NAME' = 'DISTNAME', 'STATE_UT' = 'STNAME')) %>%
+  select(YEAR, NAME, STATE_UT, RICE_TA, RICE_TQ) %>% # 'select' only selects the columns we're interested in
+  mutate(rice_yield = RICE_TQ/RICE_TA) %>%
   rename(district = NAME,
          state = STATE_UT)
 
-
+# Check output
+head(district_yields)
 ```
 
 ## Mapping rates, learning from yield mapping
 
-In previous sessions we discussed how to map rates. It seems a fairly straightforward issue, you calculate a rate by dividing your numerator (eg: number of crimes or rice production) by your denominator (eg: population). You get your variable with the relevant rate and you map it using a choropleth map. However, things are not always that simple. Rates are funny animals. Let's look at our yield data. 
+In previous sessions we discussed how to map rates. It seems a fairly straightforward issue, you calculate a rate by dividing your numerator (eg: number of crimes or rice production) by your denominator (eg: daytime population or farming area). You get your variable with the relevant rate and you map it using a choropleth map. However, things are not always that simple. Rates are funny animals. Let's look at our yield data, here yield means the amount of rice produced (in tonnes, 1 tonne = 1000kg) per hectare (a square of land with 100metre-long sides) of rice farmland. 
 
 ```{r}
-summary(district_yields$rice_per_100k)
+summary(district_yields$rice_yield)
 
 ```
 
 We can see that the district with the highest rice production rate in 1971 had a rate of 48,309 tonnes of rice per 100,000 individuals. That is very high. Just to put it into context in the UK is about 0.92. Where is that place? I can tell you is a place call Borden. Check it out:
 
 ```{r}
-borden <- subset(ncovr_sf, NAME == "Borden")
-borden$HR60
+# This will show us the row with the highest yield
+print(district_yields[which.max(district_yields$rice_yield),])
+
+# Subset the 'Saharsa' district data
+saharsa <- subset(district_yields, NAME == "saharsa")
 
 ```
 
-[Borden county](https://en.wikipedia.org/wiki/Borden_County,_Texas) in Texas. You may be thinking… “Texas Chainsaw Massacre” perhaps? No, not really. Ed Gein, who inspired the film, was based and operated in Wisconsin. Borden claim to fame is that it was named after Gail Borden, the inventor of condensed milk. So, what’s going on here? Why do we have a homicide rate in Borden that makes it look like a war zone or the setting for Midsomer Murders? Is is that it is only one of the six counties where alcohol is banned in Texas (and people are consequently going nuts?).
+[Saharsa district](https://en.wikipedia.org/wiki/Saharsa_district) in Bihar, India is known for high quality corn, much of which is exported here to the UK! But Saharsa isn't particularly known for its great rice production. So, what’s going on here? Why do we have a high production rate (yield) in Saharsa that makes it look like the rice capital of India?
 
-Check this out too:
+Well, we can see from the output above that this happened in 1971 in Saharsa, so let's map out the yields of all districts in Bihar in 1971 to investigate:
 
 ```{r}
-borden$HC60
+bihar_1971 <- filter(district_yields, YEAR == '1971')
+
+tm_shape(bihar_1971)+
+  tm_fill('rice_yield')
 ```
 
-What? A total homicide count of 1. How can a county with just one homicide have a rate that makes it look like the most dangerous place in the US?
+Saharsa is the darkly-shaded district in the top-right, it stands out massively from all other districts! Let's plot the following year, 1972, for comparison:
 
 ```{r}
-borden$PO60
+bihar_1972 <- filter(district_yields, YEAR == '1972')
+
+tm_shape(bihar_1972)+
+  tm_fill('rice_yield')
 ```
 
-Well, there were about 1076 people living there.
+Now Saharsa is in the lowest yield bracket - 0.2 to 0.4, pretty far off 5.5! Why does its yield value swing so far?
 
 ```{r}
-summary(ncovr_sf$PO60)
+print(filter(district_yields, district == 'saharsa', YEAR == '1971')$RICE_TA)
+
+area_comparison <- district_yields %>%
+  group_by(district) %>%
+  summarise(mean_area = mean(RICE_TA)) %>%
+  select(district, mean_area)
+
+print(area_comparison)
 
 ```
 
-If you contrast that with the average county in the US, that's tiny. One homicide in such a small place can end up producing a big rate. Remember that the rate is simply dividing the number of relevant events by the exposure variable (in this case population) and multiplying by a constant (in this case 100,000 since we expressed crime rates in those terms). Most times Borden is a very peaceful place:
+Although it doesn't have the smallest rice farmland area, Saharsa's rice land is pretty small. Remember that the rate is simply dividing the number of relevant events (rice production) by the exposure variable (in this case area of rice farmland). Most times Saharsa has very low yields ( < 1 tonne per hectare):
 
 ```{r}
-borden$HR70
-borden$HR80
-borden$HR90
+print(filter(district_yields, district == 'saharsa'))
+
 ```
 
-It has a homicide rate of 0 in most decades. But it only takes one homicide and, bang, it goes top of the league. So a standard map of rates is bound to be noisy. There is the instability that is introduced by virtue of having areas that may be sparsely populated and in which one single event, like in this case, will produce a very noticeable change in the rate. In fact, if you look at the counties with the highest homicide rate in the ncovr dataset you will notice all of them are places like Borden, areas that are sparsely populated, not because they are that dangerous, but because of the instability of rates.
+Saharsa's rice production is around 130 tonnes in most years. But it only takes one good year of rice growth and, bang, it goes to the top of the league. So a standard map of rates is bound to be noisy. There is the instability that is introduced by virtue of having areas that may be sparsely populated and in which one single event, like in this case a bumper crop, will produce a very noticeable change in the rate. In fact, if you look at the counties with the highest yields in the yield dataset you will notice all of them are places like Borden, areas that have small areas of rice farmland (RICE_TA). So they have high yields not because they produce massive amounts of rice, but because of the instability of rates.
 
 This is a problem that was first noted by epidemiologists doing disease mapping. But a number of other disciplines have now noted this and used some of the approaches developed by public health researchers that confronted this problem when producing maps of disease (PRO TIP: techniques and approaches used by spatial epidemiologists are very similar to those used by criminologists -in case you ever think of changing careers or need inspiration for how to solve a crime analysis problem).
 

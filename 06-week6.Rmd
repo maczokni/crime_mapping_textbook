@@ -36,13 +36,21 @@ library(leaflet)
 
 ## Getting the data
 
-We will be using the crime data from Greater Manchester police we have been using so far. Let's focus on burglary in the Fallowfield area. The code below has already been explained and used in previous sessions, so we won't go over the detail again. But rather than cut and paste automatically, try to remember what each line of code is doing.
+
+This week we will work with some slightly larger data sets than before: we will have one year's worth of police-recorded crime data for Greater Manchester Police from the police.uk website. 
+
+Within that, we will focus on burglary in the Fallowfield area. The code below has already been explained and used in previous sessions, so we won't go over the detail again. But rather than cut and paste automatically, try to remember what each line of code is doing. If you have any questions about it, do ask in the lab, remember - practice makes perfect!
 
 By the way, the police data for Manchester we have used in previous sessions correspond to only one month of the year. Here we are using a full year worth of data, so the data import will take a bit longer.
 
+We'll also be using a **geojson** shape file of wards. From this we will select Fallowfield ward specifically. 
+
+
+You can get both the geojson file of wards and the excel file of crimes from Blackboard. Save to your computer, and remember to put it in the right place for the project! Here I saved mine into the "data" subfolder.
+
 ```{r}
 #Read a geojson file with Manchester wards (remember we learned about geojson files in week 4)
-manchester_ward <- st_read("https://raw.githubusercontent.com/RUMgroup/Spatial-data-in-R/master/rumgroup/data/wards.geojson")
+manchester_ward <- st_read("data/wards.geojson")
 
 #Create a new object that only has the fallowfield ward
 df1 <- manchester_ward %>%

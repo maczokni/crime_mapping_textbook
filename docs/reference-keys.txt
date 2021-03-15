@@ -110,12 +110,12 @@ zone
 why-does-maup-matter
 what-can-we-do
 activity-7-considering-maup
-replacing-polygons-with-grid-or-hex-shapes
+transforming-polygons
 activity-8-cartograms
 references-and-further-reading
 binning
 maup
-transforming-polygons
+transforming-polygons-1
 studying-spatial-point-patterns
 what-well-do-today
 getting-the-data

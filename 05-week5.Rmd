@@ -205,7 +205,7 @@ summary(district_yields$rice_yield)
 
 ```
 
-We can see that the district with the highest rice production rate in 1971 had a rate of 55,423 tonnes of rice per 100,000 individuals. That's really high, over 500kg of rice per person! Where is that place? I can tell you is a place call Saharsa. Check it out:
+We can see that the district with the highest rice production rate in 1971 had a rate of 55,423 tonnes of rice per 100,000 individuals. That's really high, over 500kg of rice per person! Where is that place? I can tell you it's a place call Saharsa. Check it out:
 
 ```{r}
 # This will show us the row with the highest yield
@@ -216,7 +216,7 @@ saharsa <- subset(district_yields, district == "saharsa")
 
 ```
 
-[Saharsa district](https://en.wikipedia.org/wiki/Saharsa_district) in Bihar, India is known for high quality corn, much of which is exported here to the UK! But Saharsa isn't particularly known for its great rice production. So, what’s going on here? Why do we have a high production rate (yield) in Saharsa that makes it look like the rice capital of India?
+[Saharsa district](https://en.wikipedia.org/wiki/Saharsa_district) in Bihar, India is known for high quality corn, much of which is exported out here to the UK! But Saharsa isn't particularly known for its great rice production. So, what’s going on here? Why do we have a high production rate (yield) in Saharsa that makes it look like the rice capital of India?
 
 Well, we can see from the output above that this happened in 1971 in Saharsa, so let's map out the yields of all districts in Bihar in 1971 to investigate:
 
@@ -257,7 +257,7 @@ print(filter(district_yields, district == 'saharsa'))
 
 ```
 
-Saharsa's rice production is around 130 tonnes in most years. But it only takes one good year of rice growth and, bang, it goes to the top of the league. So a standard map of rates is bound to be noisy. There is the instability that is introduced by virtue of having areas that may be sparsely populated and in which one single event, like in this case a bumper crop, will produce a very noticeable change in the rate. In fact, if you look at the counties with the highest yields in the yield dataset you will notice all of them are places like Borden, areas that have small areas of rice farmland (RICE_TA). So they have high yields not because they produce massive amounts of rice, but because of the instability of rates.
+Saharsa's rice production is around 130 tonnes in most years. But it only takes one good year of rice growth and, bang, it goes to the top of the league. So a standard map of rates is bound to be noisy. There is the instability that is introduced by virtue of having areas that may be sparsely populated and in which one single event, like in this case a bumper crop, will produce a very noticeable change in the rate. In fact, if you look at the counties with the highest yields in the yield dataset you will notice all of them are places like Saharsa, areas that have small areas of rice farmland (RICE_TA). So they have high yields not because they produce massive amounts of rice, but because of the instability of rates.
 
 This is a problem that was first noted by epidemiologists doing disease mapping. But a number of other disciplines have now noted this and used some of the approaches developed by public health researchers that confronted this problem when producing maps of disease (techniques and approaches used by spatial epidemiologists are very similar to those used by criminologists -in case you ever think of changing careers or need inspiration for how to solve a crime analysis problem).
 

@@ -205,7 +205,7 @@ summary(district_yields$rice_yield)
 
 ```
 
-We can see that the district with the highest rice production rate in 1971 had a rate of 48,309 tonnes of rice per 100,000 individuals. That is very high. Just to put it into context in the UK is about 0.92. Where is that place? I can tell you is a place call Saharsa. Check it out:
+We can see that the district with the highest rice production rate in 1971 had a rate of 55,423 tonnes of rice per 100,000 individuals. That's really high, over 500kg of rice per person! Where is that place? I can tell you is a place call Saharsa. Check it out:
 
 ```{r}
 # This will show us the row with the highest yield

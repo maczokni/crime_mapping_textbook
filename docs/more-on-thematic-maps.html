@@ -24,7 +24,7 @@
 <meta name="author" content="Reka Solymosi and Juanjo Medina" />
 
 
-<meta name="date" content="2021-03-15" />
+<meta name="date" content="2021-03-16" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -562,7 +562,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb243"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb243-1"><a href="more-on-thematic-maps.html#cb243-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(district_yields<span class="sc">$</span>rice_yield)</span></code></pre></div>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ##  0.0000  0.7690  0.9935  1.0560  1.2223  5.5423</code></pre>
-<p>We can see that the district with the highest rice production rate in 1971 had a rate of 48,309 tonnes of rice per 100,000 individuals. That is very high. Just to put it into context in the UK is about 0.92. Where is that place? I can tell you is a place call Saharsa. Check it out:</p>
+<p>We can see that the district with the highest rice production rate in 1971 had a rate of 55,423 tonnes of rice per 100,000 individuals. That’s really high, over 500kg of rice per person! Where is that place? I can tell you it’s a place call Saharsa. Check it out:</p>
 <div class="sourceCode" id="cb245"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb245-1"><a href="more-on-thematic-maps.html#cb245-1" aria-hidden="true" tabindex="-1"></a><span class="co"># This will show us the row with the highest yield</span></span>
 <span id="cb245-2"><a href="more-on-thematic-maps.html#cb245-2" aria-hidden="true" tabindex="-1"></a>district_yields <span class="sc">%&gt;%</span> <span class="fu">filter</span>(rice_yield <span class="sc">==</span> <span class="fu">max</span>(rice_yield)) </span></code></pre></div>
 <pre><code>## Simple feature collection with 1 feature and 6 fields
@@ -574,7 +574,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## 1 1971  saharsa bihar  204.86  1135.4   5.542322 MULTIPOLYGON (((87.04089 26...</code></pre>
 <div class="sourceCode" id="cb247"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb247-1"><a href="more-on-thematic-maps.html#cb247-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Subset the &#39;Saharsa&#39; district data</span></span>
 <span id="cb247-2"><a href="more-on-thematic-maps.html#cb247-2" aria-hidden="true" tabindex="-1"></a>saharsa <span class="ot">&lt;-</span> <span class="fu">subset</span>(district_yields, district <span class="sc">==</span> <span class="st">&quot;saharsa&quot;</span>)</span></code></pre></div>
-<p><a href="https://en.wikipedia.org/wiki/Saharsa_district">Saharsa district</a> in Bihar, India is known for high quality corn, much of which is exported here to the UK! But Saharsa isn’t particularly known for its great rice production. So, what’s going on here? Why do we have a high production rate (yield) in Saharsa that makes it look like the rice capital of India?</p>
+<p><a href="https://en.wikipedia.org/wiki/Saharsa_district">Saharsa district</a> in Bihar, India is known for high quality corn, much of which is exported out here to the UK! But Saharsa isn’t particularly known for its great rice production. So, what’s going on here? Why do we have a high production rate (yield) in Saharsa that makes it look like the rice capital of India?</p>
 <p>Well, we can see from the output above that this happened in 1971 in Saharsa, so let’s map out the yields of all districts in Bihar in 1971 to investigate:</p>
 <div class="sourceCode" id="cb248"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb248-1"><a href="more-on-thematic-maps.html#cb248-1" aria-hidden="true" tabindex="-1"></a>bihar_1971 <span class="ot">&lt;-</span> <span class="fu">filter</span>(district_yields, YEAR <span class="sc">==</span> <span class="st">&#39;1971&#39;</span>)</span>
 <span id="cb248-2"><a href="more-on-thematic-maps.html#cb248-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -671,7 +671,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## 8  MULTIPOLYGON (((87.04089 26...
 ## 9  MULTIPOLYGON (((87.04089 26...
 ## 10 MULTIPOLYGON (((87.04089 26...</code></pre>
-<p>Saharsa’s rice production is around 130 tonnes in most years. But it only takes one good year of rice growth and, bang, it goes to the top of the league. So a standard map of rates is bound to be noisy. There is the instability that is introduced by virtue of having areas that may be sparsely populated and in which one single event, like in this case a bumper crop, will produce a very noticeable change in the rate. In fact, if you look at the counties with the highest yields in the yield dataset you will notice all of them are places like Borden, areas that have small areas of rice farmland (RICE_TA). So they have high yields not because they produce massive amounts of rice, but because of the instability of rates.</p>
+<p>Saharsa’s rice production is around 130 tonnes in most years. But it only takes one good year of rice growth and, bang, it goes to the top of the league. So a standard map of rates is bound to be noisy. There is the instability that is introduced by virtue of having areas that may be sparsely populated and in which one single event, like in this case a bumper crop, will produce a very noticeable change in the rate. In fact, if you look at the counties with the highest yields in the yield dataset you will notice all of them are places like Saharsa, areas that have small areas of rice farmland (RICE_TA). So they have high yields not because they produce massive amounts of rice, but because of the instability of rates.</p>
 <p>This is a problem that was first noted by epidemiologists doing disease mapping. But a number of other disciplines have now noted this and used some of the approaches developed by public health researchers that confronted this problem when producing maps of disease (techniques and approaches used by spatial epidemiologists are very similar to those used by criminologists -in case you ever think of changing careers or need inspiration for how to solve a crime analysis problem).</p>
 </div>
 <div id="activity-5-smoothing-as-a-way-to-address-insensitivity-to-sample-size" class="section level3" number="5.2.2">

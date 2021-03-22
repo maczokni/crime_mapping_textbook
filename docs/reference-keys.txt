@@ -119,9 +119,11 @@ transforming-polygons-1
 studying-spatial-point-patterns
 what-well-do-today
 getting-the-data
-getting-the-data-into-spatstat-the-problem-with-duplicates
-inspecting-our-data-with-spatstat
+activity-1-getting-the-data-into-spatstat-the-problem-with-duplicates
+activity-2-inspecting-our-data-with-spatstat
 density-estimates
-adding-some-context
+activity-3-density-maps
+activity-4-adding-some-context
 spatial-point-patterns-along-networks
+activity-5-spatial-point-pattern-processes-along-networks
 recap-1

@@ -102,7 +102,7 @@ ggplot() +
 
 In the point pattern analysis literature each point is often referred to as an **event** and these events can have **marks**, attributes or characteristics that are also encoded in the data. In our spatial object one of these *marks* is the type of crime (although in this case it's of little interest since we have filtered on it).
 
-## Getting the data into spatstat: the problem with duplicates
+### Activity 1: Getting the data into spatstat: the problem with duplicates
 
 So let's start using spatstat.The first thing we need to do is to transform our `sf` object into a `ppp` object which is how `spatstat` likes to store its point patterns. Unfortunately, spatstat and many other packages for analysis of spatial data precede sf, so the transformation is a bit awkard. Also before we do that, it is important to realise that a point pattern is defined as a series of events in a given area, or window, of observation. It is therefore extremely important to precisely define this window. In `spatstat` the function `owin()` is used to set the observation window. However, the standard function takes the coordinates of a rectangle or of a polygon from a matrix, and therefore it may be a bit tricky to use. Luckily the package `maptools` provides a way to transform a `SpatialPolygons` into an object of class `owin`, using the function `as.owin()`. Here are the steps: 
 
@@ -205,9 +205,9 @@ plot(jitter_bur)
 
 Notice the difference with the original plot. Can you see how the circumferences do not overlap perfectly now?
 
-## Inspecting our data with spatstat
+### Activity 2: Inspecting our data with spatstat
 
-This package supports all kind of exploratory point pattern analysis. One example of this is **quadrant counting**. One could divide the window of observation into quadrants and count the number of points into each of these quadrants. 
+This package supports all kind of exploratory point pattern analysis. One example of this is **quadrant counting**, which you learned about in the video prep for this weel. One could divide the window of observation into quadrants and count the number of points into each of these quadrants. 
 For example, if we want four quadrants along the X axis and 3 along the Y axis we could used those parameters in the `quadratcount()` function.
 Then we just use standard plotting functions from R base.
 
@@ -233,7 +233,7 @@ quadrat.test(jitter_bur, nx = 3, ny = 2)
 
 ```
 
-Observing the results we see that the p value is well below convential standards for rejection of the null hypothesis. Observing our data of burglary in Fallowfield would be extremely rare if the null hypothesis was true. We can then conclude that the burglary data is not randomly distributed in the observed space. But no cop nor criminologist would really question this. They would rarely be surprised by your findings! We do know that crime is not randomly distributed in space. 
+Observing the results we see that the p value is well below convential standards for rejection of the null hypothesis ($\alpha = 0.05$). Observing our data of burglary in Fallowfield would be extremely rare if the null hypothesis was true. We can then conclude that the burglary data is not randomly distributed in the observed space. But no cop nor criminologist would really question this. They would rarely be surprised by your findings! We do know that crime is not randomly distributed in space. 
 
 ## Density estimates
 
@@ -252,6 +252,8 @@ Essentially this method uses a statistical technique (kernel density estimation)
 
 The values that we attribute to the cells in crime mapping will typically refer to the number of crimes within the area’s unit of measurement. We don’t have the time to elaborate further on this technique now, but if you did the required reading you should have at least a notion of how this works.
 
+### Activity 3: Density maps
+
 Let's produce one of this density maps:
 
 ```{r}
@@ -264,7 +266,7 @@ The density function is estimating a kernel density estimate. Density is nothing
 
 To perform this analysis in R we need to define the **bandwidth** of the density estimation, which basically determines the area of influence of the estimation. There is no general rule to determine the correct bandwidth; generally speaking if the bandwidth is too small the estimate is too noisy, while if bandwidth is too high the estimate may miss crucial elements of the point pattern due to oversmoothing (Scott, 2009). 
 
-The key argument to pass to the density method for point patterm objects is `sigma=`, which determines the bandwidth of the kernel. In spatstat the functions `bw.diggle()`, `bw.ppl()`, and `bw.scott()` can be used to estimate the bandwidth according to difference methods. The helpfiles recommend the use of the first two. These functions run algorithms that aim to select an appropriate bandwith.
+The key argument to pass to the density method for point pattern objects is `sigma=`, which determines the bandwidth of the kernel. In spatstat the functions `bw.diggle()`, `bw.ppl()`, and `bw.scott()` can be used to estimate the bandwidth according to difference methods. The helpfiles recommend the use of the first two. These functions run algorithms that aim to select an appropriate bandwith.
 
 ```{r}
 bw.diggle(jitter_bur)
@@ -278,16 +280,16 @@ You can see the Diggle algorithm gives you the narrower bandwith. We can test ho
 
 par(mfrow=c(2,2))
 plot(density.ppp(jitter_bur, sigma = bw.diggle(jitter_bur),edge=T),
-     main = paste("h = 0.000003"))
+     main = paste("diggle"))
 
 plot(density.ppp(jitter_bur, sigma = bw.ppl(jitter_bur),edge=T),
-     main=paste("h =0.0005"))
+     main=paste("likelihood cross-validation"))
 
 plot(density.ppp(jitter_bur, sigma = bw.scott(jitter_bur)[2],edge=T),
-     main=paste("h = 0.0008"))
+     main=paste("scott 1"))
 
 plot(density.ppp(jitter_bur, sigma = bw.scott(jitter_bur)[1],edge=T),
-     main=paste("h = 0.004"))
+     main=paste("scott 2"))
 
 ```
 
@@ -324,7 +326,7 @@ When reading these maps you need to understand you are only looking at counts of
 
 There are also general considerations to keep in mind. Hot spots of crime are a simply a convenient perceptual construct. As Ned Levine (2013: 7.1) highlights *“Hot spots do not exist in reality, but are areas where there is sufficient clustering of certain activities (in this case, crime) such that they get labeled such. There is not a border around these incidents, but a gradient where people draw an imaginary line to indicate the location at which the hot spot starts.”*  Equally, there is not a unique solution to the identification of hot spots. Different techniques and algorithms will give you different answers. As Levine (2013: 7.7) emphasises: *“It would be very naive to expect that a single technique can reveal the existence of hot spots in a jurisdiction that are unequivocally clear. In most cases, analysts are not sure why there are hot spots in the first place. Until that is solved, it would be unreasonable to expect a mathematical or statistical routine to solve that problem.”* So, as with most data analysis exercises one has to try different approaches and use professional judgement to select a particular representation that may work best for a particular use. Equally, we should not reify what we produce and, instead, take the maps as a starting point for trying to understand the underlying patterns that are being revealed. Critically you want to try several different methods. You will be more persuaded a location is a hot spot if several methods for hot spot analysis point to the same location.
 
-## Adding some context
+### Activity 4: Adding some context
 
 Often it is convenient to use a basemap to provide context. In order to do that we first need to turn the image object generated by the `spatstat` package into a raster object, a more generic format for raster image used in R. Remember rasters from the first week? Now we finally get to use them a bit!
 
@@ -368,11 +370,6 @@ leaflet() %>%
     title = "Burglary map")
   
 
-
-
-
-
-
 ```
 
 And there you have it. Perhaps those familiar with Fallowfield have some guesses as to what may be going on there?
@@ -400,6 +397,8 @@ Now, look at the two maps below:
 We are representing the same spatial point pattern process in each of them. But we do have additional information in map B. We now know the street layout. The structure we observed in the map is accounted by the street layout. So what look like a non random spatial point process when we considered the full two dimensional space, now looks less random when we realise that the points can only appear alongside the linear network. 
 
 This problem is common in criminal justice applications. Crime is geocoded alongside a linear street network. Even if in physical space crime can take place along a spatial continuum, once crime is geocoded it will only be possible alongside the street network used for the geocoding process. 
+
+### Activity 5: Spatial point pattern processes along networks
 
 For exploring this kind of spatial point pattern processes along networks we need special techniques. Some researchers have developed special applications, such as [SANET](http://sanet.csis.u-tokyo.ac.jp/sub_en/manual.html). The `spatstat` package also provides some functionality for this kind of data structures.
 

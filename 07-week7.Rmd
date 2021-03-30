@@ -1,0 +1,602 @@
+---
+always_allow_html: true
+---
+
+# Global and local spatial autocorrelation
+
+This session we begin to explore the analysis of local spatial autocorrelation statistics. Spatial autocorrelation is the correlation among data values, strictly due to the relative location proximity of the objects that the data refer to. Remember in the earlier weeks when we spoke about Tobler's first law of geography - "everything is related to everything else, but near things are more related than distant things"? Spatial autocorrelation is the measure of this *correlation* between near things. If correlation is not a familiar term, there is a recommended reading for you on blackboard to refresh your memory. 
+
+
+We'll be making use of the following packages:
+
+```{r, message=FALSE, warning=FALSE}
+library(sf)
+library(readxl)
+library(janitor)
+library(tmap)
+library(dplyr)
+library(sp)
+library(spdep)
+
+```
+
+## Get data
+
+So, let's start by getting some data. We are going to take some of the data from past weeks. In getting the data ready you will have one more opportunity to practice how to read data into R but also how to perform some basic spatial checks, transformations and operations. It may seem like you have already done some of this stuff. But that's the point: to force you to practice. The more you do this stuff, the easier it will be and -trust us- eventually things will click and become second nature. First let's get the LSOA boundary data.
+
+```{r}
+shp_name <- "data/BoundaryData/england_lsoa_2011.shp"
+manchester_lsoa <- st_read(shp_name)
+
+```
+
+Now check the coordinate system.
+
+```{r}
+st_crs(manchester_lsoa)
+```
+
+There is no EPSG code assigned, but notice the datum is given for BNG. Let's address this.
+
+```{r}
+lsoa_WGS84 <- st_transform(manchester_lsoa, 4326)
+st_crs(lsoa_WGS84)
+```
+
+Now we have this WGS84 boundary, so we can plot this to make sure all looks well, and then remove the old object which we no longer need. 
+
+```{r}
+plot(st_geometry(lsoa_WGS84))
+rm(manchester_lsoa)
+```
+
+Let's add the burglary data from Greater Manchester. We have practiced this code in previous sessions so we won't go over it on detail again, but try to remember and understand what each line of code rather than blindly cut and paste. If you don't understand what each of these lines of codes is doing, raise your hand to call us over to help.
+
+```{r}
+#Read into R
+crimes <- read_xlsx("data/gmp_crimes_2021.xlsx") %>% clean_names()
+#Filter out to select burglary
+burglary <- filter(crimes, crime_type == "Burglary")
+#Transform into spatial object
+burglary_spatial = st_as_sf(burglary, coords = c("longitude", "latitude"), 
+                 crs = 4326, agr = "constant")
+#Remove redundant non spatial burglary object
+rm(burglary)
+rm(crimes)
+#Select burglaries that intersect with the Manchester city LSOA map.
+bur_mc <- st_intersects(lsoa_WGS84, burglary_spatial)
+bur_mc <- burglary_spatial[unlist(bur_mc),]
+#Check results
+plot(st_geometry(bur_mc))
+#Remove redundant objects
+rm(burglary_spatial)
+```
+
+We now have the burglaries data, let's now count how many burglaries there are within each LSOA polygon. This is a point in polygon operation that we covered in week 4 when we counted the number of violent crimes in the buffers of the licenced premises for example. If the code or the notion does not make much sense to you make sure you review the relevant session from week 4.
+
+```{r}
+#Point in polygon spatial operation (be patient this can take time)
+burglaries_per_lsoa <- bur_mc %>% 
+  st_join(lsoa_WGS84, ., left = FALSE) %>% 
+  count(code)
+#Let's rename the column with the count of burglaries (n) into something more meaningful
+burglaries_per_lsoa <- rename(burglaries_per_lsoa, burglary = n)
+#Plot with tmap
+tm_shape(burglaries_per_lsoa) + 
+  tm_fill("burglary", style = "quantile", palette = "Reds") +
+  tm_borders(alpha = 0.1) +
+  tm_layout(main.title = "Burglary counts", main.title.size = 0.7 ,
+            legend.position = c("right", "bottom"), legend.title.size = 0.8)
+```
+
+Do you see any patterns? Are burglaries randomly spread around the map? Or would you say that areas that are closer to each other tend to be more alike? Is there evidence of clustering? Do burglaries seem to appear in certain pockets of the map? 
+
+
+In this session we are going to discuss ways in which you can quantify the answer to this question. We will discuss measures of **global spatial autocorrelation**, which essentially aim to answer the degree to which areas that are near each other tend to be more alike. We say global because we are interested in the degree of clustering not on the location of the clusters. Later we will also cover techniques to identify local clusters of autocorrelation, but for now we will focus in quantifying whether areas are (on average) alike their neighbours.
+
+
+## What is a neighbour?
+
+Previously I asked whether areas are alike their neighbours or to areas that are close. But what is a neighbour? Or what do we mean by close? How can one define a set of neighbours for each area? If we want to know if what we measure in a particular area is similar to what happens on its neighbouring areas, we need to establish what we mean by a neighbour. 
+
+There are various ways of defining a neighbour. We can say that two areas are neighbours if they share boundaries, if they are next to each other. In this case we talk of neighbours by **contiguity**. By contiguous you can, at the same time, mean all areas that share common boundaries (what we call contiguity using the **rook** criteria, like in chess) or areas that share common boundaries and common *corners*, that is, that have any point in common (and we call this contiguity using the **queen** criteria). 
+
+When defining neighbours by contiguity we may also specify the *order* of contiguity. **First order contiguity** means that we are focusing on areas immediately contiguous. **Second order** means that we consider neighbours only those areas that are immediately contiguous to our first order neighbours (only the yellow areas in the figure below) and you could go on and on. Look at the graphic below for clarification:
+
+![Figure 1](img/neighbours.jpg)
+
+[Source](https://www.slideshare.net/CoreySparks/spatial-statistics-presentation-texas-am-census-rdc) 
+
+Alternatively we may define neighbours **by distance**. You can consider neighbours those areas that distant-wise are close to each other (regardless of whether boundaries are shared). In other words, areas will be defined as neighbours if they are within a specified radius.
+
+In sum, adjacency is an important concept in some spatial analysis. In some cases objects are considered adjacent when they “touch”, e.g. neighbouring countries. Contiguity measures tend to be more common when studying areas. It can also be based on distance. This is the most common approach when analysing point data, but can also be relevant when studying areas.
+
+
+## Putting 'neighbourness' in our analysis - constructing a spatial weight matrix
+
+You will come across the term **spatial weight matrix** at some point or, using mathematical notation, $W$. Essentially the spatial weight matrix is a $n$ by $n$ matrix with ones and zeroes (in the case of contiguity-based definitions (v.s. distance-based)) identifying if any two observations are neighbours or not (1 or 0). You can think of the spatial weight matrix as a new data table that we are constructing with our definition of neighbours (whether that be rook or queen definition).
+
+How can we build such a matrix? To illustrate, let's focus on Manchester's City Centre. Calculating a spatial weights matrix is a computationally intensive process, which means it takes a long time (especially in older laptops...!). The larger area you have (which will have more LSOAs) the longer this will take.
+
+
+### Activity 1: Burglaries in Manchester City Centre ward
+
+We will use familiar code to clip the spatial object with the counts of burglaries to only those that intersect with the City Centre ward. Again, we have covered this code elsewhere, so we won't explain here in detail. But don't just cut and paste, if there is anything in this code you don't fully understand you are expected to ask us.
+
+```{r}
+#Read a geojson file with Manchester wards
+manchester_ward <- st_read("data/wards.geojson")
+#Create a new object that only has the city centre ward
+df1 <- manchester_ward %>%
+  filter(wd16nm == "City Centre")
+#Change coordinate systems
+cc_ward <- st_transform(df1, 4326)
+#Check if they match those of the imd_gm object
+st_crs(cc_ward) == st_crs(burglaries_per_lsoa)
+#Get rid of objects we no longer need
+rm(manchester_ward)
+rm(df1)
+#Intersect
+cc_intersects <- st_intersects(cc_ward, burglaries_per_lsoa)
+cc_burglary <- burglaries_per_lsoa[unlist(cc_intersects),]
+#Plot with tmap
+tmap_mode("view")
+tm_shape(cc_burglary) + 
+  tm_fill("burglary", style = "quantile", palette = "Reds", id="code") +
+  tm_borders() +
+  tm_layout(main.title = "Burglary counts", main.title.size = 0.7 ,
+            legend.position = c("right", "top"), legend.title.size = 0.8)
+
+```
+
+So now we have a new spatial object `cc_burglary` with the 23 LSOA units that compose the City Centre Ward of Manchester. By focusing in a smaller subset of areas we can understand perhaps a bit better what comes next. But again we carry on. Do you perceive here some degree of spatial autocorrelation?
+
+
+### Activity 2: Manually explore neighbours
+
+The id argument in the tm_fill ensures that when you click over any of the areas you get not only the count of burglaries in that LSOA (the quantity we are mapping) gets displayed within a bubble, but you also get to see the code that identifies that LSOA.
+
+Move your cursor over the LSOA covering the West of Beswick (E01033688). You will see this area had 34 burglaries in 2019. Using the rook criteria identify the first order neighbors of this LSOA. List their identifiers. Are things different if we use the queen criteria? If so, how does it change? Think and think hard about what the lecture by Luc Anseling discussed. Have you identified *all* the neighbours of this area? (there are multiple ways of answering this question, just make sure you reason your answer).
+
+## Creating a list of neighbours
+
+It would be very, very tedious having to identify the neighbours of all the areas in our study area by hand, in the way we have done aboce in Activity 2. That's why we love computers. We can automate tedious work so that they do it and we have more time to do fun stuff. We can use code to get the computer to establish what areas are next to each other (if we are using a contiguity based definition of being a neighbour).
+
+
+### Activity 3: Creating a neighbour list
+
+To calculate our neighbours, we are first going to turn our `sf` object into spatial (`sp`) objects, so we can make use of the functions from the `sp` package that allow us to create a list of neighbours.
+
+```{r}
+#We coerce the sf object into a new sp object that we are calling bur_ccsp (remember names are arbitrary)
+bur_ccsp <- as(cc_burglary, "Spatial")
+
+```
+
+Let's also change the code variable to be a character vector (rather than a factor) as we will need it to be in this format later on. We do this using the `as.character()` function. 
+
+```{r}
+cc_burglary$lsoa_code <- as.character(cc_burglary$code)
+```
+
+
+In order to identify neighbours we will use the `poly2nb()` function from the `spdep` package that we loaded at the beginning of our session. The `spdep` package provides basic functions for building neighbour lists and spatial weights, tests for spatial autocorrelation for areal data like Moran's I (more on this below), and functions for fitting spatial regression models. 
+
+
+This function builds a neighbours list based on regions with contiguous boundaries. If you look at the documentation you will see that you can pass a "queen" argument that takes TRUE or FALSE as options. If you do not specify this argument the default is set to `TRUE`. That is, if you don't specify `queen = FALSE` this function will return a list of first order neighbours using the Queen criteria. If `TRUE`, a single shared boundary point meets the contiguity condition. 
+
+```{r}
+
+w <- poly2nb(bur_ccsp, row.names=bur_ccsp$lsoa_code)
+class(w)
+```
+
+This has created an object of class `nb` - which is a neighbour list object. We can get some idea of what's there if we ask for a summary.
+
+```{r}
+summary(w)
+```
+
+This is basically telling us that using this criteria each LSOA polygon has an average of 4.3 neighbours (when we just focus on the city centre) and that all areas have some neighbours (there is no islands). The link number distribution gives you the number of links (neighbours) per area. So here we have 3 polygons with 2 neighbours, 3 with 3, 7 with 4, and so on. The summary function here also identifies the areas sitting at both extreme of the distribution.
+
+For more details we can look at the structure of w.
+
+```{r}
+str(w)
+```
+
+We can graphically represent the links using the following code:
+
+```{r}
+#We first plot the boundaries
+plot(bur_ccsp, col='gray', border='blue', lwd=2)
+#Then we use the coordinates function to obtain the coordinates of the polygon centroids
+xy <- coordinates(bur_ccsp)
+#Then we draw lines between the polygons centroids for neighbours that are listed as linked in w
+plot(w, xy, col='red', lwd=2, add=TRUE)
+```
+
+## Generating the weight matrix
+
+From this neighbourhood list we can specify our weight matrix. 
+
+### Activity 4: Building a spatial weights matrix
+
+We can transform our neighbourhood list object `w` into a spatial weights matrix. A spatial weights matrix reflects the intensity of the geographic relationship between observations. For this we use the `spdep` function `nb2mat()`.
+
+```{r}
+wm <- nb2mat(w, style='B')
+wm
+```
+
+
+Starting from our neighbours list (`w`), in which regions are either listed as neighbours or are absent (thus not in the set of neighbours for some definition), the function creates an $n$ by $n$ weights matrix (where $n$ is the number of neighbourhoods here) with values given by the coding scheme style chosen (specified with the `style=` parameter in the `nb2mat()` function. Here we specify this value as `B` which results in basic binary coding. That means that this matrix has values of 0 or 1 indicating whether the elements listed in the rows are adjacent (using our definition, which in this case was the Queen criteria) with each other. 
+
+
+The diagonal is full of zeroes. This is because we exclude "self-influence" and specify that an area cannot be a neighbour of itself (formally $w_{ii} = 0$ for all $i = 1,...,n$). Then, for each other cell, the matrix contains the "spatial influence" of unit $j$ on unit $i$. 
+
+
+For example, the first column there is the first LSOA in our neighbour list object (`w`). Look back to when we printed the list of neighbours with the `str(w)` function, just above. You can see, for the first like the output was: ` $ : int [1:4] 2 6 11 22`. So we see, this first LSOA has 4 neighbours, and these are the 2nd, 6th, 11th, and 22nd LSOAs. Sure enough, if you look across this first row in our weights matrix (`wm`), you will see that every value is a `0` except for four `1`s, one at the 2nd column, one in the 6th, one in the 11th, and one in the 22nd. Here the `1` is telling us that yes, this is a neighbour (while `0`s tell us no, these are not neighbours), as we used the binary coding scheme (`style = 'B'`). 
+
+
+When our spatial weights matrix looks like this, it is *symmetrical*. That is the influence of one neighbour on the other is the same as it's influence on that neighbourhood - if they neighbour, their influence is 1, if they do not, it is 0. 
+
+
+
+### Activity 5: Row standardised spatial weights matrix
+
+
+So with  binary coding scheme, we get a spatial influence of 1 if the LSOA is a neighbour, and 0 if it is not a neighbour. But we can also get more informative than that. 
+
+
+In many computations we will see that the matrix is **row standardised**. We can obtain a row standardise matrix changing the `style=`  parameter to `style='W'`: 
+
+```{r}
+wm_rs <- nb2mat(w, style='W')
+wm_rs
+```
+
+Row standardisation of a matrix ensure that the sum of the values across each row add up to 1. So, for example, if you have four neighbours and that has to add up to 4, you need to divide 1 by 4, which gives you 0.25. So if we look back at our first row there, you can see in the 2nd, 6th, 11th, and 22nd column now a 0.25 instead of the 1 with the binary coding, representing the spatial influence for each of the neighbours.
+
+Row standardisation ensures that all weights are between 0 and 1. This facilities the interpretation of operation with the weights matrix as an averaging of neighboring values, and allows for the spatial parameter used in our analyses to be comparable between models.
+
+In this case our spatial weights matrix is *not symmetrical*. The spatial influence of one neighbourhood on the other depends on how many other neighbours it has. So for example, while the influence on LSOA 1 from LSOA 2 is 0.25 (since LSOA 1 has 4 neighbours), the influence of LSOA 1 on LSOA 2 is only 0.20, since LSOA 2 has 5 neighbours.
+
+
+### Activity 6: Spatial weights list
+
+Besides a spatial weights matrix, we can also have a spatial weights list. 
+Before we can use the functions from `spdep` to compute the global Moran's I we need to create a `listw` type spatial weights object (instead of the matrix we used above). To get the same value as above in the `wm` object, we use `style='B'` to use binary (TRUE/FALSE) distance weights.
+
+
+```{r}
+ww <-  nb2listw(w, style='B')
+ww
+```
+
+
+## Moran's I
+
+The most well known measure of spatial autocorrelation is the Moran's I. It was developed by Patrick Alfred Pierce Moran, an Australian statistician. You can find the formula and some explanation in [the wikipedia article](https://en.wikipedia.org/wiki/Moran's_I). The video lecture by Luc Anselin covers an explanation of Moran's I. We strongly recommend you watch the video. You can also find helpful [this link](https://pro.arcgis.com/en/pro-app/tool-reference/spatial-statistics/h-how-spatial-autocorrelation-moran-s-i-spatial-st.htm) if things are still unclear. The formula you see may look intimidating but it is nothing but the formula for standard correlation expanded to incorporate the spatial weight matrix.
+
+$ I = \frac{n}{\sum_i \sum_j w_{ij}} * \frac{\sum_i \sum_j * (x_i - \bar{x})(x_j - \bar{x})}{\sum_i(x_i - \bar{x})^2}$
+
+
+To compute this in R,  we can use the `moran()` function. Have a look at `?moran` to see a description of this in R.
+You will see the above formula but in code form: `I = (n sum_i sum_j w_ij (x_i - xbar) (x_j - xbar)) / (S0 sum_i (x_i - xbar)^2)`. (Note: `S0` is refers to the sum of the weights, which is also same as $\sum_i \sum_j w_{ij}$)
+
+### Activity 7: Calculate Moran's I
+
+As the function is defined as `moran(y, ww, n, Szero(ww))`, we will need to add the arguments of `x` - our variable of interest, `ww` - our weights list,  `n` - the number of observations, and `S0` - the sum of the weights (note that when we have *row standardised* weights then `S0` is the same as `n`, so actually that part can be ignored from the equation, but we still must supply this information). In order to supply this `S0` we can use the `Szero()` function (in the spdep package) and pass to it our weights object (`ww`).  You might think it odd to supply these parameters as they can be derived from the “ww” object which has that information. Anyway, we supply them and it works. There probably are cases where it makes sense to use other values.
+
+```{r}
+moran(bur_ccsp$burglary, ww, n=length(ww$neighbours), S0=Szero(ww))
+```
+
+So the Moran's I here is 0.13, which is not very large. The Index is bounded by -1 and 1, and 0.13 is not large, but it is still above zero, so we might want to explore whether this is significant using a test of statistical significance for this statistic. 
+
+The Spatial Autocorrelation (Global Moran's I) tool is an inferential statistic, which means that the results of the analysis are always interpreted within the context of its null hypothesis. For the Global Moran's I statistic, the null hypothesis states that the attribute being analysed is randomly distributed among the features in your study area; said another way, the spatial processes promoting the observed pattern of values is random chance. Imagine that you could pick up the values for the attribute you are analysing and throw them down onto your features, letting each value fall where it may. This process (picking up and throwing down the values) is an example of a random chance spatial process. When the p-value returned by this tool is statistically significant, you can reject the null hypothesis. 
+
+In some software you can use statistical tests invoking asymptotic theory, but like Luc ANselin mentions in his videos, the most appropriate way of doing these tests is by using a computational approach, such as a Monte Carlo procedure. The way Monte Carlo works is that the values of burglary are randomly assigned to the polygons, and the Moran’s I is computed. This is repeated several times to establish a distribution of expected values under the null hypothesis. The observed value of Moran’s I is then compared with the simulated distribution to see how likely it is that the observed values could be considered a random draw.
+
+If confused, watch [this quick video](https://www.youtube.com/watch?v=5nM5e2_1OQ0) on monte carlo simulations. 
+
+We use the function `moran.mc()` to run a permutation test for Moran's I statistic calculated by using some number of random permutations of our numeric vector, for the given spatial weighting scheme, to establish the rank of the observed statistic in relation to the simulated values.
+
+We need to specify our variable of interest (*burglary*), the `listw` object we created earlier (*ww*), and the number of permutations we want to run (here we choose 99).
+
+```{r}
+set.seed(1234) # The seed number you choose is the starting point used in the generation of a sequence of random numbers, which is why (provided you use the same pseudo-random number generator) you'll obtain the same results given the same seed number. 
+burg_moranmc_results <- moran.mc(bur_ccsp$burglary, ww, nsim=99)
+burg_moranmc_results
+```
+
+So, the probability of observing this Moran's I if the null hypothesis was true is `r I(burg_moranmc_results$p.value)`. This is higher than our alpha level of 0.05. In this case, we can not reject our null hypothesis of spatial randomness, and must conclude that there isn't a significant global spatial autocorrelation in our data.
+
+
+### Activity 8: Moran scatter plot
+
+We can make a “Moran scatter plot” to visualize spatial autocorrelation. Note the row standardisation of the weights matrix.
+
+```{r}
+rwm <- mat2listw(wm, style='W')
+# Checking if rows add up to 1 (they should)
+mat <- listw2mat(rwm)
+#This code is simply adding each row to see if we get one when we add their values up, we are only displaying the first 15 rows in the matrix
+apply(mat, 1, sum)[1:15]
+```
+
+Now we can plot:
+
+```{r}
+moran.plot(bur_ccsp$burglary, rwm)
+```
+
+The X axis represents the values of our burglary variable in each unit (each LSOA) and the Y axis represents a spatial lag of this variable. A spatial lag in this context is simply the weighted average value of the burglary count in the areas that are considered neighbours of each LSOA. 
+
+
+So we are plotting the value of burglary against the weighted average value of burglary in the neighbours. And you can see the correlation is almost flat here. As with any correlation measure, you could get **positive spatial autocorrelation**, that would mean that as you move further to the right in the X axis you have higher levels of burglary in the surrounding area. This is what we see here. But the correlation is fairly low and as we saw is not statistically significant. You can also obtain **negative spatial autocorrelation**. That is, that would mean that areas with high level of crime *tend* (it's all about the global average effect!) to be surrounded by areas with low levels of crime. This is clearly not what we see here.
+
+
+It is very important to understand that global statistics like the spatial autocorrelation (Global Moran's I) tool assess the **overall** pattern and trend of your data. They are most effective when the spatial pattern is consistent across the study area. In other words, you may have clusters (local pockets of autocorrelation), without having clustering (global autocorrelation). This may happen if the sign of the clusters negate each other.
+
+
+But don't just take our word for how important this is, or how it's commonly applied in criminological research. Instead, now that you've gone through on how to do this, and have begun to get a sense of understanding, read the following paper on [https://link.springer.com/article/10.1023/A:1007592124641](https://link.springer.com/article/10.1023/A:1007592124641) where the authors make use of Moran's I to explain spatial characteristics of homicide. You will likely see this in other papers as well, and now you will know what it means and why it's important. 
+
+
+
+## Local spatial autocorrelation
+
+So now we know about global measures of spatial association, in particular the Moran's I statistic, which provide a mechanism to make inferences about a population from a sample. While this is useful for us to be able to assess quantitatively whether crime events cluster in a non-random manner, in the words of [Jerry Ratcliffe](https://pdfs.semanticscholar.org/26d2/356618cd759d04348f1e51c8209b0175bfce.pdf) "this simply explains what most criminal justice students learn in their earliest classes." For example, consider the study of robberies in Philadelphia:
+
+![](img/philly_rob.png)
+
+
+Aggregated to the police districts, this returns a global Moran’s I value (range 0 to 1) of 0.56, which suggests that there is clustering of robbery within police sectors.  [(Ratcliffe, Jerry. "Crime mapping: spatial and temporal challenges." Handbook of quantitative criminology. Springer, New York, NY, 2010. 5-24.)](https://pdfs.semanticscholar.org/26d2/356618cd759d04348f1e51c8209b0175bfce.pdf). While should hardly be surprising given the above map, we as humans are likely to see patterns even if there aren't any, and that is why these tests are helpful to verify (or disspell) our assumptions. But the global autocorrelation statistic only tells us about overall pattern, whether there is any clustering. It does not tell us about where this clustering is, or what it looks like (hotspots? cold spots? outliers?). 
+
+
+In this section we will learn about local indicators of spatial association (LISA) and show how they allow for the decomposition of global indicators, such as Moran's I, into the contribution of each observation. The LISA statistics serve two purposes. On one hand, they may be interpreted as indicators of local pockets of nonstationarity, or hot spots. On the other hand, they may be used to assess the influence of individual locations on the magnitude of the global statistic and to identify “outliers” [(Anselin, Luc. "Local indicators of spatial association—LISA." Geographical analysis 27.2 (1995): 93-115.)](http://onlinelibrary.wiley.com/doi/10.1111/j.1538-4632.1995.tb00338.x/full). 
+
+
+### Activity 9: Get data and weights for all Manchester 
+
+To explore local indicators of spatial correlation, let's go back to using all of Manchester, rather than just City Centre ward. We want to have enough data to see local variation, and while the code may take slightly longer to run, we can have a go at more meaningful stats. 
+
+So this is our `burglaries_per_lsoa` object that we're referring back to. To check what our data look like, we can always plot again with `tmap`:
+
+```{r}
+tmap_mode("plot")
+tm_shape(burglaries_per_lsoa) + 
+  tm_fill("burglary", style = "quantile", palette = "Reds") +
+  tm_borders(alpha = 0.1) +
+  tm_layout(main.title = "Burglary counts", main.title.size = 0.7 ,
+            legend.position = c("right", "bottom"), legend.title.size = 0.8)
+
+```
+
+Looks good! Now that we have the data we need to coerce into a spatial object, as before, for it to work well with the functions we use from the `sp` package, and then generate the weight matrix. Again, what we do here is stuff we did above for the global correlation. In fact, if you did the optional homework already, you will also have run this code.
+
+```{r}
+#Coerce sf into sp
+burglary_m <- as(burglaries_per_lsoa, "Spatial")
+#Generate list of neighbours using the Queen criteria
+w <- poly2nb(burglary_m, row.names=burglary_m$lsoa_code)
+#Generate list with weights using row standardisation
+ww <-  nb2listw(w, style='W')
+
+```
+
+### Activity 10: Exploring a Local Indicator of Spatial Association: Local Moran's I. 
+
+To illustrate Local Indicators of Spatial association (LISA) we will demonstrate the example of the Local Moran's I. The first step before we can generate this particular LISA map is to compute this local Moran's I. The initial part of the video presentation by Luc Anselin that we expected you to watch explains the formula and logic underpinning these computations and we won't reiterate here that detail. But at least a a general reminder:
+
+> Global tests for spatial autocorrelation [introduced last week] are calculated from the local relationships between the values observed at a spatial entity and its neighbours, for the neighbour definition chosen. Because of this, we can break global measures down into their components, and by extension, construct localised testsintended to detect **‘clusters’** – observations with very similar neighbours –and **‘hotspots’** [spatial outliers] – observations with very different neighbours.
+ > (Bivand et al. 2008, highlights added)
+
+Let's first look at the Moran's scatterplot:
+
+```{r}
+moran.plot(burglary_m$burglary, ww)
+```
+
+Notice how the plot is split in 4 quadrants. The top right corner belongs to areas that have high level of burglary and are surrounded by other areas that have above the average level of burglary. This are the high-high locations that Luc Anselin referred to. The bottom left corner belongs to the low-low areas. These are areas with low level of burglary and surrounded by areas with below average levels of burglary. Both the high-high and low-low represent clusters. A high-high cluster is what you may refer to as a hot spot. And the low-low clusters represent cold spots. In the opposite diagonal we have *spatial outliers*. They are not outliers in the standard sense, extreme observations, they are outliers in that they are surrounded by areas that are very unlike them. So you could have high-low spatial outliers, areas with high levels of burglary and low levels of surrounding burglary, or low-high spatial outliers, areas that have themselves low levels of burglary (or whatever else we are mapping) and that are surrounded by areas with above average levels of burglary.
+
+You can also see here that the positive spatial autocorrelation is more noticeable when we focus on the whole of Manchester city, unlike what we observed when only looked at the city centre. You can check this running the global Moran's I.
+
+```{r}
+moran(burglary_m$burglary, ww, n=length(ww$neighbours), S0=Szero(ww))
+moran.mc(burglary_m$burglary, ww, nsim=99999)
+```
+
+You can see that the global Moran's I statistic is 0.38 and that the pseudo p-value we generate with our computational Monte Carlo method is highly significant. There is indeed global spatial autocorrelation, when we look at all of Manchester (not just city centre ward). Knowing this we can try to decompose this, figure out what is driving this global measure.
+
+To compute the local Moran we can use a function from the `spdep` package.
+
+```{r}
+locm_bm <- localmoran(burglary_m$burglary, ww)
+summary(locm_bm)
+```
+
+The first column provides the summary statistic for the local moran statistic. Being local you will have one for each of the areas. The last column gives you a p value for this statistic. In order to produce the LISA map we need to do some previous work. First we are going to create some new variables that we are going to need:
+
+
+First we scale the variable of interest. When we scale burglary what we are doing is re-scaling the values so that the mean is zero. This is the process of computing a *z-score*, which you achieve through taking the value, subtracting the mean, and dividing by the standard deviation. See an explanation of what this does [here](http://www.gastonsanchez.com/visually-enforced/how-to/2014/01/15/Center-data-in-R/). 
+
+We can use `scale()`, which is a generic function whose default method centers and/or scales the variable. Here centering is done by subtracting the mean (omitting NAs) the corresponding columns, and scaling is done by dividing the (centered) variable by their standard deviations:
+
+```{r}
+#scale the variable of interest and save it to a new column
+burglary_m$s_burglary <- scale(burglary_m$burglary) %>% as.vector()
+```
+
+
+We've also added `as.vector()` to the end, to make sure that the data type we get out of this is a vector, that maps neatly into our dataframe. 
+
+
+Now we also want to account for the spatial dependence of our values. Remember how we keep saying about "The First Law of Geography", according to [Waldo Tobler](https://en.wikipedia.org/wiki/Waldo_R._Tobler), is "everything is related to everything else, but near things are more related than distant things." Seriously, we should all just tattoo this onto our foreheads because this is the key message of the module...!
+
+
+So what do we mean by this spatial dependence? When a value observed in one location depends on the values observed at neighbouring locations, there is a **spatial dependence**. And spatial data may show spatial dependence in the variables and error terms.
+
+
+*Why should spatial dependence occur?* There are two reasons commonly given. First, data collection of observations associated with spatial units may reflect measurement error. This happens when the boundaries for which information is collected do not accurately reflect the nature of the underlying process generating the sample data. A second reason for spatial dependence is that the spatial dimension of a social or economic characteristic may be an important aspect of the phenomenon. For example, based on the premise that location and distance are important forces at work, regional science theory relies on notions of spatial interaction and diffusion effects, hierarchies of place and spatial spillovers. 
+
+
+There are two types of dependence, spatial error and spatial lag. Here we focus on spatial lag. 
+
+
+**Spatial lag** is when the dependent variable y in place i is affected by the independent variables in both place i and j. 
+
+
+![](img/spatial_lag.png)
+
+
+This will be important to keep in mind when considering spatial regression. With spatial lag in ordinary least square regression, the assumption of uncorrelated error terms is violated, because near things will have associated error terms. Similarly, the assumption of independent observations is also violated, as the observations are influenced by the other observations near them. As a result, the estimates are biased and inefficient. Spatial lag is suggestive of a possible diffusion process – events in one place predict an increased likelihood of similar events in neighboring places.
+
+
+
+So to be able to account for the spatial lag in our model, we must create a variable to account for this. We can do this with the `lag.listw()` function. Remember from last week: a spatial lag in this context is simply the average value of the burglary count in the areas that are considered neighbours of each LSOA. So we are plotting the value of burglary against the average value of burglary in the neighbours. 
+
+
+For this we need our `listw` object, which is the `ww` object created earlier, when we generated the list with weights using row standardisation. We then pass this `listw` object into the `lag.listw()` function, which computes  the spatial lag of a numeric vector using a `listw` sparse representation of a spatial weights matrix. 
+
+
+
+```{r}
+#create a spatial lag variable and save it to a new column
+burglary_m$lag_s_burglary <- lag.listw(ww, burglary_m$s_burglary)
+```
+
+
+Make sure to check the summaries to ensure nothing weird is going on
+
+
+```{r}
+
+summary(burglary_m$s_burglary)
+summary(burglary_m$lag_s_burglary)
+```
+
+We can create a Moran scatter plot so that you see that nothing has changed apart from the scale in winch we are using the variables. The observations that are influential are highlighted in the plot as you can see.
+
+```{r}
+x <- burglary_m$s_burglary
+y <- burglary_m$lag_s_burglary
+xx <- tibble(x,y)
+moran.plot(x, ww)
+```
+
+We are now going to create a new variable to identify the quadrant in which each observation falls within the Moran Scatter plot, so that we can tell apart the high-high, low-low, high-low, and low-high areas. We will only identify those that are significant according to the p value that was provided by the local moran function.
+
+
+Before we get started, let's quickly review the tools we will use. 
+
+All our data is in this `burglary_m` dataframe. This has a variable for the LSOA code (`code`), a variable for the number of burglaries (`burglary`), and then also the two variables we created, the scaled measure of burglary (`s_burglary`), and the spatial lag measure (`lag_s_burglary`).
+
+
+We also have our `locm_bm` object, which we created with the `localmoran()` function, that has calculated a variety of measures for each of our observations, which we explored with the `summary()` function. You can see (if you scroll up) that the 5th element in this object is the p-value ("Pr(z > 0)"). To call the nth element of an object, you can use the square brackets after its name. So to return the nth column of thing, you can use `thing[,n]`. Again this should not be new to you, as we've been doing this sort of thing for a while. 
+
+
+So the data we need for each observation, in order to identify whether it belongs to the high-high, low-low, high-low, or low-high quadrants are the standardised burglary score, the spatial lag score, and the p-value. 
+
+
+
+Essentially all we'll be doing, is assigning a variable values based on where in the plot it is. So for example, if it's in the upper right, it is high-high, and has values larger than 0 for both the burglary and the spatial lag values.  It it's in the upper left, it's low-high, and has a value larger than 0 for the spatial lag value, but lower than 0 on the burglary value. And so on, and so on. Here's an image to illustrate:
+
+
+
+![](img/moran_plot_annotate.png)
+
+
+So let's first initialise this variable. In this instance we are creating a new column in the `burglary_m` dataframe and calling it `quad_sig`. 
+
+
+
+We are using the `mutate()` function from the dplyr package to create our new variable, just as we have in previous labs. 
+
+We also use nested ifelse() statements. Nested ifelse() just means that it's an ifelse() inside another ifelse() statement. To help us with these sorts of situations is the `ifelse()` function. We saw this with the previous exercises, but I'll describe it brielfy again. It allows us to conditionally assign some value to some variable. The structure of the function is so that you have to pass it a condition, then a value to assign if the condition is true, and then another value if the condition is false. You are basically using this function to say: "if this condition is true, do first thing, else, do the second thing". It would look something like this:
+
+
+
+```{r, eval=FALSE}
+
+dataframe$new_variable <- ifelse(dataframe$some_numeric_var < 100, "smaller than 100", "not smaller than 100")
+
+```
+
+When nesting these, all you do is put another condition to check in the "thing to do if false", so it checks all conditions. So in the first instance we check if the value for burglary is greater than zero, and the value for the lag is greater than zero, and the p-value is smaller than our threshold of 0.05. If it is, then this should belong to the "high-high" group. If any one of these conditions is not met, then we move into the 'thing to do if false' section, where we now check again another set of criteria, and so on and so on. If none of these are met, we assign it the non-significant value: 
+
+
+```{r}
+burglary_m <- st_as_sf(burglary_m) %>% 
+  mutate(quad_sig = ifelse(burglary_m$s_burglary > 0 & 
+                              burglary_m$lag_s_burglary > 0 & 
+                              locm_bm[,5] <= 0.05, 
+                     "high-high",
+                     ifelse(burglary_m$s_burglary <= 0 & 
+                              burglary_m$lag_s_burglary <= 0 & 
+                              locm_bm[,5] <= 0.05, 
+                     "low-low", 
+                     ifelse(burglary_m$s_burglary > 0 & 
+                              burglary_m$lag_s_burglary <= 0 & 
+                              locm_bm[,5] <= 0.05, 
+                     "high-low",
+                     ifelse(burglary_m$s_burglary <= 0 & 
+                              burglary_m$lag_s_burglary > 0 & 
+                              locm_bm[,5] <= 0.05,
+                     "low-high", 
+                     "non-significant")))))
+```
+
+
+(Note we had to wrap our data in a `st_as_sf()` function, to covert back to sf object). 
+
+
+Now we can have a look at what this returns us: 
+
+```{r}
+
+table(burglary_m$quad_sig)
+
+```
+
+This looks like a lot of non-significant results. We want to be sure this isn't an artifact of our code but is true, we can check how many values are under 0.05:
+
+
+```{r}
+
+nrow(locm_bm[locm_bm[,5] <= 0.05,])
+
+```
+
+
+We can see that only 29 areas have p-values under 0.05 threshold. So this is in line with our results, and we can rest assured. 
+
+
+Well, this is exciting, but where are these regions?
+
+Let's put 'em on a map, just simply, using quick thematic map (`qtm()`): 
+
+
+```{r}
+
+qtm(burglary_m, fill="quad_sig", fill.title="LISA")
+
+
+```
+
+
+Very nice!
+
+
+
+
+So how do we interpret these results? Well keep in mind: 
+
+- The LISA value for each location is determined from its individual contribution to the global Moran's I calculation.
+- Whether or not this value is statistically significant is assessed by comparing the actual value to the value calculated for the same location by randomly reassigning the data among all the areal units and recalculating the values each time (the Monte Carlo simulation approach discussed earlier).
+
+
+So essentially this map now tells us that there was statistically significant moderate clustering in burglaries in Manchester.  When reporting your results, report at least the Moran’s I test value and the p value.  So, for this test, you should report Moran’s I = 0.32, p < .001. Including the LISA cluster map is also a great way of showing how the attribute is actually clustering.  
+
+

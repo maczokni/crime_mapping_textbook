@@ -74,7 +74,7 @@ rm(burglary_spatial)
 
 We now have the burglaries data, let's now count how many burglaries there are within each LSOA polygon. This is a point in polygon operation that we covered in week 4 when we counted the number of violent crimes in the buffers of the licenced premises for example. If the code or the notion does not make much sense to you make sure you review the relevant session from week 4.
 
-```{r}
+```{r message = FALSE, warning = FALSE} # Prevents excessive warning message printing
 #Point in polygon spatial operation (be patient this can take time)
 burglaries_per_lsoa <- bur_mc %>% 
   st_join(lsoa_WGS84, ., left = FALSE) %>% 
@@ -103,7 +103,7 @@ There are various ways of defining a neighbour. We can say that two areas are ne
 
 When defining neighbours by contiguity we may also specify the *order* of contiguity. **First order contiguity** means that we are focusing on areas immediately contiguous. **Second order** means that we consider neighbours only those areas that are immediately contiguous to our first order neighbours (only the yellow areas in the figure below) and you could go on and on. Look at the graphic below for clarification:
 
-![Figure 1](img/neighbours.jpg)
+![Figure 1](img/neighbours_large.png)
 
 [Source](https://www.slideshare.net/CoreySparks/spatial-statistics-presentation-texas-am-census-rdc) 
 
@@ -477,7 +477,7 @@ summary(burglary_m$s_burglary)
 summary(burglary_m$lag_s_burglary)
 ```
 
-We can create a Moran scatter plot so that you see that nothing has changed apart from the scale in winch we are using the variables. The observations that are influential are highlighted in the plot as you can see.
+We can create a Moran scatter plot so that you see that nothing has changed apart from the scale in which we are using the variables. The observations that are influential are highlighted in the plot as you can see.
 
 ```{r}
 x <- burglary_m$s_burglary
@@ -501,7 +501,7 @@ So the data we need for each observation, in order to identify whether it belong
 
 
 
-Essentially all we'll be doing, is assigning a variable values based on where in the plot it is. So for example, if it's in the upper right, it is high-high, and has values larger than 0 for both the burglary and the spatial lag values.  It it's in the upper left, it's low-high, and has a value larger than 0 for the spatial lag value, but lower than 0 on the burglary value. And so on, and so on. Here's an image to illustrate:
+Essentially all we'll be doing, is assigning a variable values based on where in the plot it is. So for example, if it's in the upper right, it is high-high, and has values larger than 0 for both the burglary and the spatial lag values.  If it's in the upper left, it's low-high, and has a value larger than 0 for the spatial lag value, but lower than 0 on the burglary value. And so on, and so on. Here's an image to illustrate:
 
 
 

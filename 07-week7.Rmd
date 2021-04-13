@@ -74,7 +74,7 @@ rm(burglary_spatial)
 
 We now have the burglaries data, let's now count how many burglaries there are within each LSOA polygon. This is a point in polygon operation that we covered in week 4 when we counted the number of violent crimes in the buffers of the licenced premises for example. If the code or the notion does not make much sense to you make sure you review the relevant session from week 4.
 
-```{r message = FALSE, warning = FALSE} # Prevents excessive warning message printing
+```{r message = FALSE, warning = FALSE} 
 #Point in polygon spatial operation (be patient this can take time)
 burglaries_per_lsoa <- bur_mc %>% 
   st_join(lsoa_WGS84, ., left = FALSE) %>% 

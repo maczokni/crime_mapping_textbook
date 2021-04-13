@@ -24,7 +24,7 @@
 <meta name="author" content="Reka Solymosi and Juanjo Medina" />
 
 
-<meta name="date" content="2021-03-30" />
+<meta name="date" content="2021-04-13" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -738,10 +738,10 @@ Contains OS data © Crown copyright [and database right] (year)”</p>
 <div class="sourceCode" id="cb95"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb95-1"><a href="making-maps-in-r.html#cb95-1" aria-hidden="true" tabindex="-1"></a>manchester_lsoa <span class="ot">&lt;-</span> <span class="fu">st_read</span>(shp_name)</span></code></pre></div>
 <pre><code>## Reading layer `england_lsoa_2011&#39; from data source `/Users/reka/Desktop/crime_mapping_textbook/data/BoundaryData/england_lsoa_2011.shp&#39; using driver `ESRI Shapefile&#39;
 ## Simple feature collection with 282 features and 3 fields
-## geometry type:  POLYGON
-## dimension:      XY
-## bbox:           xmin: 378833.2 ymin: 382620.6 xmax: 390350.2 ymax: 405357.1
-## projected CRS:  OSGB 1936 / British National Grid</code></pre>
+## Geometry type: POLYGON
+## Dimension:     XY
+## Bounding box:  xmin: 378833.2 ymin: 382620.6 xmax: 390350.2 ymax: 405357.1
+## Projected CRS: OSGB 1936 / British National Grid</code></pre>
 <p>Now you have your spatial data file. You can have a look at what sort of data it contains, the same way you would view a dataframe, with the <code>View()</code> function:</p>
 <div class="sourceCode" id="cb97"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb97-1"><a href="making-maps-in-r.html#cb97-1" aria-hidden="true" tabindex="-1"></a><span class="fu">View</span>(manchester_lsoa)</span></code></pre></div>
 <pre><code>## Rows: 282

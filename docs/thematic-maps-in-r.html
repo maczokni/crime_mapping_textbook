@@ -24,7 +24,7 @@
 <meta name="author" content="Reka Solymosi and Juanjo Medina" />
 
 
-<meta name="date" content="2021-03-30" />
+<meta name="date" content="2021-04-13" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -346,10 +346,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb112-5"><a href="thematic-maps-in-r.html#cb112-5" aria-hidden="true" tabindex="-1"></a>manchester_lsoa <span class="ot">&lt;-</span> <span class="fu">st_read</span>(shp_name)</span></code></pre></div>
 <pre><code>## Reading layer `england_lsoa_2011&#39; from data source `/Users/reka/Desktop/crime_mapping_textbook/data/BoundaryData/england_lsoa_2011.shp&#39; using driver `ESRI Shapefile&#39;
 ## Simple feature collection with 282 features and 3 fields
-## geometry type:  POLYGON
-## dimension:      XY
-## bbox:           xmin: 378833.2 ymin: 382620.6 xmax: 390350.2 ymax: 405357.1
-## projected CRS:  OSGB 1936 / British National Grid</code></pre>
+## Geometry type: POLYGON
+## Dimension:     XY
+## Bounding box:  xmin: 378833.2 ymin: 382620.6 xmax: 390350.2 ymax: 405357.1
+## Projected CRS: OSGB 1936 / British National Grid</code></pre>
 <div class="sourceCode" id="cb114"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb114-1"><a href="thematic-maps-in-r.html#cb114-1" aria-hidden="true" tabindex="-1"></a>crimes_per_lsoa <span class="ot">&lt;-</span> crimes <span class="sc">%&gt;%</span></span>
 <span id="cb114-2"><a href="thematic-maps-in-r.html#cb114-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">clean_names</span>() <span class="sc">%&gt;%</span> </span>
 <span id="cb114-3"><a href="thematic-maps-in-r.html#cb114-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(lsoa_code) <span class="sc">%&gt;%</span></span>
@@ -364,10 +364,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb116"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb116-1"><a href="thematic-maps-in-r.html#cb116-1" aria-hidden="true" tabindex="-1"></a>manchester_crime_lsoa <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">&quot;data/BoundaryData/manchester_crime_lsoa.shp&quot;</span>)</span></code></pre></div>
 <pre><code>## Reading layer `manchester_crime_lsoa&#39; from data source `/Users/reka/Desktop/crime_mapping_textbook/data/BoundaryData/manchester_crime_lsoa.shp&#39; using driver `ESRI Shapefile&#39;
 ## Simple feature collection with 282 features and 4 fields
-## geometry type:  POLYGON
-## dimension:      XY
-## bbox:           xmin: 378833.2 ymin: 382620.6 xmax: 390350.2 ymax: 405357.1
-## projected CRS:  Transverse_Mercator</code></pre>
+## Geometry type: POLYGON
+## Dimension:     XY
+## Bounding box:  xmin: 378833.2 ymin: 382620.6 xmax: 390350.2 ymax: 405357.1
+## Projected CRS: Transverse_Mercator</code></pre>
 <div id="activity-1-spot-the-difference" class="section level4" number="3.1.0.1">
 <h4><span class="header-section-number">3.1.0.1</span> Activity 1: Spot the difference</h4>
 <p>Before we carry on, can you tell what is different between <em>manchester_lsoa.shp</em> and <em>manchester_crime_lsoa.shp</em> that you now have saved for working with? Discuss in your groups, and write your thoughts on the shared google doc.</p>

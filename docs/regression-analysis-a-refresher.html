@@ -24,7 +24,7 @@
 <meta name="author" content="Reka Solymosi and Juanjo Medina" />
 
 
-<meta name="date" content="2021-04-15" />
+<meta name="date" content="2021-04-19" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -382,7 +382,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb426-2"><a href="regression-analysis-a-refresher.html#cb426-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
 <span id="cb426-3"><a href="regression-analysis-a-refresher.html#cb426-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(arm)</span>
 <span id="cb426-4"><a href="regression-analysis-a-refresher.html#cb426-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sjPlot)</span>
-<span id="cb426-5"><a href="regression-analysis-a-refresher.html#cb426-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(effects)</span></code></pre></div>
+<span id="cb426-5"><a href="regression-analysis-a-refresher.html#cb426-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(effects)</span>
+<span id="cb426-6"><a href="regression-analysis-a-refresher.html#cb426-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lmtest)</span>
+<span id="cb426-7"><a href="regression-analysis-a-refresher.html#cb426-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(car)</span>
+<span id="cb426-8"><a href="regression-analysis-a-refresher.html#cb426-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(olsrr)</span></code></pre></div>
 <p>Regression has been one the main technique of data analysis in the social sciences for many years and it belongs to a family of techniques called generalised linear models. Regression is a flexible model that allows you to “explain” or “predict” a given outcome (Y), variously called your outcome, response or dependent variable, as a function of a number of what is variously called inputs, features or independent, explanatory, or predictive variables (X1, X2, X3, etc.). Following Gelman and Hill (2007), I will try to stick for the most part to the terms outputs and inputs.</p>
 <p>Today we will cover linear regression or ordinary least squares regression (OLS), which is a technique that you use when you are interested in explaining variation in an interval level variable. First we will see how you can use regression analysis when you only have one input and then we will move to situations when we have several explanatory variables or inputs. For those of you already familiar with regression analysis this session can be a bit of a refresher, for those that aren’t a bit of an introduction. Today we will cover regression models more generally and in the next lab we will discuss adaptations to the regression model that are necessary when you have spatial autocorrelation.</p>
 <div id="activity-1-getting-some-homicide-data" class="section level3" number="8.1.1">
@@ -1200,14 +1203,50 @@ R<sup>2</sup> / R<sup>2</sup> adjusted
 <p>“Optimally, this means that the outcome measure should accurately reflect the phenomenon of interest, the model should include all relevant predictors, and the model should generalize to all cases to which it will be applied… Data used in empirical research rarely meet all (if any) of these criteria precisely. However, keeping these goals in mind can help you be precise about the types of questions you can and cannot answer reliably”</p>
 </blockquote>
 <ul>
-<li><p><strong>Additiviy and linearity</strong>. These are the most important mathematical assumptions of the model. We already talked about additivity in previous sessions and discussed how you can include interaction effects in your models if the additivity assumption is violated. We will discuss problems with non-linearities today as well as ways to diagnose and solve this problem. If the relationship is non linear (e.g, it is curvilinear) predicted values will be wrong in a biased manner, meaning that predicted values will systematically miss the true pattern of the mean of y (as related to the x-variables).</p></li>
+<li><p><strong>Additiviy and linearity</strong>. These are the most important mathematical assumptions of the model. We already talked about additivity in the previous section and discussed how you can include interaction effects in your models if the additivity assumption is violated. We will discuss problems with non-linearities today as well as ways to diagnose and solve this problem. If the relationship is non linear (e.g, it is curvilinear) predicted values will be wrong in a biased manner, meaning that predicted values will systematically miss the true pattern of the mean of y (as related to the x-variables).</p></li>
 <li><p><strong>Independence of errors</strong>. Regression assumes that the errors from the prediction line (or hyperplane) are independent. If there is dependency between the observations (you are assessing change across the same units, working with spatial units, or with units that are somehow grouped such as students from the same class), you may have to use models that are more appropriate (e.g., multilevel models, spatial regression, etc.).</p></li>
 <li><p><strong>Equal variances of errors</strong>. When the variance of the residuals is unequal, you may need different estimation methods. This is, nonetheless, considered a minor issue. There is a small effect on the validity of t-test and F-test results, but generally regression inferences are robust with regard to the variance issue.</p></li>
 <li><p><strong>Normality of errors</strong>. The residuals should be normally distributed. Gelman and Hill (2007: 46) discuss this as the least important of the assumptions and in fact “do <em>not</em> recommend diagnostics of the normality of the regression residuals.” If the errors do not have a normal distribution, it usually is not particularly serious. Regression inferences tend to be robust with respect to normality (or nonnormality of the errors). In practice, the residuals may appear to be nonnormal when the wrong regression equation has been used. So, I will show you how to inspect normality of the residuals not because this is a problem on itself, but because it may be give you further evidence that there is some other problem with the model you are applying to your data.</p></li>
 </ul>
 <p>Apart from this, it is convenient to diagnose multicollinearity (this affects interpretation) and influential observations.</p>
-<p>So these are the assumptions of linear regression, and today we will go through how to test for them, and also what are some options that you can consider if you find that your model violates them. While finding that some of the assumptions are violated do not necessarily mean that you have to scrap your model, it is important to use these diagnostics to illustrate that you have considered what the possible issues with your model is, and if you find any serious issues that you address them.</p>
-<p>You may have noticed the second of this assumption is independence of errors. This is an issue with spatial data. If you have spatial autocorrelation basically you are saying that your observations are not independent. What happens in area X is likely to be similar to what happens in its surrounding neighbours (if you have positive spatial autocorrelation). What do you do? Well, that’s what we will cover next week. We will learn how to fit regression models where you have spatial dependency.</p>
+<p>So these are the assumptions of linear regression.</p>
+<p>In this section we can go through very quickly how to test for some of them using visuals. While finding that some of the assumptions are violated do not necessarily mean that you have to scrap your model, it is important to use these diagnostics to illustrate that you have considered what the possible issues with your model is, and if you find any serious issues that you address them.</p>
+<p>In r, we can use the <code>plot()</code> function on our output lm object to look through some diagnostics. This gives us 4 plots, so to show them all, we’ll use the code <code>par(mfrow = c(2, 2))</code> to split our plot window into 4 panes (remember to set back, run <code>par(mfrow = c(1, 1))</code>). For example, let’s return to <code>fit_1</code>, our very first model.</p>
+<div class="sourceCode" id="cb486"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb486-1"><a href="regression-analysis-a-refresher.html#cb486-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">2</span>))</span>
+<span id="cb486-2"><a href="regression-analysis-a-refresher.html#cb486-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(fit_1)</span></code></pre></div>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-269-1.png" width="672" /></p>
+<p>The 4 plots we get are</p>
+<ul>
+<li><strong>Residuals vs Fitted</strong>. Used to check the linear relationship assumptions. A horizontal line, without distinct patterns is an indication for a linear relationship, what is good.</li>
+<li><strong>Normal Q-Q</strong>. Used to examine whether the residuals are normally distributed. It’s good if residuals points follow the straight dashed line.</li>
+<li><strong>Scale-Location (or Spread-Location)</strong>. Used to check the homogeneity of variance of the residuals (homoscedasticity). Horizontal line with equally spread points is a good indication of homoscedasticity. This is not the case in our example, where we have a bit of a heteroscedasticity problem (remember funnel-shape from the video!).</li>
+<li><strong>Residuals vs Leverage</strong>. Used to identify influential cases, that is extreme values that might influence the regression results when included or excluded from the analysis.</li>
+</ul>
+<p>We can also run some tests to confirm what we see in the plots.</p>
+<p>For example, to test for heteroskedasticity (unequal variance in our residuals) we can run a Breusch-Pagan test from the <code>lmtest</code> package or a NCV test from the <code>car</code> package.</p>
+<div class="sourceCode" id="cb487"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb487-1"><a href="regression-analysis-a-refresher.html#cb487-1" aria-hidden="true" tabindex="-1"></a>lmtest<span class="sc">::</span><span class="fu">bptest</span>(fit_1)  <span class="co"># Breusch-Pagan test</span></span></code></pre></div>
+<pre><code>## 
+##  studentized Breusch-Pagan test
+## 
+## data:  fit_1
+## BP = 75.912, df = 1, p-value &lt; 2.2e-16</code></pre>
+<div class="sourceCode" id="cb489"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb489-1"><a href="regression-analysis-a-refresher.html#cb489-1" aria-hidden="true" tabindex="-1"></a>car<span class="sc">::</span><span class="fu">ncvTest</span>(fit_1) <span class="co"># NCV test</span></span></code></pre></div>
+<pre><code>## Non-constant Variance Score Test 
+## Variance formula: ~ fitted.values 
+## Chisquare = 598.5657, Df = 1, p = &lt; 2.22e-16</code></pre>
+<p>Both these test have a p-value less that a significance level of 0.05, therefore we can reject the null hypothesis that the variance of the residuals is constant and infer that heteroscedasticity is indeed present, thereby confirming our graphical inference.</p>
+<p>For testing whether the residuals violate the normality assumption, we can use the <code>ols_test_normality()</code> function from the <code>olsrr</code> package.</p>
+<div class="sourceCode" id="cb491"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb491-1"><a href="regression-analysis-a-refresher.html#cb491-1" aria-hidden="true" tabindex="-1"></a>olsrr<span class="sc">::</span><span class="fu">ols_test_normality</span>(fit_1)</span></code></pre></div>
+<pre><code>## -----------------------------------------------
+##        Test             Statistic       pvalue  
+## -----------------------------------------------
+## Shapiro-Wilk              0.8917         0.0000 
+## Kolmogorov-Smirnov        0.078          0.0000 
+## Cramer-von Mises         254.8478        0.0000 
+## Anderson-Darling          46.495         0.0000 
+## -----------------------------------------------</code></pre>
+<p><strong>NOTE: </strong>You may have noticed the second of this assumption is independence of errors. This is an issue with spatial data. If you have spatial autocorrelation basically you are saying that your observations are not independent. What happens in area X is likely to be similar to what happens in its surrounding neighbours (if you have positive spatial autocorrelation). What do you do? Well, that’s what we will cover next week. We will learn how to fit regression models where you have spatial dependency.</p>
+<p>Alright, that’s enough for this week!</p>
 
 </div>
 </div>

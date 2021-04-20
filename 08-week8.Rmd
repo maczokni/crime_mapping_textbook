@@ -188,7 +188,7 @@ arm::display(fit_1)
 
 ```
 
-For now I just want you to focus on the numbers in the "Estimate" (or coef.est) column. The value of 6.18 estimated for the **intercept** is the "predicted" value for Y when X equals zero. This is the predicted value of the fear of crime score *when resource deprivation has a value of zero*. 
+For now I just want you to focus on the numbers in the "Estimate" (or coef.est) column. The value of 6.18 estimated for the **intercept** is the "predicted" value for Y when X equals zero. This is the predicted value of the homicide rate *when resource deprivation has a value of zero*. 
 
 ```{r}
 summary(ncovr$RD90)

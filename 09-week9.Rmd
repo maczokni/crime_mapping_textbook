@@ -11,7 +11,7 @@ Last week we provided you with an introduction to regression analysis with R. Th
 
 Before we do any of this, we need to load the libraries we will use today:
 
-```{r, eval = FALSE}
+```{r, message=FALSE, warning=FALSE}
 library(sf)
 library(tmap)
 library(ggplot2)
@@ -220,6 +220,7 @@ The  p  (probability)  value  associated  with  this  Moran's  I  is below our s
 Both Lagrange multiplier tests (for the error and the lagged models, `LMerr` and `LMlag` respectively), as well as their robust forms (`RLMerr` and `RLMLag`, also respectively) are included in the `lm.LMtests` function. Again, a regression object and a spatial `listw` object must be passed as arguments. In addition, the tests must be specified as a character vector (the default is only `LMerror`), using the `c( )` operator (concatenate), as illustrated below. 
 
 ```{r}
+
 lm.LMtests(fit_2, rwm_n, test = c("LMerr","LMlag","RLMerr","RLMlag","SARMA"))
 ```
 
@@ -284,21 +285,35 @@ In  the  OLS  regression  model,  the  coefficients  for  any  of  the  explanat
 
 In, other words, in the spatial lag model, the coefficients only focus on the "short-run impact" of $x~i$ on $y~i$ , rather than the net effect. As Ward and Gleditsch (2008) explain "Since the value of  $y~i$  will influence the level of" homicide "in other" counties $y~j$  and these $y~j$ , in turn, feedback on to $y~i$ , we need to take into account the additional effects that the short impact of $x~i$  exerts on $y~i$  through its impact on the level of" homicide "in other" counties. You can still read the coefficients in the same way but need to keep in mind that they are not measuring the net effect. Part of their effect will be captured  by  the  spatial  lag.  Yet,  you  may  still  want  to  have  a  look  at  whether  things  change dramatically, particularly in terms of their significance (which is not the case in this example).
 
-In sum, this implies that a change in the ith region’s predictor can affect the jth region’s outcome. We have 2 situations: (a) the direct impact of an observation’s predictor on its own outcome, and (b) the indirect impact of an observation’s neighbor’s predictor on its outcome.This leads to three quantities that we want to know:
+In sum, this implies that a change in the $i$th region’s predictor can affect the $j$th region’s outcome. We have 2 situations: (a) the direct impact of an observation’s predictor on its own outcome, and (b) the indirect impact of an observation’s neighbor’s predictor on its outcome.This leads to three quantities that we want to know:
 
 - **Average Direct Impact**, which is similar to a traditional interpretation
 - **Average Total impact**, which would be the total of direct and indirect impacts of a predictor on one’s outcome
 - **Average Indirect impact**, which would be the average impact of one’s neighbors on one’s outcome
 
-These quantities can be found using the `impacts()` function in the `spdep` library. We follow the example that converts the spatial weight matrix into a “sparse” matrix, and power it up using the `trW()` function. This follows the approximation methods described in Lesage and Pace, 2009. Here, we use Monte Carlo simulation to obtain simulated distributions of the various impacts. 
+These quantities can be found using the `impacts()` function in the `spatialreg` library. This function performs the calculation of impacts for spatial lag, which is needed in order to interpret the regression coefficients correctly, because of the spillovers between the terms in these data generation processes 
+
+Impacts takes the argument of our model (`fit_2_lag`), as well as our spatial weights. Now we could specify our already existing spatial weights object `rwm_n` using the `listw=` parameter, however, we have a very large matrix, and this might mean our calculations will take all day (if you don't believe me, try it! but don't say I didn't warn you!)
+
+
+Instead, what we can do is follow the example that converts the spatial weight matrix into a “sparse” matrix, and power it up using the `trW()` function. This follows the approximation methods described in Lesage and Pace, 2009. It prepares a vector of traces of powers of a spatial weights matrix Here, we use Monte Carlo simulation to obtain simulated distributions of the various impacts. If we use this, our outcome will be much faster. The `trW()` function needs our spatial weights to be in a sparse matrix class object, so we can transform this using the `as()` function: 
 
 ```{r}
-library(spdep)
+
 W <- as(rwm_n, "CsparseMatrix")
 trMC <- trW(W, type="MC")
-im<-impacts(fit_2_lag, tr=trMC, R=100)
+
+```
+
+
+Finally, `R=` asks for the number of simulations used to compute the distribution for the impact measures. 
+
+```{r}
+
+im<-impacts(fit_2_lag, tr = trMC, R=100)
+
 sums<-summary(im,  zstats=T)
-#To print the coefficients
+
 data.frame(sums$res)
 ```
 

@@ -52,7 +52,7 @@ manchester_crime_lsoa <- st_read("data/BoundaryData/manchester_crime_lsoa.shp")
 #### Activity 1: Spot the difference
 
 
-Before we carry on, can you tell what is different between *manchester_lsoa.shp* and *manchester_crime_lsoa.shp* that you now have saved for working with? Discuss in your groups, and write your thoughts on the shared google doc.  
+Before we carry on, can you tell what is different between *manchester_lsoa.shp* and *manchester_crime_lsoa.shp* that you now have saved for working with? Discuss in your groups.  
 
 ## Creating thematic maps
 
@@ -404,7 +404,7 @@ tmap_arrange(crime_count_map, res_pop_map, crime_rate_map)
 
 ```
 
-What do you think about these three maps? How do you think this might be different if we were to look at workday population instead of residential population as a denominator? Discuss in your groups and make notes in your shared google doc. 
+What do you think about these three maps? How do you think this might be different if we were to look at workday population instead of residential population as a denominator? Discuss in your groups. 
 
 <!-- ### Homework 2  -->
 

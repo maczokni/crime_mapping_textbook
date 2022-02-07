@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 1 A first lesson about R | Crime Mapping in R</title>
   <meta name="description" content="Worksheets for labs of Crime Mapping course" />
-  <meta name="generator" content="bookdown 0.21 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.22 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 1 A first lesson about R | Crime Mapping in R" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Reka Solymosi and Juanjo Medina" />
 
 
-<meta name="date" content="2021-04-28" />
+<meta name="date" content="2022-02-07" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,7 +33,7 @@
   
 <link rel="prev" href="index.html"/>
 <link rel="next" href="making-maps-in-r.html"/>
-<script src="libs/header-attrs-2.7.2/header-attrs.js"></script>
+<script src="libs/header-attrs-2.9/header-attrs.js"></script>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -51,6 +51,8 @@
 
 
 
+<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
 <script src="libs/htmlwidgets-1.5.3/htmlwidgets.js"></script>
 <link href="libs/leaflet-1.3.1/leaflet.css" rel="stylesheet" />
 <script src="libs/leaflet-1.3.1/leaflet.js"></script>
@@ -126,6 +128,7 @@ code span.va { color: #19177c; } /* Variable */
 code span.vs { color: #4070a0; } /* VerbatimString */
 code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
+
 
 <link rel="stylesheet" href="style.css" type="text/css" />
 </head>
@@ -432,7 +435,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li>Mac, follow the guidance in the video <a href="https://www.youtube.com/watch?v=cX532N_XLIs&amp;list=PLqzoL9-eJTNDw71zWePXyHx3_cm_fMP8S">here</a> and then, you will also need to install command line tools, for that you can watch another video <a href="https://www.youtube.com/watch?v=3Yd9J_dhSfY">here</a></li>
 <li>Linux: for ubuntu see the video <a href="https://www.youtube.com/watch?v=kF0-FH-xBiE">here</a> and if you have questions, let the teaching team know!</li>
 </ul>
-<p>Once you have watched or read the instructions for your relevant operating system, you are now ready to actually have a go at downloading the software for yourself. Before you start, write in the google doc any questions or concerns, and once ready, install!</p>
+<p>Once you have watched or read the instructions for your relevant operating system, you are now ready to actually have a go at downloading the software for yourself. Before you start, make sure to ask us any questions or concerns, and once ready, install!</p>
 </div>
 <div id="install-r" class="section level4 unnumbered">
 <h4>Install <code>R</code>:</h4>
@@ -544,8 +547,7 @@ As indicated above, the window in the bottom left corner is the main <strong>con
 <p>You can use google to make your cookbook, and the website <a href="https://stackoverflow.com/">stackoverflow</a>, in particular, can help you find the function you need. But be wary, especially in the beginning, that you understand what the function does. There can be several different functions for the same action. One good approach is to add a function of interest to your cookbook and ask the teaching team about what it does, and how it might be different to other functions that do the same thing.</p>
 <div id="activity-5-play-around-with-functions" class="section level4" number="1.3.1.1">
 <h4><span class="header-section-number">1.3.1.1</span> Activity 5: Play around with functions</h4>
-<p>Have a guess (or google) about what you think is the function to get the median. Once you have your answer, write it in the shared google docs. Then, use it to get the median of the numbers 10, 34, 5, 3, 77.</p>
-<p>Write the answer in your shared google doc (or note it down for yourself if in the quiet room).</p>
+<p>Have a guess (or google) about what you think is the function to get the median. Once you have your answer, speak to the person next to you. Then, use it to get the median of the numbers 10, 34, 5, 3, 77.</p>
 <p>The answer is further below, after the note:</p>
 <p><strong>NOTE:</strong> <code>R</code> is case-sensitive! For example:</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="a-first-lesson-about-r.html#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculating the logarithm </span></span>
@@ -692,7 +694,7 @@ As indicated above, the window in the bottom left corner is the main <strong>con
 <p>We will get some data by installing a package which has data in it as well as functions, and then go on to produce some basic summaries. This should give some practice!</p>
 <div id="activity-8-playing-around-with-data" class="section level3" number="1.5.1">
 <h3><span class="header-section-number">1.5.1</span> Activity 8: Playing around with data</h3>
-<p>We are going to look at some data that are part of the <em>fivethirtyeight</em> package. This package contains data sets and code behind the stories in <a href="http://fivethirtyeight.com/">this particular online newspaper</a>. This package is not part of the base installation of R, so you will need to install it first. I won’t give you the code for it. See if you can figure it out by looking at previous examples. Discuss and write in the google doc what you think the code will be.</p>
+<p>We are going to look at some data that are part of the <em>fivethirtyeight</em> package. This package contains data sets and code behind the stories in <a href="http://fivethirtyeight.com/">this particular online newspaper</a>. This package is not part of the base installation of R, so you will need to install it first. I won’t give you the code for it. See if you can figure it out by looking at previous examples. Discuss in small groups what you think the code will be.</p>
 <p>Done? Ok, now we are going to look at the data sets that are included in this package. Remember first we have to load the package if we want to use it:</p>
 <div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="a-first-lesson-about-r.html#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;fivethirtyeight&quot;</span>)</span></code></pre></div>
 <pre><code>## Some larger datasets need to be installed separately, like senators and
@@ -782,7 +784,7 @@ As indicated above, the window in the bottom left corner is the main <strong>con
 <pre><code>## Warning: Removed 1 rows containing non-finite values (stat_smooth).</code></pre>
 <pre><code>## Warning: Removed 1 rows containing missing values (geom_point).</code></pre>
 <p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>
-<p>What do you think this graphic is telling you? Discuss and write in your shared google docs.</p>
+<p>What do you think this graphic is telling you? Discuss with the person next to you.</p>
 <p>Graphing is very powerful in R, and much of the spatial visualisation we will produce throughout the module will build on this. If you are not already familiar with this, I recommend a read of the data visualisation chapter of R for Data Science <a href="https://r4ds.had.co.nz/data-visualisation.html">https://r4ds.had.co.nz/data-visualisation.html</a></p>
 </div>
 </div>
@@ -847,6 +849,7 @@ gitbook.start({
 "weibo": false,
 "instapaper": false,
 "vk": false,
+"whatsapp": false,
 "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
 },
 "fontsettings": {

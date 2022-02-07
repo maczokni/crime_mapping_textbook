@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 9 Spatial regression models | Crime Mapping in R</title>
   <meta name="description" content="Worksheets for labs of Crime Mapping course" />
-  <meta name="generator" content="bookdown 0.21 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.22 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 9 Spatial regression models | Crime Mapping in R" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Reka Solymosi and Juanjo Medina" />
 
 
-<meta name="date" content="2021-04-28" />
+<meta name="date" content="2022-02-07" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,7 +33,7 @@
   
 <link rel="prev" href="regression-analysis-a-refresher.html"/>
 
-<script src="libs/header-attrs-2.7.2/header-attrs.js"></script>
+<script src="libs/header-attrs-2.9/header-attrs.js"></script>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -51,6 +51,8 @@
 
 
 
+<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
 <script src="libs/htmlwidgets-1.5.3/htmlwidgets.js"></script>
 <link href="libs/leaflet-1.3.1/leaflet.css" rel="stylesheet" />
 <script src="libs/leaflet-1.3.1/leaflet.js"></script>
@@ -126,6 +128,7 @@ code span.va { color: #19177c; } /* Variable */
 code span.vs { color: #4070a0; } /* VerbatimString */
 code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
+
 
 <link rel="stylesheet" href="style.css" type="text/css" />
 </head>
@@ -405,40 +408,42 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2><span class="header-section-number">9.1</span> Introduction</h2>
 <p>Last week we provided you with an introduction to regression analysis with R. The data we used had a spatial component. We were modelling the geographical distribution of homicide across US counties. However, we did not incorporate this spatial component into our models. As we have explained throughout the semester criminal events often cluster geographically in space. So if we want to develop a regression model for crime we may have to recognise this spatial component. Remember as well, from last week, that regression models assume independence between the observations. That is, a regression model is formally assuming that what happens in area Xi is not in any way related (it is independent) of what happens in area Xii. But if those two areas are adjacent in geographical space we know that there is a good chance that this assumption may be violated. In previous weeks we covered formal tests for spatial autocorrelation, which allow us to test whether this assumption is met or not. So before we fit a regression model with spatial data we need to explore the issue of autocorrelation. We already know how to do this. In this session, we will examine the data from last week, explore whether autocorrelation is an issue, and then introduce models that allow us to take into account spatial autocorrelation. We will see that there are two basic ways of adjusting for spatial autocorrelation: through a spatial lag model or through a spatial error model.</p>
 <p>Before we do any of this, we need to load the libraries we will use today:</p>
-<div class="sourceCode" id="cb488"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb488-1"><a href="spatial-regression-models.html#cb488-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
-<span id="cb488-2"><a href="spatial-regression-models.html#cb488-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tmap)</span>
-<span id="cb488-3"><a href="spatial-regression-models.html#cb488-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb488-4"><a href="spatial-regression-models.html#cb488-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sp)</span>
-<span id="cb488-5"><a href="spatial-regression-models.html#cb488-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(spdep)</span>
-<span id="cb488-6"><a href="spatial-regression-models.html#cb488-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(spatialreg)</span>
-<span id="cb488-7"><a href="spatial-regression-models.html#cb488-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
-<span id="cb488-8"><a href="spatial-regression-models.html#cb488-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(janitor)</span>
-<span id="cb488-9"><a href="spatial-regression-models.html#cb488-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
-<span id="cb488-10"><a href="spatial-regression-models.html#cb488-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gganimate)</span>
-<span id="cb488-11"><a href="spatial-regression-models.html#cb488-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
-<span id="cb488-12"><a href="spatial-regression-models.html#cb488-12" aria-hidden="true" tabindex="-1"></a><span class="co"># library(transformr) - this needs to be installed, but doesn&#39;t need loading</span></span></code></pre></div>
+<div class="sourceCode" id="cb483"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb483-1"><a href="spatial-regression-models.html#cb483-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb483-2"><a href="spatial-regression-models.html#cb483-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tmap)</span>
+<span id="cb483-3"><a href="spatial-regression-models.html#cb483-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb483-4"><a href="spatial-regression-models.html#cb483-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sp)</span>
+<span id="cb483-5"><a href="spatial-regression-models.html#cb483-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(spdep)</span>
+<span id="cb483-6"><a href="spatial-regression-models.html#cb483-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(spatialreg)</span>
+<span id="cb483-7"><a href="spatial-regression-models.html#cb483-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
+<span id="cb483-8"><a href="spatial-regression-models.html#cb483-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(janitor)</span>
+<span id="cb483-9"><a href="spatial-regression-models.html#cb483-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb483-10"><a href="spatial-regression-models.html#cb483-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gganimate)</span>
+<span id="cb483-11"><a href="spatial-regression-models.html#cb483-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
+<span id="cb483-12"><a href="spatial-regression-models.html#cb483-12" aria-hidden="true" tabindex="-1"></a><span class="co"># library(transformr) - this needs to be installed, but doesn&#39;t need loading</span></span></code></pre></div>
 <p>Then we will be using the ncovr data from last week. You can go back to last week’s learning materials to download from Blackboard.</p>
 <p>Last week we did not treat the data as spatial and, consequently, relied on the .csv file. But notice that in the unzip ncovr file there is also a shapefile that we can load as a spatial object into R:</p>
-<div class="sourceCode" id="cb489"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb489-1"><a href="spatial-regression-models.html#cb489-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
-<span id="cb489-2"><a href="spatial-regression-models.html#cb489-2" aria-hidden="true" tabindex="-1"></a>shp_name <span class="ot">&lt;-</span> <span class="st">&quot;data/ncovr/NAT.shp&quot;</span></span>
-<span id="cb489-3"><a href="spatial-regression-models.html#cb489-3" aria-hidden="true" tabindex="-1"></a>ncovr_sf <span class="ot">&lt;-</span> <span class="fu">st_read</span>(shp_name)</span></code></pre></div>
-<pre><code>## Reading layer `NAT&#39; from data source `/Users/reka/Desktop/crime_mapping_textbook/data/ncovr/NAT.shp&#39; using driver `ESRI Shapefile&#39;
+<div class="sourceCode" id="cb484"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb484-1"><a href="spatial-regression-models.html#cb484-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb484-2"><a href="spatial-regression-models.html#cb484-2" aria-hidden="true" tabindex="-1"></a>shp_name <span class="ot">&lt;-</span> <span class="st">&quot;data/ncovr/NAT.shp&quot;</span></span>
+<span id="cb484-3"><a href="spatial-regression-models.html#cb484-3" aria-hidden="true" tabindex="-1"></a>ncovr_sf <span class="ot">&lt;-</span> <span class="fu">st_read</span>(shp_name)</span></code></pre></div>
+<pre><code>## Reading layer `NAT&#39; from data source 
+##   `/Users/reka/Desktop/crime_mapping_textbook/data/ncovr/NAT.shp&#39; 
+##   using driver `ESRI Shapefile&#39;
 ## Simple feature collection with 3085 features and 69 fields
 ## Geometry type: MULTIPOLYGON
 ## Dimension:     XY
 ## Bounding box:  xmin: -124.7314 ymin: 24.95597 xmax: -66.96985 ymax: 49.37173
 ## Geodetic CRS:  WGS 84</code></pre>
 <p>We can indeed represent our variable of interest using a choropleth map.</p>
-<div class="sourceCode" id="cb491"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb491-1"><a href="spatial-regression-models.html#cb491-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tmap)</span>
-<span id="cb491-2"><a href="spatial-regression-models.html#cb491-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb491-3"><a href="spatial-regression-models.html#cb491-3" aria-hidden="true" tabindex="-1"></a>current_style <span class="ot">&lt;-</span> <span class="fu">tmap_style</span>(<span class="st">&quot;col_blind&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb486"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb486-1"><a href="spatial-regression-models.html#cb486-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tmap)</span>
+<span id="cb486-2"><a href="spatial-regression-models.html#cb486-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb486-3"><a href="spatial-regression-models.html#cb486-3" aria-hidden="true" tabindex="-1"></a>current_style <span class="ot">&lt;-</span> <span class="fu">tmap_style</span>(<span class="st">&quot;col_blind&quot;</span>)</span></code></pre></div>
 <pre><code>## tmap style set to &quot;col_blind&quot;</code></pre>
 <pre><code>## other available styles are: &quot;white&quot;, &quot;gray&quot;, &quot;natural&quot;, &quot;cobalt&quot;, &quot;albatross&quot;, &quot;beaver&quot;, &quot;bw&quot;, &quot;classic&quot;, &quot;watercolor&quot;</code></pre>
-<div class="sourceCode" id="cb494"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb494-1"><a href="spatial-regression-models.html#cb494-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(ncovr_sf) <span class="sc">+</span> </span>
-<span id="cb494-2"><a href="spatial-regression-models.html#cb494-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="st">&quot;HR90&quot;</span>, <span class="at">title =</span> <span class="st">&quot;Homicide Rate (Quantiles)&quot;</span>, <span class="at">style=</span><span class="st">&quot;quantile&quot;</span>, <span class="at">palette =</span> <span class="st">&quot;Reds&quot;</span>) <span class="sc">+</span></span>
-<span id="cb494-3"><a href="spatial-regression-models.html#cb494-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.1</span>) <span class="sc">+</span></span>
-<span id="cb494-4"><a href="spatial-regression-models.html#cb494-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">&quot;Homicide Rate across US Counties, 1990&quot;</span>, <span class="at">main.title.size =</span> <span class="fl">0.7</span> ,</span>
-<span id="cb494-5"><a href="spatial-regression-models.html#cb494-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">legend.position =</span> <span class="fu">c</span>(<span class="st">&quot;right&quot;</span>, <span class="st">&quot;bottom&quot;</span>), <span class="at">legend.title.size =</span> <span class="fl">0.8</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb489"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb489-1"><a href="spatial-regression-models.html#cb489-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(ncovr_sf) <span class="sc">+</span> </span>
+<span id="cb489-2"><a href="spatial-regression-models.html#cb489-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="st">&quot;HR90&quot;</span>, <span class="at">title =</span> <span class="st">&quot;Homicide Rate (Quantiles)&quot;</span>, <span class="at">style=</span><span class="st">&quot;quantile&quot;</span>, <span class="at">palette =</span> <span class="st">&quot;Reds&quot;</span>) <span class="sc">+</span></span>
+<span id="cb489-3"><a href="spatial-regression-models.html#cb489-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.1</span>) <span class="sc">+</span></span>
+<span id="cb489-4"><a href="spatial-regression-models.html#cb489-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">&quot;Homicide Rate across US Counties, 1990&quot;</span>, <span class="at">main.title.size =</span> <span class="fl">0.7</span> ,</span>
+<span id="cb489-5"><a href="spatial-regression-models.html#cb489-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">legend.position =</span> <span class="fu">c</span>(<span class="st">&quot;right&quot;</span>, <span class="st">&quot;bottom&quot;</span>), <span class="at">legend.title.size =</span> <span class="fl">0.8</span>)</span></code></pre></div>
 <p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-274-1.png" width="672" /></p>
 <p>Do you think there is spatial patterning for homicide?</p>
 </div>
@@ -449,42 +454,42 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="activity-1-a-non-spatial-regression-on-spatial-data---listen-to-the-residuals" class="section level3" number="9.2.1">
 <h3><span class="header-section-number">9.2.1</span> Activity 1: A non-spatial regression on spatial data - listen to the residuals</h3>
 <p>So here is the function <code>lm()</code> which we learned all about last week (or refreshed about…!). Anyway, here we model homicide rate in the 1990s (<code>HR90</code>) using all 6 variables of interest, <code>RD90</code>- Resource Deprivation/Affluence, <code>SOUTH</code> - Counties in the southern region scored 1, <code>DV90</code> divorce rate, <code>MA90</code> the median age, <code>PS90</code> - population structure, and <code>UE90</code> unemployment. Let’s fit the model now:</p>
-<div class="sourceCode" id="cb495"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb495-1"><a href="spatial-regression-models.html#cb495-1" aria-hidden="true" tabindex="-1"></a>fit_1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(HR90 <span class="sc">~</span> RD90 <span class="sc">+</span> SOUTH <span class="sc">+</span> DV90 <span class="sc">+</span> MA90 <span class="sc">+</span> PS90 <span class="sc">+</span> UE90, <span class="at">data=</span>ncovr_sf)</span></code></pre></div>
+<div class="sourceCode" id="cb490"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb490-1"><a href="spatial-regression-models.html#cb490-1" aria-hidden="true" tabindex="-1"></a>fit_1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(HR90 <span class="sc">~</span> RD90 <span class="sc">+</span> SOUTH <span class="sc">+</span> DV90 <span class="sc">+</span> MA90 <span class="sc">+</span> PS90 <span class="sc">+</span> UE90, <span class="at">data=</span>ncovr_sf)</span></code></pre></div>
 <p>Now that we have fitted the model we can extract the residuals. If you look at the fit_1 object in your RStudio environment or if you run the <code>str()</code> function to look inside this object you will see that this object is a list with different elements, one of which is the residuals. An element of this object then includes the residual for each of your observations (the difference between the observed value and the value predicted by your model). We can extract the residuals using the <code>residuals()</code> function and add them to our spatial data set.</p>
-<div class="sourceCode" id="cb496"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb496-1"><a href="spatial-regression-models.html#cb496-1" aria-hidden="true" tabindex="-1"></a>ncovr_sf<span class="sc">$</span>res_fit1 <span class="ot">&lt;-</span> <span class="fu">residuals</span>(fit_1)</span></code></pre></div>
+<div class="sourceCode" id="cb491"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb491-1"><a href="spatial-regression-models.html#cb491-1" aria-hidden="true" tabindex="-1"></a>ncovr_sf<span class="sc">$</span>res_fit1 <span class="ot">&lt;-</span> <span class="fu">residuals</span>(fit_1)</span></code></pre></div>
 <p>If you now look at the dataset you will see that there is a new variable with the residuals. In those cases where the residual is negative this is telling us that the observed value is lower than the predicted (that is, our model is <em>overpredicting</em> the level of homicide for that observation) when the residual is positive the observed value is higher than the predicted (that is, our model is <em>underpredicting</em> the level of homicide for that observation).</p>
 <p>We could also extract the predicted values if we wanted. We would use the <code>fitted()</code> function.</p>
-<div class="sourceCode" id="cb497"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb497-1"><a href="spatial-regression-models.html#cb497-1" aria-hidden="true" tabindex="-1"></a>ncovr_sf<span class="sc">$</span>fitted_fit1 <span class="ot">&lt;-</span> <span class="fu">fitted</span>(fit_1)</span></code></pre></div>
+<div class="sourceCode" id="cb492"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb492-1"><a href="spatial-regression-models.html#cb492-1" aria-hidden="true" tabindex="-1"></a>ncovr_sf<span class="sc">$</span>fitted_fit1 <span class="ot">&lt;-</span> <span class="fu">fitted</span>(fit_1)</span></code></pre></div>
 <p>Now look at the second county in the dataset. It has a homicide rate in 1990 of 15.88. This is the observed value. If we look at the new column we have created (“fitted_fit1”), our model predicts a homicide rate of 2.41. That is, knowing the level unemployment, whether the county is North or South, the level of resource deprivation, etc., we are predicting a homicide rate of 2.41. Now, this is lower than the observed value, so our model is underpredicting the level of homicide in this case. If you observed the residual you will see that it has a value of 13.46, which is simply the difference between the observed and the predicted value.</p>
 <p>With spatial data one useful thing to do is to look at any spatial patterning in the distribution of the residuals. Notice that the residuals are the difference between the observed values for homicide and the predicted values for homicide, so you want your residual to NOT display any spatial patterning. If, on the other hand, your model displays a patterning in the areas of the study region where it predicts badly, then you may have a problem. This is telling you that your model is not a good representation of the social phenomena you are studying across the full study area: there is systematically more distortion in some areas than in others.</p>
 <p>We are going to produce a choropleth map for the residuals, but we will use a common classification method we haven’t covered yet: standard deviations. Standard deviation is a statistical technique that is based on how much the data differs from the mean. First, you measure the mean and standard deviation for your data. Then, each standard deviation becomes a class in your choropleth maps.</p>
 <p>In order to do that we will compute the mean and the standard deviation for the variable we want to plot and break the variable according to these values. The following code creates a new variable in which we will express the residuals in terms of standard deviations away from the mean. So, for each observation, we subtract the mean and divide by the standard deviation. Remember, this is exactly what the <code>scale</code> function does, which we have introduced in week 7:</p>
-<div class="sourceCode" id="cb498"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb498-1"><a href="spatial-regression-models.html#cb498-1" aria-hidden="true" tabindex="-1"></a>ncovr_sf<span class="sc">$</span>sd_breaks <span class="ot">&lt;-</span> <span class="fu">scale</span>(ncovr_sf<span class="sc">$</span>res_fit1)[,<span class="dv">1</span>] <span class="co"># because scale is made for matrices, we just need to get the first column using [,1]</span></span>
-<span id="cb498-2"><a href="spatial-regression-models.html#cb498-2" aria-hidden="true" tabindex="-1"></a><span class="co"># this is equal to (ncovr_sf$res_fit1 - mean(ncovr_sf$res_fit1)) / sd(ncovr_sf$res_fit1)</span></span>
-<span id="cb498-3"><a href="spatial-regression-models.html#cb498-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ncovr_sf<span class="sc">$</span>sd_breaks)</span></code></pre></div>
+<div class="sourceCode" id="cb493"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb493-1"><a href="spatial-regression-models.html#cb493-1" aria-hidden="true" tabindex="-1"></a>ncovr_sf<span class="sc">$</span>sd_breaks <span class="ot">&lt;-</span> <span class="fu">scale</span>(ncovr_sf<span class="sc">$</span>res_fit1)[,<span class="dv">1</span>] <span class="co"># because scale is made for matrices, we just need to get the first column using [,1]</span></span>
+<span id="cb493-2"><a href="spatial-regression-models.html#cb493-2" aria-hidden="true" tabindex="-1"></a><span class="co"># this is equal to (ncovr_sf$res_fit1 - mean(ncovr_sf$res_fit1)) / sd(ncovr_sf$res_fit1)</span></span>
+<span id="cb493-3"><a href="spatial-regression-models.html#cb493-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ncovr_sf<span class="sc">$</span>sd_breaks)</span></code></pre></div>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ## -3.5370 -0.5238 -0.1404  0.0000  0.3314 13.7407</code></pre>
 <p>Next we use a new style, <code>fixed</code>, within the <code>tm_fill</code> function. When we break the variable into classes using the <code>fixed</code> argument we need to specify the boundaries of the classes. We do this using the breaks argument. In this case we are going to ask R to create 7 classes based on standard deviations away from the mean. Remember that a value of 1 would be 1 standard deviation (s.d.) higher than the mean, and -1 would be one s.d. lower. If we assume normal distribution, then 68% of all counties should lie within the middle band from -1 to +1 s.d. (you can find a refresher of this <a href="https://en.wikipedia.org/wiki/68%E2%80%9395%E2%80%9399.7_rule">on Wikipedia</a>).</p>
-<div class="sourceCode" id="cb500"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb500-1"><a href="spatial-regression-models.html#cb500-1" aria-hidden="true" tabindex="-1"></a>my_breaks <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">14</span>,<span class="sc">-</span><span class="dv">3</span>,<span class="sc">-</span><span class="dv">2</span>,<span class="sc">-</span><span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">14</span>)</span>
-<span id="cb500-2"><a href="spatial-regression-models.html#cb500-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb500-3"><a href="spatial-regression-models.html#cb500-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(ncovr_sf) <span class="sc">+</span> </span>
-<span id="cb500-4"><a href="spatial-regression-models.html#cb500-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="st">&quot;sd_breaks&quot;</span>, <span class="at">title =</span> <span class="st">&quot;Residuals&quot;</span>, <span class="at">style =</span> <span class="st">&quot;fixed&quot;</span>, <span class="at">breaks =</span> my_breaks, <span class="at">palette =</span> <span class="st">&quot;-RdBu&quot;</span>) <span class="sc">+</span></span>
-<span id="cb500-5"><a href="spatial-regression-models.html#cb500-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.1</span>) <span class="sc">+</span></span>
-<span id="cb500-6"><a href="spatial-regression-models.html#cb500-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">&quot;Residuals&quot;</span>, <span class="at">main.title.size =</span> <span class="fl">0.7</span> ,</span>
-<span id="cb500-7"><a href="spatial-regression-models.html#cb500-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">legend.position =</span> <span class="fu">c</span>(<span class="st">&quot;right&quot;</span>, <span class="st">&quot;bottom&quot;</span>), <span class="at">legend.title.size =</span> <span class="fl">0.8</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb495"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb495-1"><a href="spatial-regression-models.html#cb495-1" aria-hidden="true" tabindex="-1"></a>my_breaks <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">14</span>,<span class="sc">-</span><span class="dv">3</span>,<span class="sc">-</span><span class="dv">2</span>,<span class="sc">-</span><span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">14</span>)</span>
+<span id="cb495-2"><a href="spatial-regression-models.html#cb495-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb495-3"><a href="spatial-regression-models.html#cb495-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(ncovr_sf) <span class="sc">+</span> </span>
+<span id="cb495-4"><a href="spatial-regression-models.html#cb495-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="st">&quot;sd_breaks&quot;</span>, <span class="at">title =</span> <span class="st">&quot;Residuals&quot;</span>, <span class="at">style =</span> <span class="st">&quot;fixed&quot;</span>, <span class="at">breaks =</span> my_breaks, <span class="at">palette =</span> <span class="st">&quot;-RdBu&quot;</span>) <span class="sc">+</span></span>
+<span id="cb495-5"><a href="spatial-regression-models.html#cb495-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.1</span>) <span class="sc">+</span></span>
+<span id="cb495-6"><a href="spatial-regression-models.html#cb495-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">&quot;Residuals&quot;</span>, <span class="at">main.title.size =</span> <span class="fl">0.7</span> ,</span>
+<span id="cb495-7"><a href="spatial-regression-models.html#cb495-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">legend.position =</span> <span class="fu">c</span>(<span class="st">&quot;right&quot;</span>, <span class="st">&quot;bottom&quot;</span>), <span class="at">legend.title.size =</span> <span class="fl">0.8</span>)</span></code></pre></div>
 <p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-279-1.png" width="672" /></p>
 <p>Notice the spatial patterning of areas of over-prediction (negative residuals, or blue tones) and under-prediction (positive residuals, or brown tones). This visual inspection of the residuals is telling you that spatial autocorrelation may be present here. This, however, would require a more formal test.</p>
 </div>
 <div id="activity-2-spatial-autocorrelation-again" class="section level3" number="9.2.2">
 <h3><span class="header-section-number">9.2.2</span> Activity 2: Spatial autocorrelation (again)</h3>
 <p>Remember from week 7 that in order to do this first we need to turn our <code>sf</code> object into a <code>sp</code> class object and then create the spatial weight matrix. If the code below and what it does is not clear to you, revise the notes from week 7, when we first introduced it.</p>
-<div class="sourceCode" id="cb501"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb501-1"><a href="spatial-regression-models.html#cb501-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sp)</span>
-<span id="cb501-2"><a href="spatial-regression-models.html#cb501-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(spdep)</span>
-<span id="cb501-3"><a href="spatial-regression-models.html#cb501-3" aria-hidden="true" tabindex="-1"></a><span class="co">#We coerce the sf object into a new sp object</span></span>
-<span id="cb501-4"><a href="spatial-regression-models.html#cb501-4" aria-hidden="true" tabindex="-1"></a>ncovr_sp <span class="ot">&lt;-</span> <span class="fu">as</span>(ncovr_sf, <span class="st">&quot;Spatial&quot;</span>)</span>
-<span id="cb501-5"><a href="spatial-regression-models.html#cb501-5" aria-hidden="true" tabindex="-1"></a><span class="co">#Then we create a list of neighbours using the Queen criteria</span></span>
-<span id="cb501-6"><a href="spatial-regression-models.html#cb501-6" aria-hidden="true" tabindex="-1"></a>w <span class="ot">&lt;-</span> <span class="fu">poly2nb</span>(ncovr_sp, <span class="at">row.names=</span>ncovr_sp<span class="sc">$</span>FIPSNO)</span>
-<span id="cb501-7"><a href="spatial-regression-models.html#cb501-7" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(w)</span></code></pre></div>
+<div class="sourceCode" id="cb496"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb496-1"><a href="spatial-regression-models.html#cb496-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sp)</span>
+<span id="cb496-2"><a href="spatial-regression-models.html#cb496-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(spdep)</span>
+<span id="cb496-3"><a href="spatial-regression-models.html#cb496-3" aria-hidden="true" tabindex="-1"></a><span class="co">#We coerce the sf object into a new sp object</span></span>
+<span id="cb496-4"><a href="spatial-regression-models.html#cb496-4" aria-hidden="true" tabindex="-1"></a>ncovr_sp <span class="ot">&lt;-</span> <span class="fu">as</span>(ncovr_sf, <span class="st">&quot;Spatial&quot;</span>)</span>
+<span id="cb496-5"><a href="spatial-regression-models.html#cb496-5" aria-hidden="true" tabindex="-1"></a><span class="co">#Then we create a list of neighbours using the Queen criteria</span></span>
+<span id="cb496-6"><a href="spatial-regression-models.html#cb496-6" aria-hidden="true" tabindex="-1"></a>w <span class="ot">&lt;-</span> <span class="fu">poly2nb</span>(ncovr_sp, <span class="at">row.names=</span>ncovr_sp<span class="sc">$</span>FIPSNO)</span>
+<span id="cb496-7"><a href="spatial-regression-models.html#cb496-7" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(w)</span></code></pre></div>
 <pre><code>## Neighbour list object:
 ## Number of regions: 3085 
 ## Number of nonzero links: 18168 
@@ -499,10 +504,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## 1 most connected region:
 ## 49037 with 14 links</code></pre>
 <p>This should give you an idea of the distribution of connectedness across the data, with counties having on average nearly 6 neighbours. Now we can generate the row-standardised spatial weight matrix and the Moran Scatterplot.</p>
-<div class="sourceCode" id="cb503"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb503-1"><a href="spatial-regression-models.html#cb503-1" aria-hidden="true" tabindex="-1"></a>wm <span class="ot">&lt;-</span> <span class="fu">nb2mat</span>(w, <span class="at">style=</span><span class="st">&#39;B&#39;</span>)</span>
-<span id="cb503-2"><a href="spatial-regression-models.html#cb503-2" aria-hidden="true" tabindex="-1"></a>rwm <span class="ot">&lt;-</span> <span class="fu">mat2listw</span>(wm, <span class="at">style=</span><span class="st">&#39;W&#39;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb498"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb498-1"><a href="spatial-regression-models.html#cb498-1" aria-hidden="true" tabindex="-1"></a>wm <span class="ot">&lt;-</span> <span class="fu">nb2mat</span>(w, <span class="at">style=</span><span class="st">&#39;B&#39;</span>)</span>
+<span id="cb498-2"><a href="spatial-regression-models.html#cb498-2" aria-hidden="true" tabindex="-1"></a>rwm <span class="ot">&lt;-</span> <span class="fu">mat2listw</span>(wm, <span class="at">style=</span><span class="st">&#39;W&#39;</span>)</span></code></pre></div>
 <p>We obtain the Moran’s test for regression residuals using the function <code>lm.morantest()</code> as below. It is important to realize that the Moran’s I test statistic for residual spatial autocorrelation takes into account the fact that the variable under consideration is a residual, computed from a regression. The usual Moran’s I test statistic does not. It is therefore incorrect to simply apply a Moran’s I test to the residuals from the regression without correcting for the fact that these are residuals.</p>
-<div class="sourceCode" id="cb504"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb504-1"><a href="spatial-regression-models.html#cb504-1" aria-hidden="true" tabindex="-1"></a><span class="fu">lm.morantest</span>(fit_1, rwm, <span class="at">alternative=</span><span class="st">&quot;two.sided&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb499"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb499-1"><a href="spatial-regression-models.html#cb499-1" aria-hidden="true" tabindex="-1"></a><span class="fu">lm.morantest</span>(fit_1, rwm, <span class="at">alternative=</span><span class="st">&quot;two.sided&quot;</span>)</span></code></pre></div>
 <pre><code>## 
 ##  Global Moran I for regression residuals
 ## 
@@ -537,31 +542,31 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="activity-3-assessing-spatial-regimes-using-residuals" class="section level3" number="9.4.1">
 <h3><span class="header-section-number">9.4.1</span> Activity 3: Assessing spatial regimes using residuals</h3>
 <p>Look at the residual map we produced earlier. Do you think that the residuals look different in the South and in the North? If the pattern is not clear to you, you may want to run other forms of visualisation.</p>
-<div class="sourceCode" id="cb506"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb506-1"><a href="spatial-regression-models.html#cb506-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb506-2"><a href="spatial-regression-models.html#cb506-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb506-3"><a href="spatial-regression-models.html#cb506-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(ncovr_sf, <span class="fu">aes</span>(<span class="at">x =</span> res_fit1, <span class="at">colour =</span> <span class="fu">as.factor</span>(SOUTH))) <span class="sc">+</span> </span>
-<span id="cb506-4"><a href="spatial-regression-models.html#cb506-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>() </span></code></pre></div>
+<div class="sourceCode" id="cb501"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb501-1"><a href="spatial-regression-models.html#cb501-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb501-2"><a href="spatial-regression-models.html#cb501-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb501-3"><a href="spatial-regression-models.html#cb501-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(ncovr_sf, <span class="fu">aes</span>(<span class="at">x =</span> res_fit1, <span class="at">colour =</span> <span class="fu">as.factor</span>(SOUTH))) <span class="sc">+</span> </span>
+<span id="cb501-4"><a href="spatial-regression-models.html#cb501-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>() </span></code></pre></div>
 <p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-283-1.png" width="672" /></p>
 <p>What do you see in this plot? And, critically, what does it mean? What is this telling you about the predicted values that result from our model? (Remember what a residual is: the difference between the observed values and the predicted values).</p>
 <p>There are formal tests that one can use to further explore these issues. The paper by Bollen et al. (2001) mentions them (Chow tests). But those are beyond the scope of this course. Sufficient to say that, as Bollen et al. (2001), we are going to split our analysis and run them separately for the Southern and the Northern states. We have covered the <code>filter()</code> function from <code>dplyr</code> to split datasets based on values of a variable. But to split <code>sf</code> objects it is better to rely on the more generic subset function, since <code>filter()</code> doesn’t accommodate well the column with the geographic information that <code>sf</code> provides.</p>
-<div class="sourceCode" id="cb507"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb507-1"><a href="spatial-regression-models.html#cb507-1" aria-hidden="true" tabindex="-1"></a>ncovr_s_sf <span class="ot">&lt;-</span> <span class="fu">subset</span>(ncovr_sf, SOUTH <span class="sc">==</span> <span class="dv">1</span>)</span>
-<span id="cb507-2"><a href="spatial-regression-models.html#cb507-2" aria-hidden="true" tabindex="-1"></a>ncovr_n_sf <span class="ot">&lt;-</span> <span class="fu">subset</span>(ncovr_sf, SOUTH <span class="sc">==</span> <span class="dv">0</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb502"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb502-1"><a href="spatial-regression-models.html#cb502-1" aria-hidden="true" tabindex="-1"></a>ncovr_s_sf <span class="ot">&lt;-</span> <span class="fu">subset</span>(ncovr_sf, SOUTH <span class="sc">==</span> <span class="dv">1</span>)</span>
+<span id="cb502-2"><a href="spatial-regression-models.html#cb502-2" aria-hidden="true" tabindex="-1"></a>ncovr_n_sf <span class="ot">&lt;-</span> <span class="fu">subset</span>(ncovr_sf, SOUTH <span class="sc">==</span> <span class="dv">0</span>)</span></code></pre></div>
 </div>
 </div>
 <div id="lagrange-multipliers" class="section level2" number="9.5">
 <h2><span class="header-section-number">9.5</span> Lagrange multipliers</h2>
 <p>The Moran’s I test statistic has high power against a range of spatial alternatives. However, it does not provide much help in terms of which alternative model would be most appropriate. The Lagrange Multiplier test statistics do allow a distinction between spatial error models and spatial lag models.</p>
 <p>In order to practice their computation and interpretation, let’s run two separate OLS regression models (one for the South and one for the North), using the same predictors as we used last week and, first, focusing on homicide in the northern counties in the 1990s. We have split the data in two, so that means that before we do this we need to create new files for the spatial weight matrix: in particular we will create one using first order queen criteria.</p>
-<div class="sourceCode" id="cb508"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb508-1"><a href="spatial-regression-models.html#cb508-1" aria-hidden="true" tabindex="-1"></a><span class="co">#We coerce the sf object into a new sp object</span></span>
-<span id="cb508-2"><a href="spatial-regression-models.html#cb508-2" aria-hidden="true" tabindex="-1"></a>ncovr_n_sp <span class="ot">&lt;-</span> <span class="fu">as</span>(ncovr_n_sf, <span class="st">&quot;Spatial&quot;</span>)</span>
-<span id="cb508-3"><a href="spatial-regression-models.html#cb508-3" aria-hidden="true" tabindex="-1"></a><span class="co">#Then we create a list of neighbours using the Queen criteria</span></span>
-<span id="cb508-4"><a href="spatial-regression-models.html#cb508-4" aria-hidden="true" tabindex="-1"></a>w_n <span class="ot">&lt;-</span> <span class="fu">poly2nb</span>(ncovr_n_sp, <span class="at">row.names=</span>ncovr_n_sp<span class="sc">$</span>FIPSNO)</span>
-<span id="cb508-5"><a href="spatial-regression-models.html#cb508-5" aria-hidden="true" tabindex="-1"></a>wm_n <span class="ot">&lt;-</span> <span class="fu">nb2mat</span>(w_n, <span class="at">style=</span><span class="st">&#39;B&#39;</span>)</span>
-<span id="cb508-6"><a href="spatial-regression-models.html#cb508-6" aria-hidden="true" tabindex="-1"></a>rwm_n <span class="ot">&lt;-</span> <span class="fu">mat2listw</span>(wm_n, <span class="at">style=</span><span class="st">&#39;W&#39;</span>)</span>
-<span id="cb508-7"><a href="spatial-regression-models.html#cb508-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb508-8"><a href="spatial-regression-models.html#cb508-8" aria-hidden="true" tabindex="-1"></a>fit_2 <span class="ot">&lt;-</span> <span class="fu">lm</span>(HR90 <span class="sc">~</span> RD90 <span class="sc">+</span> DV90 <span class="sc">+</span> MA90 <span class="sc">+</span> PS90 <span class="sc">+</span>UE90, <span class="at">data=</span>ncovr_n_sf)</span></code></pre></div>
+<div class="sourceCode" id="cb503"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb503-1"><a href="spatial-regression-models.html#cb503-1" aria-hidden="true" tabindex="-1"></a><span class="co">#We coerce the sf object into a new sp object</span></span>
+<span id="cb503-2"><a href="spatial-regression-models.html#cb503-2" aria-hidden="true" tabindex="-1"></a>ncovr_n_sp <span class="ot">&lt;-</span> <span class="fu">as</span>(ncovr_n_sf, <span class="st">&quot;Spatial&quot;</span>)</span>
+<span id="cb503-3"><a href="spatial-regression-models.html#cb503-3" aria-hidden="true" tabindex="-1"></a><span class="co">#Then we create a list of neighbours using the Queen criteria</span></span>
+<span id="cb503-4"><a href="spatial-regression-models.html#cb503-4" aria-hidden="true" tabindex="-1"></a>w_n <span class="ot">&lt;-</span> <span class="fu">poly2nb</span>(ncovr_n_sp, <span class="at">row.names=</span>ncovr_n_sp<span class="sc">$</span>FIPSNO)</span>
+<span id="cb503-5"><a href="spatial-regression-models.html#cb503-5" aria-hidden="true" tabindex="-1"></a>wm_n <span class="ot">&lt;-</span> <span class="fu">nb2mat</span>(w_n, <span class="at">style=</span><span class="st">&#39;B&#39;</span>)</span>
+<span id="cb503-6"><a href="spatial-regression-models.html#cb503-6" aria-hidden="true" tabindex="-1"></a>rwm_n <span class="ot">&lt;-</span> <span class="fu">mat2listw</span>(wm_n, <span class="at">style=</span><span class="st">&#39;W&#39;</span>)</span>
+<span id="cb503-7"><a href="spatial-regression-models.html#cb503-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb503-8"><a href="spatial-regression-models.html#cb503-8" aria-hidden="true" tabindex="-1"></a>fit_2 <span class="ot">&lt;-</span> <span class="fu">lm</span>(HR90 <span class="sc">~</span> RD90 <span class="sc">+</span> DV90 <span class="sc">+</span> MA90 <span class="sc">+</span> PS90 <span class="sc">+</span>UE90, <span class="at">data=</span>ncovr_n_sf)</span></code></pre></div>
 <p>First look at the Moran’s I.</p>
-<div class="sourceCode" id="cb509"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb509-1"><a href="spatial-regression-models.html#cb509-1" aria-hidden="true" tabindex="-1"></a><span class="fu">lm.morantest</span>(fit_2, rwm_n, <span class="at">alternative=</span><span class="st">&quot;two.sided&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb504"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb504-1"><a href="spatial-regression-models.html#cb504-1" aria-hidden="true" tabindex="-1"></a><span class="fu">lm.morantest</span>(fit_2, rwm_n, <span class="at">alternative=</span><span class="st">&quot;two.sided&quot;</span>)</span></code></pre></div>
 <pre><code>## 
 ##  Global Moran I for regression residuals
 ## 
@@ -579,7 +584,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="activity-4-lagrange-multiplier-tests" class="section level3" number="9.5.1">
 <h3><span class="header-section-number">9.5.1</span> Activity 4: Lagrange multiplier tests</h3>
 <p>Both Lagrange multiplier tests (for the error and the lagged models, <code>LMerr</code> and <code>LMlag</code> respectively), as well as their robust forms (<code>RLMerr</code> and <code>RLMLag</code>, also respectively) are included in the <code>lm.LMtests</code> function. Again, a regression object and a spatial <code>listw</code> object must be passed as arguments. In addition, the tests must be specified as a character vector (the default is only <code>LMerror</code>), using the <code>c( )</code> operator (concatenate), as illustrated below.</p>
-<div class="sourceCode" id="cb511"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb511-1"><a href="spatial-regression-models.html#cb511-1" aria-hidden="true" tabindex="-1"></a><span class="fu">lm.LMtests</span>(fit_2, rwm_n, <span class="at">test =</span> <span class="fu">c</span>(<span class="st">&quot;LMerr&quot;</span>,<span class="st">&quot;LMlag&quot;</span>,<span class="st">&quot;RLMerr&quot;</span>,<span class="st">&quot;RLMlag&quot;</span>,<span class="st">&quot;SARMA&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb506"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb506-1"><a href="spatial-regression-models.html#cb506-1" aria-hidden="true" tabindex="-1"></a><span class="fu">lm.LMtests</span>(fit_2, rwm_n, <span class="at">test =</span> <span class="fu">c</span>(<span class="st">&quot;LMerr&quot;</span>,<span class="st">&quot;LMlag&quot;</span>,<span class="st">&quot;RLMerr&quot;</span>,<span class="st">&quot;RLMlag&quot;</span>,<span class="st">&quot;SARMA&quot;</span>))</span></code></pre></div>
 <pre><code>## 
 ##  Lagrange multiplier diagnostics for spatial dependence
 ## 
@@ -649,10 +654,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="activity-5-spatial-lag-model" class="section level3" number="9.6.1">
 <h3><span class="header-section-number">9.6.1</span> Activity 5: Spatial lag model</h3>
 <p>Maximum Likelihood (ML) estimation of the spatial lag model is carried out with the <code>lagsarlm()</code> function. The required arguments are a regression “formula,” a data set and a <code>listw</code> spatial weights object. The default method uses Ord’s eigenvalue decomposition of the spatial weights matrix. This function lives in the <code>spatialreg</code> package.</p>
-<div class="sourceCode" id="cb513"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb513-1"><a href="spatial-regression-models.html#cb513-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(spatialreg)</span>
-<span id="cb513-2"><a href="spatial-regression-models.html#cb513-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb513-3"><a href="spatial-regression-models.html#cb513-3" aria-hidden="true" tabindex="-1"></a>fit_2_lag <span class="ot">&lt;-</span> <span class="fu">lagsarlm</span>(HR90 <span class="sc">~</span> RD90 <span class="sc">+</span> DV90 <span class="sc">+</span> MA90 <span class="sc">+</span> PS90 <span class="sc">+</span> UE90, <span class="at">data=</span>ncovr_n_sf, rwm_n)</span>
-<span id="cb513-4"><a href="spatial-regression-models.html#cb513-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit_2_lag)</span></code></pre></div>
+<div class="sourceCode" id="cb508"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb508-1"><a href="spatial-regression-models.html#cb508-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(spatialreg)</span>
+<span id="cb508-2"><a href="spatial-regression-models.html#cb508-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb508-3"><a href="spatial-regression-models.html#cb508-3" aria-hidden="true" tabindex="-1"></a>fit_2_lag <span class="ot">&lt;-</span> <span class="fu">lagsarlm</span>(HR90 <span class="sc">~</span> RD90 <span class="sc">+</span> DV90 <span class="sc">+</span> MA90 <span class="sc">+</span> PS90 <span class="sc">+</span> UE90, <span class="at">data=</span>ncovr_n_sf, rwm_n)</span>
+<span id="cb508-4"><a href="spatial-regression-models.html#cb508-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit_2_lag)</span></code></pre></div>
 <pre><code>## 
 ## Call:
 ## lagsarlm(formula = HR90 ~ RD90 + DV90 + MA90 + PS90 + UE90, data = ncovr_n_sf, 
@@ -705,31 +710,31 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>These quantities can be found using the <code>impacts()</code> function in the <code>spatialreg</code> library. This function performs the calculation of impacts for spatial lag, which is needed in order to interpret the regression coefficients correctly, because of the spillovers between the terms in these data generation processes</p>
 <p>Impacts takes the argument of our model (<code>fit_2_lag</code>), as well as our spatial weights. Now we could specify our already existing spatial weights object <code>rwm_n</code> using the <code>listw=</code> parameter, however, we have a very large matrix, and this might mean our calculations will take all day (if you don’t believe me, try it! but don’t say I didn’t warn you!)</p>
 <p>Instead, what we can do is follow the example that converts the spatial weight matrix into a “sparse” matrix, and power it up using the <code>trW()</code> function. This follows the approximation methods described in Lesage and Pace, 2009. It prepares a vector of traces of powers of a spatial weights matrix Here, we use Monte Carlo simulation to obtain simulated distributions of the various impacts. If we use this, our outcome will be much faster. The <code>trW()</code> function needs our spatial weights to be in a sparse matrix class object, so we can transform this using the <code>as()</code> function:</p>
-<div class="sourceCode" id="cb515"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb515-1"><a href="spatial-regression-models.html#cb515-1" aria-hidden="true" tabindex="-1"></a>W <span class="ot">&lt;-</span> <span class="fu">as</span>(rwm_n, <span class="st">&quot;CsparseMatrix&quot;</span>)</span>
-<span id="cb515-2"><a href="spatial-regression-models.html#cb515-2" aria-hidden="true" tabindex="-1"></a>trMC <span class="ot">&lt;-</span> <span class="fu">trW</span>(W, <span class="at">type=</span><span class="st">&quot;MC&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb510"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb510-1"><a href="spatial-regression-models.html#cb510-1" aria-hidden="true" tabindex="-1"></a>W <span class="ot">&lt;-</span> <span class="fu">as</span>(rwm_n, <span class="st">&quot;CsparseMatrix&quot;</span>)</span>
+<span id="cb510-2"><a href="spatial-regression-models.html#cb510-2" aria-hidden="true" tabindex="-1"></a>trMC <span class="ot">&lt;-</span> <span class="fu">trW</span>(W, <span class="at">type=</span><span class="st">&quot;MC&quot;</span>)</span></code></pre></div>
 <p>Finally, <code>R=</code> asks for the number of simulations used to compute the distribution for the impact measures.</p>
-<div class="sourceCode" id="cb516"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb516-1"><a href="spatial-regression-models.html#cb516-1" aria-hidden="true" tabindex="-1"></a>im<span class="ot">&lt;-</span><span class="fu">impacts</span>(fit_2_lag, <span class="at">tr =</span> trMC, <span class="at">R=</span><span class="dv">100</span>)</span>
-<span id="cb516-2"><a href="spatial-regression-models.html#cb516-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb516-3"><a href="spatial-regression-models.html#cb516-3" aria-hidden="true" tabindex="-1"></a>sums<span class="ot">&lt;-</span><span class="fu">summary</span>(im,  <span class="at">zstats=</span>T)</span>
-<span id="cb516-4"><a href="spatial-regression-models.html#cb516-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb516-5"><a href="spatial-regression-models.html#cb516-5" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(sums<span class="sc">$</span>res)</span></code></pre></div>
+<div class="sourceCode" id="cb511"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb511-1"><a href="spatial-regression-models.html#cb511-1" aria-hidden="true" tabindex="-1"></a>im<span class="ot">&lt;-</span><span class="fu">impacts</span>(fit_2_lag, <span class="at">tr =</span> trMC, <span class="at">R=</span><span class="dv">100</span>)</span>
+<span id="cb511-2"><a href="spatial-regression-models.html#cb511-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb511-3"><a href="spatial-regression-models.html#cb511-3" aria-hidden="true" tabindex="-1"></a>sums<span class="ot">&lt;-</span><span class="fu">summary</span>(im,  <span class="at">zstats=</span>T)</span>
+<span id="cb511-4"><a href="spatial-regression-models.html#cb511-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb511-5"><a href="spatial-regression-models.html#cb511-5" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(sums<span class="sc">$</span>res)</span></code></pre></div>
 <pre><code>##        direct     indirect       total
-## 1  2.78002072  0.312915726  3.09293644
-## 2  0.53394535  0.060100235  0.59404559
-## 3 -0.09865809 -0.011104834 -0.10976293
-## 4  0.93569065  0.105320194  1.04101085
-## 5 -0.07990480 -0.008993986 -0.08889878</code></pre>
-<div class="sourceCode" id="cb518"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb518-1"><a href="spatial-regression-models.html#cb518-1" aria-hidden="true" tabindex="-1"></a><span class="co">#To print the p values</span></span>
-<span id="cb518-2"><a href="spatial-regression-models.html#cb518-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(sums<span class="sc">$</span>pzmat)</span></code></pre></div>
-<pre><code>##            Direct    Indirect       Total
-## RD90 0.0000000000 0.006369089 0.000000000
-## DV90 0.0000000000 0.005558751 0.000000000
-## MA90 0.0002833353 0.021736174 0.000225024
-## PS90 0.0000000000 0.008188202 0.000000000
-## UE90 0.0993468018 0.172938363 0.099098243</code></pre>
+## 1  2.78000997  0.312926477  3.09293644
+## 2  0.53394329  0.060102299  0.59404559
+## 3 -0.09865771 -0.011105216 -0.10976293
+## 4  0.93568704  0.105323812  1.04101085
+## 5 -0.07990449 -0.008994295 -0.08889878</code></pre>
+<div class="sourceCode" id="cb513"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb513-1"><a href="spatial-regression-models.html#cb513-1" aria-hidden="true" tabindex="-1"></a><span class="co">#To print the p values</span></span>
+<span id="cb513-2"><a href="spatial-regression-models.html#cb513-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(sums<span class="sc">$</span>pzmat)</span></code></pre></div>
+<pre><code>##           Direct    Indirect       Total
+## RD90 0.000000000 0.004402578 0.000000000
+## DV90 0.000000000 0.003655513 0.000000000
+## MA90 0.003623684 0.059391980 0.004282742
+## PS90 0.000000000 0.004631352 0.000000000
+## UE90 0.127424906 0.235831583 0.134232336</code></pre>
 <p>We see that all the variables have significant direct, indirect and total effects. You may want to have a look at how things differ when you just run a non spatial model.</p>
-<div class="sourceCode" id="cb520"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb520-1"><a href="spatial-regression-models.html#cb520-1" aria-hidden="true" tabindex="-1"></a>fit_1_OLS <span class="ot">&lt;-</span> <span class="fu">lm</span>(HR90 <span class="sc">~</span> RD90 <span class="sc">+</span> DV90 <span class="sc">+</span> MA90 <span class="sc">+</span> PS90 <span class="sc">+</span>UE90, <span class="at">data=</span>ncovr_n_sf)</span>
-<span id="cb520-2"><a href="spatial-regression-models.html#cb520-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit_1_OLS)</span></code></pre></div>
+<div class="sourceCode" id="cb515"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb515-1"><a href="spatial-regression-models.html#cb515-1" aria-hidden="true" tabindex="-1"></a>fit_1_OLS <span class="ot">&lt;-</span> <span class="fu">lm</span>(HR90 <span class="sc">~</span> RD90 <span class="sc">+</span> DV90 <span class="sc">+</span> MA90 <span class="sc">+</span> PS90 <span class="sc">+</span>UE90, <span class="at">data=</span>ncovr_n_sf)</span>
+<span id="cb515-2"><a href="spatial-regression-models.html#cb515-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit_1_OLS)</span></code></pre></div>
 <pre><code>## 
 ## Call:
 ## lm(formula = HR90 ~ RD90 + DV90 + MA90 + PS90 + UE90, data = ncovr_n_sf)
@@ -762,15 +767,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="activity-6-spatial-error-model" class="section level3" number="9.7.1">
 <h3><span class="header-section-number">9.7.1</span> Activity 6: Spatial error model</h3>
 <p>Maximum likelihood estimation of the spatial error model is similar to the lag procedure and implemented in the <code>errorsarlm()</code> function. Again, the formula, data set and a <code>listw</code> spatial weights object must be specified, as illustrated below.</p>
-<div class="sourceCode" id="cb522"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb522-1"><a href="spatial-regression-models.html#cb522-1" aria-hidden="true" tabindex="-1"></a><span class="co">#We coerce the sf object into a new sp object</span></span>
-<span id="cb522-2"><a href="spatial-regression-models.html#cb522-2" aria-hidden="true" tabindex="-1"></a>ncovr_s_sp <span class="ot">&lt;-</span> <span class="fu">as</span>(ncovr_s_sf, <span class="st">&quot;Spatial&quot;</span>)</span>
-<span id="cb522-3"><a href="spatial-regression-models.html#cb522-3" aria-hidden="true" tabindex="-1"></a><span class="co">#Then we create a list of neighbours using the Queen criteria</span></span>
-<span id="cb522-4"><a href="spatial-regression-models.html#cb522-4" aria-hidden="true" tabindex="-1"></a>w_s <span class="ot">&lt;-</span> <span class="fu">poly2nb</span>(ncovr_s_sp, <span class="at">row.names=</span>ncovr_s_sp<span class="sc">$</span>FIPSNO)</span>
-<span id="cb522-5"><a href="spatial-regression-models.html#cb522-5" aria-hidden="true" tabindex="-1"></a>wm_s <span class="ot">&lt;-</span> <span class="fu">nb2mat</span>(w_s, <span class="at">style=</span><span class="st">&#39;B&#39;</span>)</span>
-<span id="cb522-6"><a href="spatial-regression-models.html#cb522-6" aria-hidden="true" tabindex="-1"></a>rwm_s <span class="ot">&lt;-</span> <span class="fu">mat2listw</span>(wm_s, <span class="at">style=</span><span class="st">&#39;W&#39;</span>)</span>
-<span id="cb522-7"><a href="spatial-regression-models.html#cb522-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb522-8"><a href="spatial-regression-models.html#cb522-8" aria-hidden="true" tabindex="-1"></a>fit_3_err <span class="ot">&lt;-</span> <span class="fu">errorsarlm</span>(HR90 <span class="sc">~</span> RD90 <span class="sc">+</span> DV90 <span class="sc">+</span> MA90 <span class="sc">+</span> PS90 <span class="sc">+</span> UE90, <span class="at">data=</span>ncovr_s_sf, rwm_s)</span>
-<span id="cb522-9"><a href="spatial-regression-models.html#cb522-9" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit_3_err)</span></code></pre></div>
+<div class="sourceCode" id="cb517"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb517-1"><a href="spatial-regression-models.html#cb517-1" aria-hidden="true" tabindex="-1"></a><span class="co">#We coerce the sf object into a new sp object</span></span>
+<span id="cb517-2"><a href="spatial-regression-models.html#cb517-2" aria-hidden="true" tabindex="-1"></a>ncovr_s_sp <span class="ot">&lt;-</span> <span class="fu">as</span>(ncovr_s_sf, <span class="st">&quot;Spatial&quot;</span>)</span>
+<span id="cb517-3"><a href="spatial-regression-models.html#cb517-3" aria-hidden="true" tabindex="-1"></a><span class="co">#Then we create a list of neighbours using the Queen criteria</span></span>
+<span id="cb517-4"><a href="spatial-regression-models.html#cb517-4" aria-hidden="true" tabindex="-1"></a>w_s <span class="ot">&lt;-</span> <span class="fu">poly2nb</span>(ncovr_s_sp, <span class="at">row.names=</span>ncovr_s_sp<span class="sc">$</span>FIPSNO)</span>
+<span id="cb517-5"><a href="spatial-regression-models.html#cb517-5" aria-hidden="true" tabindex="-1"></a>wm_s <span class="ot">&lt;-</span> <span class="fu">nb2mat</span>(w_s, <span class="at">style=</span><span class="st">&#39;B&#39;</span>)</span>
+<span id="cb517-6"><a href="spatial-regression-models.html#cb517-6" aria-hidden="true" tabindex="-1"></a>rwm_s <span class="ot">&lt;-</span> <span class="fu">mat2listw</span>(wm_s, <span class="at">style=</span><span class="st">&#39;W&#39;</span>)</span>
+<span id="cb517-7"><a href="spatial-regression-models.html#cb517-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb517-8"><a href="spatial-regression-models.html#cb517-8" aria-hidden="true" tabindex="-1"></a>fit_3_err <span class="ot">&lt;-</span> <span class="fu">errorsarlm</span>(HR90 <span class="sc">~</span> RD90 <span class="sc">+</span> DV90 <span class="sc">+</span> MA90 <span class="sc">+</span> PS90 <span class="sc">+</span> UE90, <span class="at">data=</span>ncovr_s_sf, rwm_s)</span>
+<span id="cb517-9"><a href="spatial-regression-models.html#cb517-9" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit_3_err)</span></code></pre></div>
 <pre><code>## 
 ## Call:errorsarlm(formula = HR90 ~ RD90 + DV90 + MA90 + PS90 + UE90, 
 ##     data = ncovr_s_sf, listw = rwm_s)
@@ -818,53 +823,46 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="activity-7-small-multiples" class="section level3" number="9.8.1">
 <h3><span class="header-section-number">9.8.1</span> Activity 7: Small multiples</h3>
 <p>One way that we can represent change over time in our spatial data is to create small multiples of the same map. Faceting and small multiples is a format for comparing the geographical distribution of different social phenomena. For this session we will be using the spatial object of ASB in Manchester between 2016-2017 (<code>manchester_asb.csv</code>) which you can download from Blackboard.</p>
-<div class="sourceCode" id="cb524"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb524-1"><a href="spatial-regression-models.html#cb524-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
-<span id="cb524-2"><a href="spatial-regression-models.html#cb524-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(janitor)</span>
-<span id="cb524-3"><a href="spatial-regression-models.html#cb524-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb524-4"><a href="spatial-regression-models.html#cb524-4" aria-hidden="true" tabindex="-1"></a>mcr_asb <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;data/manchester_asb.csv&quot;</span>) <span class="sc">%&gt;%</span> <span class="fu">clean_names</span>()</span></code></pre></div>
-<pre><code>## Warning: Missing column names filled in: &#39;X1&#39; [1]</code></pre>
+<div class="sourceCode" id="cb519"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb519-1"><a href="spatial-regression-models.html#cb519-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
+<span id="cb519-2"><a href="spatial-regression-models.html#cb519-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(janitor)</span>
+<span id="cb519-3"><a href="spatial-regression-models.html#cb519-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb519-4"><a href="spatial-regression-models.html#cb519-4" aria-hidden="true" tabindex="-1"></a>mcr_asb <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;data/manchester_asb.csv&quot;</span>) <span class="sc">%&gt;%</span> <span class="fu">clean_names</span>()</span></code></pre></div>
+<pre><code>## New names:
+## * `` -&gt; ...1</code></pre>
+<pre><code>## Rows: 32162 Columns: 15</code></pre>
+<pre><code>## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (8): Month, Reported.by, Falls.within, Location, LSOA.code, LSOA.name, C...
+## dbl (4): ...1, X, Longitude, Latitude
+## lgl (3): Crime.ID, Last.outcome.category, Context</code></pre>
 <pre><code>## 
-## ── Column specification ────────────────────────────────────────────────────────
-## cols(
-##   X1 = col_double(),
-##   X = col_double(),
-##   Crime.ID = col_logical(),
-##   Month = col_character(),
-##   Reported.by = col_character(),
-##   Falls.within = col_character(),
-##   Longitude = col_double(),
-##   Latitude = col_double(),
-##   Location = col_character(),
-##   LSOA.code = col_character(),
-##   LSOA.name = col_character(),
-##   Crime.type = col_character(),
-##   Last.outcome.category = col_logical(),
-##   Context = col_logical(),
-##   borough = col_character()
-## )</code></pre>
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
 <p>We’ll also need our boundary data. Read in the city centre LSOAs geojson (also on Blackboard) <code>cc_lsoas.geojson</code>.</p>
-<div class="sourceCode" id="cb527"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb527-1"><a href="spatial-regression-models.html#cb527-1" aria-hidden="true" tabindex="-1"></a>cc_lsoas <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">&quot;data/cc_lsoas.geojson&quot;</span>)</span></code></pre></div>
-<pre><code>## Reading layer `cc_lsoas&#39; from data source `/Users/reka/Desktop/crime_mapping_textbook/data/cc_lsoas.geojson&#39; using driver `GeoJSON&#39;
+<div class="sourceCode" id="cb524"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb524-1"><a href="spatial-regression-models.html#cb524-1" aria-hidden="true" tabindex="-1"></a>cc_lsoas <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">&quot;data/cc_lsoas.geojson&quot;</span>)</span></code></pre></div>
+<pre><code>## Reading layer `cc_lsoas&#39; from data source 
+##   `/Users/reka/Desktop/crime_mapping_textbook/data/cc_lsoas.geojson&#39; 
+##   using driver `GeoJSON&#39;
 ## Simple feature collection with 23 features and 3 fields
 ## Geometry type: POLYGON
 ## Dimension:     XY
 ## Bounding box:  xmin: -2.265664 ymin: 53.46601 xmax: -2.20089 ymax: 53.50136
 ## Geodetic CRS:  WGS 84</code></pre>
 <p>Create a frequency table of the number of ASB incidents by month and by LSOA, and select only the city centre LSOAs.</p>
-<div class="sourceCode" id="cb529"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb529-1"><a href="spatial-regression-models.html#cb529-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
-<span id="cb529-2"><a href="spatial-regression-models.html#cb529-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb529-3"><a href="spatial-regression-models.html#cb529-3" aria-hidden="true" tabindex="-1"></a>asb_by_lsoa <span class="ot">&lt;-</span> mcr_asb <span class="sc">%&gt;%</span> </span>
-<span id="cb529-4"><a href="spatial-regression-models.html#cb529-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(lsoa_code, month) <span class="sc">%&gt;%</span> </span>
-<span id="cb529-5"><a href="spatial-regression-models.html#cb529-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb529-6"><a href="spatial-regression-models.html#cb529-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(lsoa_code <span class="sc">%in%</span> cc_lsoas<span class="sc">$</span>code)</span></code></pre></div>
+<div class="sourceCode" id="cb526"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb526-1"><a href="spatial-regression-models.html#cb526-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb526-2"><a href="spatial-regression-models.html#cb526-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb526-3"><a href="spatial-regression-models.html#cb526-3" aria-hidden="true" tabindex="-1"></a>asb_by_lsoa <span class="ot">&lt;-</span> mcr_asb <span class="sc">%&gt;%</span> </span>
+<span id="cb526-4"><a href="spatial-regression-models.html#cb526-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(lsoa_code, month) <span class="sc">%&gt;%</span> </span>
+<span id="cb526-5"><a href="spatial-regression-models.html#cb526-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb526-6"><a href="spatial-regression-models.html#cb526-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(lsoa_code <span class="sc">%in%</span> cc_lsoas<span class="sc">$</span>code)</span></code></pre></div>
 <p>Now you might notice that there should be 13 months in the data set (from <code>05-2016</code> to <code>05-2017</code>), however, the number of resulting rows is not 23*13 (), but instead 289. This indicates that we have some missing observations. There are months when there were no ASBs in some of our areas, but here that is just an absence of recorded data, rather than a recorded value of 0.</p>
 <p>To fix this, we can identify the LSOAs and the missing months by selecting those where we have fewer than 13 observations:</p>
-<div class="sourceCode" id="cb530"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb530-1"><a href="spatial-regression-models.html#cb530-1" aria-hidden="true" tabindex="-1"></a>asb_by_lsoa <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(lsoa_code) <span class="sc">%&gt;%</span> <span class="fu">count</span>() <span class="sc">%&gt;%</span> <span class="fu">filter</span>(n <span class="sc">&lt;</span> <span class="dv">13</span>) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(lsoa_code)</span></code></pre></div>
+<div class="sourceCode" id="cb527"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb527-1"><a href="spatial-regression-models.html#cb527-1" aria-hidden="true" tabindex="-1"></a>asb_by_lsoa <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(lsoa_code) <span class="sc">%&gt;%</span> <span class="fu">count</span>() <span class="sc">%&gt;%</span> <span class="fu">filter</span>(n <span class="sc">&lt;</span> <span class="dv">13</span>) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(lsoa_code)</span></code></pre></div>
 <pre><code>## [1] &quot;E01033673&quot; &quot;E01033684&quot;</code></pre>
 <p>There are two such LSOAs here. Let’s see which months we have data or for each.</p>
-<div class="sourceCode" id="cb532"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb532-1"><a href="spatial-regression-models.html#cb532-1" aria-hidden="true" tabindex="-1"></a>asb_by_lsoa <span class="sc">%&gt;%</span> </span>
-<span id="cb532-2"><a href="spatial-regression-models.html#cb532-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(lsoa_code <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;E01033673&quot;</span>, <span class="st">&quot;E01033684&quot;</span>) ) <span class="sc">%&gt;%</span> </span>
-<span id="cb532-3"><a href="spatial-regression-models.html#cb532-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(lsoa_code, month) <span class="sc">%&gt;%</span> <span class="fu">count</span>() </span></code></pre></div>
+<div class="sourceCode" id="cb529"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb529-1"><a href="spatial-regression-models.html#cb529-1" aria-hidden="true" tabindex="-1"></a>asb_by_lsoa <span class="sc">%&gt;%</span> </span>
+<span id="cb529-2"><a href="spatial-regression-models.html#cb529-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(lsoa_code <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;E01033673&quot;</span>, <span class="st">&quot;E01033684&quot;</span>) ) <span class="sc">%&gt;%</span> </span>
+<span id="cb529-3"><a href="spatial-regression-models.html#cb529-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(lsoa_code, month) <span class="sc">%&gt;%</span> <span class="fu">count</span>() </span></code></pre></div>
 <pre><code>## # A tibble: 16 x 3
 ## # Groups:   lsoa_code, month [16]
 ##    lsoa_code month       n
@@ -886,17 +884,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## 15 E01033684 2016-12     1
 ## 16 E01033684 2017-04     1</code></pre>
 <p>Looks like LSOA E01033673 is missing 2016-12 and 2017-05, while LSOA E01033684 is missing 2016-06, 2016-08, 2016-09, 2016-11, 2017-01, 2017-02, 2017-03, and 2017-05. Let’s create a dataframe where we have for each observation each of these missing months for the LSOAs, and an n of 0, as these months we know there were 0 stop and searches:</p>
-<div class="sourceCode" id="cb534"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb534-1"><a href="spatial-regression-models.html#cb534-1" aria-hidden="true" tabindex="-1"></a>missing_months <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">lsoa_code =</span> <span class="fu">c</span>(<span class="st">&quot;E01033673&quot;</span>, <span class="st">&quot;E01033673&quot;</span>, <span class="st">&quot;E01033684&quot;</span>, <span class="st">&quot;E01033684&quot;</span>, <span class="st">&quot;E01033684&quot;</span>, <span class="st">&quot;E01033684&quot;</span>, <span class="st">&quot;E01033684&quot;</span>, <span class="st">&quot;E01033684&quot;</span>, <span class="st">&quot;E01033684&quot;</span>, <span class="st">&quot;E01033684&quot;</span>), </span>
-<span id="cb534-2"><a href="spatial-regression-models.html#cb534-2" aria-hidden="true" tabindex="-1"></a>                             <span class="at">month =</span> <span class="fu">c</span>(<span class="st">&quot;2016-12&quot;</span>, <span class="st">&quot;2017-05&quot;</span>, <span class="st">&quot;2016-06&quot;</span>, <span class="st">&quot;2016-08&quot;</span>, <span class="st">&quot;2016-09&quot;</span>, <span class="st">&quot;2016-11&quot;</span>, <span class="st">&quot;2017-01&quot;</span>, <span class="st">&quot;2017-02&quot;</span>, <span class="st">&quot;2017-03&quot;</span>, <span class="st">&quot;2017-05&quot;</span>), </span>
-<span id="cb534-3"><a href="spatial-regression-models.html#cb534-3" aria-hidden="true" tabindex="-1"></a>                             <span class="at">n =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>) )</span></code></pre></div>
+<div class="sourceCode" id="cb531"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb531-1"><a href="spatial-regression-models.html#cb531-1" aria-hidden="true" tabindex="-1"></a>missing_months <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">lsoa_code =</span> <span class="fu">c</span>(<span class="st">&quot;E01033673&quot;</span>, <span class="st">&quot;E01033673&quot;</span>, <span class="st">&quot;E01033684&quot;</span>, <span class="st">&quot;E01033684&quot;</span>, <span class="st">&quot;E01033684&quot;</span>, <span class="st">&quot;E01033684&quot;</span>, <span class="st">&quot;E01033684&quot;</span>, <span class="st">&quot;E01033684&quot;</span>, <span class="st">&quot;E01033684&quot;</span>, <span class="st">&quot;E01033684&quot;</span>), </span>
+<span id="cb531-2"><a href="spatial-regression-models.html#cb531-2" aria-hidden="true" tabindex="-1"></a>                             <span class="at">month =</span> <span class="fu">c</span>(<span class="st">&quot;2016-12&quot;</span>, <span class="st">&quot;2017-05&quot;</span>, <span class="st">&quot;2016-06&quot;</span>, <span class="st">&quot;2016-08&quot;</span>, <span class="st">&quot;2016-09&quot;</span>, <span class="st">&quot;2016-11&quot;</span>, <span class="st">&quot;2017-01&quot;</span>, <span class="st">&quot;2017-02&quot;</span>, <span class="st">&quot;2017-03&quot;</span>, <span class="st">&quot;2017-05&quot;</span>), </span>
+<span id="cb531-3"><a href="spatial-regression-models.html#cb531-3" aria-hidden="true" tabindex="-1"></a>                             <span class="at">n =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>) )</span></code></pre></div>
 <p>And bind this to our existing dataframe with <code>rbind()</code>:</p>
-<div class="sourceCode" id="cb535"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb535-1"><a href="spatial-regression-models.html#cb535-1" aria-hidden="true" tabindex="-1"></a>asb_by_lsoa <span class="ot">&lt;-</span> <span class="fu">rbind</span>(asb_by_lsoa, missing_months)</span></code></pre></div>
+<div class="sourceCode" id="cb532"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb532-1"><a href="spatial-regression-models.html#cb532-1" aria-hidden="true" tabindex="-1"></a>asb_by_lsoa <span class="ot">&lt;-</span> <span class="fu">rbind</span>(asb_by_lsoa, missing_months)</span></code></pre></div>
 <p>Now we see we have the required 299 observations!</p>
 <p>We can now join this to our cc_lsoas boundary file.</p>
-<div class="sourceCode" id="cb536"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb536-1"><a href="spatial-regression-models.html#cb536-1" aria-hidden="true" tabindex="-1"></a>cc_lsoas_asb <span class="ot">&lt;-</span> <span class="fu">left_join</span>(cc_lsoas, asb_by_lsoa, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;code&quot;</span> <span class="ot">=</span> <span class="st">&quot;lsoa_code&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb533"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb533-1"><a href="spatial-regression-models.html#cb533-1" aria-hidden="true" tabindex="-1"></a>cc_lsoas_asb <span class="ot">&lt;-</span> <span class="fu">left_join</span>(cc_lsoas, asb_by_lsoa, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;code&quot;</span> <span class="ot">=</span> <span class="st">&quot;lsoa_code&quot;</span>))</span></code></pre></div>
 <p>Let’s also make sure that any NAs are replaced by 0s (if you’re unsure here, watch the feedback session video for week 4!)</p>
-<div class="sourceCode" id="cb537"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb537-1"><a href="spatial-regression-models.html#cb537-1" aria-hidden="true" tabindex="-1"></a>cc_lsoas_asb <span class="sc">%&gt;%</span> </span>
-<span id="cb537-2"><a href="spatial-regression-models.html#cb537-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">n =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(n), <span class="dv">0</span>, n))</span></code></pre></div>
+<div class="sourceCode" id="cb534"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb534-1"><a href="spatial-regression-models.html#cb534-1" aria-hidden="true" tabindex="-1"></a>cc_lsoas_asb <span class="sc">%&gt;%</span> </span>
+<span id="cb534-2"><a href="spatial-regression-models.html#cb534-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">n =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(n), <span class="dv">0</span>, n))</span></code></pre></div>
 <pre><code>## Simple feature collection with 299 features and 5 fields
 ## Geometry type: POLYGON
 ## Dimension:     XY
@@ -926,10 +924,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## 9  POLYGON ((-2.229713 53.4734...
 ## 10 POLYGON ((-2.229713 53.4734...</code></pre>
 <p>We now have a simple features object which has in the attribute tables the number of ASB incidents (<code>n</code>) for each LSOA for each month in our data set. We can use the function <code>tm_facets()</code> from the tmap package to now try to produce the small multiples:</p>
-<div class="sourceCode" id="cb539"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb539-1"><a href="spatial-regression-models.html#cb539-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(cc_lsoas_asb) <span class="sc">+</span> </span>
-<span id="cb539-2"><a href="spatial-regression-models.html#cb539-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="st">&quot;n&quot;</span>) <span class="sc">+</span></span>
-<span id="cb539-3"><a href="spatial-regression-models.html#cb539-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_borders</span>() <span class="sc">+</span></span>
-<span id="cb539-4"><a href="spatial-regression-models.html#cb539-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_facets</span>(<span class="st">&quot;month&quot;</span>, <span class="at">free.coords=</span><span class="cn">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb536"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb536-1"><a href="spatial-regression-models.html#cb536-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(cc_lsoas_asb) <span class="sc">+</span> </span>
+<span id="cb536-2"><a href="spatial-regression-models.html#cb536-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="st">&quot;n&quot;</span>) <span class="sc">+</span></span>
+<span id="cb536-3"><a href="spatial-regression-models.html#cb536-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_borders</span>() <span class="sc">+</span></span>
+<span id="cb536-4"><a href="spatial-regression-models.html#cb536-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_facets</span>(<span class="st">&quot;month&quot;</span>, <span class="at">free.coords=</span><span class="cn">FALSE</span>)</span></code></pre></div>
 <p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-303-1.png" width="672" /></p>
 <p>We can now see how ASB varies across the months, and start to think about how this might change over seasons for example with seasonal patterns in routine activities!</p>
 <p><em>PS: you can also use the <code>facet_wrap()</code> and <code>facet_grid()</code> functions in <code>ggplot2</code> package if you prefer - remember there are always many ways to solve the same problem in R!</em></p>
@@ -939,18 +937,18 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h3><span class="header-section-number">9.8.2</span> Activity 8: Animations</h3>
 <p>You want a data viz person to get excited? Mention animations! Now they are brought to <code>ggplot2</code> thanks to the <code>gganimate</code> extension.</p>
 <p>So first thing we do is to load the <code>gganimate</code> package:</p>
-<div class="sourceCode" id="cb540"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb540-1"><a href="spatial-regression-models.html#cb540-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gganimate)</span></code></pre></div>
+<div class="sourceCode" id="cb537"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb537-1"><a href="spatial-regression-models.html#cb537-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gganimate)</span></code></pre></div>
 <p>Also, to apply <code>gganimate</code> to <code>sf</code> objects, you need to have a package called <code>transformr</code> installed. You don’t need to load this, but make sure it’s installed!</p>
 <p>Then, we need to make sure that our temporal variable is a date object. We can use the <code>ymd()</code> function, from the fantastic <code>lubridate</code> package (really I cannot praise this package enough, it makes handling dates so easy…!) to make sure that our Month variable is a date object.</p>
 <p>But we have no day you say! Only month! How can we use <code>ymd()</code> which clearly requires <em>y</em>ear <em>m</em>onth ad <em>day</em>! Well, one approach is to make this up, and just say that everything in our data happened on the 1st of the month. We can use the <code>paste0()</code> function to do this:</p>
-<div class="sourceCode" id="cb541"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb541-1"><a href="spatial-regression-models.html#cb541-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
-<span id="cb541-2"><a href="spatial-regression-models.html#cb541-2" aria-hidden="true" tabindex="-1"></a>cc_lsoas_asb<span class="sc">$</span>date_month <span class="ot">&lt;-</span> <span class="fu">ymd</span>(<span class="fu">paste0</span>(cc_lsoas_asb<span class="sc">$</span>month, <span class="st">&quot;-01&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb538"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb538-1"><a href="spatial-regression-models.html#cb538-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
+<span id="cb538-2"><a href="spatial-regression-models.html#cb538-2" aria-hidden="true" tabindex="-1"></a>cc_lsoas_asb<span class="sc">$</span>date_month <span class="ot">&lt;-</span> <span class="fu">ymd</span>(<span class="fu">paste0</span>(cc_lsoas_asb<span class="sc">$</span>month, <span class="st">&quot;-01&quot;</span>))</span></code></pre></div>
 <p>Now, we can create a simple static plot, the way we already know how. Let’s plot the number of ASB incidents per LSOA, and save this in an object called <code>anim</code>:</p>
-<div class="sourceCode" id="cb542"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb542-1"><a href="spatial-regression-models.html#cb542-1" aria-hidden="true" tabindex="-1"></a>anim <span class="ot">&lt;-</span> <span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb542-2"><a href="spatial-regression-models.html#cb542-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> cc_lsoas_asb, <span class="fu">aes</span>(<span class="at">fill =</span> n))</span></code></pre></div>
+<div class="sourceCode" id="cb539"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb539-1"><a href="spatial-regression-models.html#cb539-1" aria-hidden="true" tabindex="-1"></a>anim <span class="ot">&lt;-</span> <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb539-2"><a href="spatial-regression-models.html#cb539-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> cc_lsoas_asb, <span class="fu">aes</span>(<span class="at">fill =</span> n))</span></code></pre></div>
 <p>Now, finally, we can animate this graph. Take the object of the static graph (anim) and add a form of transition, which will be used to animate the graph. In this case, we can use <code>transition_states()</code>. This transition splits your data into multiple states based on the levels in a given column, much like how faceting splits up the data in multiple panels. It then shifts between the defined states and pauses at each state. Layers with data without the specified column will be kept constant during the animation (again, mimicking facet_wrap). States are the unquoted name of the column holding the state levels in the data. You can then use the <code>closest_state</code> to dynamically label the graph:</p>
-<div class="sourceCode" id="cb543"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb543-1"><a href="spatial-regression-models.html#cb543-1" aria-hidden="true" tabindex="-1"></a>anim <span class="sc">+</span> <span class="fu">transition_states</span>(date_month, <span class="at">transition_length =</span> <span class="dv">1</span>, <span class="at">state_length =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb543-2"><a href="spatial-regression-models.html#cb543-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Month: {closest_state}&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb540"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb540-1"><a href="spatial-regression-models.html#cb540-1" aria-hidden="true" tabindex="-1"></a>anim <span class="sc">+</span> <span class="fu">transition_states</span>(date_month, <span class="at">transition_length =</span> <span class="dv">1</span>, <span class="at">state_length =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb540-2"><a href="spatial-regression-models.html#cb540-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Month: {closest_state}&quot;</span>)</span></code></pre></div>
 <p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-307-1.gif" /><!-- --></p>
 <p>How cool is that!?</p>
 <p>You can now make animations about transition over time to impress your friends, family, future employers, and so on. What a way to end this course!</p>
@@ -1010,6 +1008,7 @@ gitbook.start({
 "weibo": false,
 "instapaper": false,
 "vk": false,
+"whatsapp": false,
 "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
 },
 "fontsettings": {

@@ -40,7 +40,7 @@ Before you move on to the installation steps, look at your answer from Activity 
 - Linux: for ubuntu see the video [here](https://www.youtube.com/watch?v=kF0-FH-xBiE) and if you have questions, let the teaching team know!
 
 
-Once you have watched or read the instructions for your relevant operating system, you are now ready to actually have a go at downloading the software for yourself. Before you start, write in the google doc any questions or concerns, and once ready, install! 
+Once you have watched or read the instructions for your relevant operating system, you are now ready to actually have a go at downloading the software for yourself. Before you start, make sure to ask us any questions or concerns, and once ready, install! 
 
 
 #### Install `R`: {-}
@@ -236,9 +236,8 @@ You can use google to make your cookbook, and the website [stackoverflow](https:
 
 #### Activity 5: Play around with functions
 
-Have a guess (or google) about what you think is the function to get the median. Once you have your answer, write it in the shared google docs. Then, use it to get the median of the numbers 10, 34, 5, 3, 77. 
+Have a guess (or google) about what you think is the function to get the median. Once you have your answer, speak to the person next to you. Then, use it to get the median of the numbers 10, 34, 5, 3, 77. 
 
-Write the answer in your shared google doc (or note it down for yourself if in the quiet room).
 
 The answer is further below, after the note: 
 
@@ -584,7 +583,7 @@ We will get some data by installing a package which has data in it as well as fu
 ### Activity 8: Playing around with data
 
 
-We are going to look at some data that are part of the *fivethirtyeight* package. This package contains data sets and code behind the stories in [this particular online newspaper](http://fivethirtyeight.com/). This package is not part of the base installation of R, so you will need to install it first. I won't give you the code for it. See if you can figure it out by looking at previous examples. Discuss and write in the google doc what you think the code will be. 
+We are going to look at some data that are part of the *fivethirtyeight* package. This package contains data sets and code behind the stories in [this particular online newspaper](http://fivethirtyeight.com/). This package is not part of the base installation of R, so you will need to install it first. I won't give you the code for it. See if you can figure it out by looking at previous examples. Discuss in small groups what you think the code will be. 
 
 
 Done? Ok, now we are going to look at the data sets that are included in this package. Remember first we have to load the package if we want to use it:
@@ -675,7 +674,7 @@ ggplot(hate_crimes, aes(x=share_vote_trump, y=avg_hatecrimes_per_100k_fbi)) +
      geom_smooth(method=lm)
 ```
 
-What do you think this graphic is telling you? Discuss and write in your shared google docs. 
+What do you think this graphic is telling you? Discuss with the person next to you. 
 
 
 Graphing is very powerful in R, and much of the spatial visualisation we will produce throughout the module will build on this. If you are not already familiar with this, I recommend a read of the data visualisation chapter of R for Data Science [https://r4ds.had.co.nz/data-visualisation.html](https://r4ds.had.co.nz/data-visualisation.html)

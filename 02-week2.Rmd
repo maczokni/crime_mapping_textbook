@@ -211,7 +211,7 @@ Having had a chance to inspect the data set you've downloaded, let's consider wh
 ### Activity 2: Find the spatial data
 
 
-If you have a look at the column names, what are some of the variables which you think might have some spatial component? Have a think about each column, and how you think it may help to put these crimes on the map. Discuss in your groups, and add the answer to the shared google doc. Once you are done, read on. 
+If you have a look at the column names, what are some of the variables which you think might have some spatial component? Have a think about each column, and how you think it may help to put these crimes on the map. Discuss in your groups. Once you are done, read on. 
 
 
 So what did you decide in your discussion? There are a few answers here. 
@@ -355,7 +355,7 @@ class(crimes_sf)
 ```
 
 
-You might also notice something else that is different between crimes and crimes_sf. Have a look at the dimension (hint look in your 'Environment' tab). Do you see? Discuss what you think is different, and write your answers in the shared google doc. 
+You might also notice something else that is different between crimes and crimes_sf. Have a look at the dimension (hint look in your 'Environment' tab). Do you see? Discuss what you think is different with your neighour or one of the teaching team. 
 
 
 #### Activity 4: Mapping our points
@@ -663,7 +663,7 @@ ggplot() +
 
 ```
 
-Great, we now have an outline of the LSOAs in Manchester. Notice how the shape is different to that of the points in our crime data. Why do you think this is? Discuss and write your thoughts in the shared google doc. 
+Great, we now have an outline of the LSOAs in Manchester. Notice how the shape is different to that of the points in our crime data. Why do you think this is? Discuss your thoughts with your neighbour. Or one of the teaching team. Don't be shy! 
 
 
 #### Activity 8: Data wrangling with dplyr

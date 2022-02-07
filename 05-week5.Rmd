@@ -220,7 +220,13 @@ saharsa <- subset(district_yields, district == "saharsa")
 
 Well, we can see from the output above that this happened in 1971 in Saharsa, so let's map out the yields of all districts in Bihar in 1971 to investigate:
 
+(note for the next part iwht neighbours to work we have to remove the one polygon with the empty geometry with `st_is_empty()`
+
 ```{r}
+
+# remove district with empty geometry
+district_yields <- district_yields %>% filter(!st_is_empty(.))
+
 bihar_1971 <- filter(district_yields, YEAR == '1971')
 
 tm_shape(bihar_1971)+
@@ -276,10 +282,9 @@ Here we are going to introduce the approach implemented in `DCluster`, a package
 Specifically, we use the `empbaysmooth(Observed, Expected)` function, where we specify two values, the **expected** value (the global average) and the **observed** value (the rate we actually see). 
 
 
-(note for the next part iwht neighbours to work we have to remove the one polygon with the empty geometry with `st_is_empty()`
+
 ```{r}
 
-bihar_1971 <- bihar_1971 %>% filter(!st_is_empty(.))
 
 res <- empbaysmooth(bihar_1971$rice_yield, bihar_1971$RICE_TA*(sum(bihar_1971$rice_yield)/sum(bihar_1971$RICE_TA)))
 ```

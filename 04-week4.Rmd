@@ -380,7 +380,7 @@ You can add a point manually:
 ```{r}
 m <- leaflet() %>%
   addTiles()  %>% 
-  addMarkers(lng=-2.230899, lat=53.464987, popup="You would be here if it weren't 2021")
+  addMarkers(lng=-2.230899, lat=53.464987, popup="You are here")
 m  
 ```
 
@@ -392,7 +392,7 @@ Or many points manually, with some popup text as well:
 
 latitudes = c(53.464987, 53.472726, 53.466649) 
 longitudes = c(-2.230899, -2.245481, -2.243421) 
-popups = c("You are (not) here", "Here is another point", "Here is another point") 
+popups = c("You are here", "Here is another point", "Here is another point") 
 df = data.frame(latitudes, longitudes, popups)      
 
 m <- leaflet(data = df) %>%

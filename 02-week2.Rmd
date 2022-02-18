@@ -6,7 +6,7 @@ This week we will start making some maps in R, and learn about how we can take r
 Today we will use the following packages, so make sure you have them downloaded: 
 
 
-- `reader`
+- `readr`
 - `tibble`
 - `janitor`
 - `sf`

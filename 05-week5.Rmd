@@ -606,7 +606,7 @@ In particular, they highlight four main issues inherent in most studies of space
 
 - issues associated with politically bounded units of aggregation, 
 - edge effects of bounded space
-- the modifiable aerial unit problem (MAUP)
+- the Modifiable Areal Unit Problem (MAUP)
 - and ways in which the results of statistical analyses can be manipulated by changes in the level of
 aggregation. 
 

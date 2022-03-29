@@ -38,7 +38,7 @@ Today we will cover linear regression or ordinary least squares regression (OLS)
 
 ### Activity 1: Getting some homicide data
 
-We will use a dataset that includes information about homicides in the US, as well as information in a number of sociodemographic variables that are often thought of as associated with the geographical distribution of homicides. We had used this data set in an earlier lab session, so you may have it saved alredy. In case you do not, it is available on blackboard under the data tab for this week's learning materials. Is is the file `NAT.csv` inside the `ncovr.zip` file (rememver you'll have to extract the zip folder first!). 
+We will use a dataset that includes information about homicides in the US, as well as information in a number of sociodemographic variables that are often thought of as associated with the geographical distribution of homicides. We had used this data set in an earlier lab session, so you may have it saved alredy. In case you do not, it is available on blackboard under the data tab for this week's learning materials. Is is the file `NAT.csv` inside the `ncovr.zip` file (remember you'll have to extract the zip folder first!). 
 
 
 ```{r}

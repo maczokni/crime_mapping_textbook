@@ -638,7 +638,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb230"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb230-1"><a href="more-on-thematic-maps.html#cb230-1" tabindex="-1"></a><span class="co"># And plot it with ggplot</span></span>
 <span id="cb230-2"><a href="more-on-thematic-maps.html#cb230-2" tabindex="-1"></a><span class="fu">ggplot</span>(district_match_results) <span class="sc">+</span></span>
 <span id="cb230-3"><a href="more-on-thematic-maps.html#cb230-3" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="fu">aes</span>(<span class="at">x =</span> shapefile_year, <span class="at">y =</span> district_match_percent), <span class="at">stat =</span> <span class="st">&#39;identity&#39;</span>)</span></code></pre></div>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-145-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-146-1.png" width="672" /></p>
 <p>So, before continuing you should look at the table and graph you’ve just made and decide which shapefile we should use now. Which one will be the best for representing your attribute table?</p>
 </div>
 <div id="activity-4-joining-datasets" class="section level4 hasAnchor" number="5.1.1.4">
@@ -719,13 +719,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb240-5"><a href="more-on-thematic-maps.html#cb240-5" tabindex="-1"></a></span>
 <span id="cb240-6"><a href="more-on-thematic-maps.html#cb240-6" tabindex="-1"></a><span class="fu">tm_shape</span>(bihar_1971)<span class="sc">+</span></span>
 <span id="cb240-7"><a href="more-on-thematic-maps.html#cb240-7" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="st">&#39;rice_yield&#39;</span>)</span></code></pre></div>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-149-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-150-1.png" width="672" /></p>
 <p>Saharsa is the darkly-shaded district in the top-right, it stands out massively from all other districts! Let’s plot the following year, 1972, for comparison:</p>
 <div class="sourceCode" id="cb241"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb241-1"><a href="more-on-thematic-maps.html#cb241-1" tabindex="-1"></a>bihar_1972 <span class="ot">&lt;-</span> <span class="fu">filter</span>(district_yields, YEAR <span class="sc">==</span> <span class="st">&#39;1972&#39;</span>)</span>
 <span id="cb241-2"><a href="more-on-thematic-maps.html#cb241-2" tabindex="-1"></a></span>
 <span id="cb241-3"><a href="more-on-thematic-maps.html#cb241-3" tabindex="-1"></a><span class="fu">tm_shape</span>(bihar_1972)<span class="sc">+</span></span>
 <span id="cb241-4"><a href="more-on-thematic-maps.html#cb241-4" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="st">&#39;rice_yield&#39;</span>)</span></code></pre></div>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-150-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-151-1.png" width="672" /></p>
 <p>Now Saharsa is in the lowest yield bracket - 0.2 to 0.4, pretty far off 5.5! Why does its yield value swing so far?</p>
 <div class="sourceCode" id="cb242"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb242-1"><a href="more-on-thematic-maps.html#cb242-1" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">filter</span>(district_yields, district <span class="sc">==</span> <span class="st">&#39;saharsa&#39;</span>, YEAR <span class="sc">==</span> <span class="st">&#39;1971&#39;</span>) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(RICE_TA))</span></code></pre></div>
 <pre><code>## [1] 204.86</code></pre>
@@ -842,7 +842,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb255-17"><a href="more-on-thematic-maps.html#cb255-17" tabindex="-1"></a>            <span class="at">legend.text.size =</span> <span class="fl">0.5</span>)</span>
 <span id="cb255-18"><a href="more-on-thematic-maps.html#cb255-18" tabindex="-1"></a></span>
 <span id="cb255-19"><a href="more-on-thematic-maps.html#cb255-19" tabindex="-1"></a><span class="fu">tmap_arrange</span>(map1, map2, map3) </span></code></pre></div>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-157-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-158-1.png" width="672" /></p>
 <p>Notice that the quantiles are not the same, so that will make your comparison difficult!</p>
 </div>
 </div>
@@ -917,7 +917,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb261"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb261-1"><a href="more-on-thematic-maps.html#cb261-1" tabindex="-1"></a><span class="fu">ggplot</span>(ma_spatial, <span class="fu">aes</span>(lng, lat)) <span class="sc">+</span>                        <span class="co">#define data and variables for x and y axes</span></span>
 <span id="cb261-2"><a href="more-on-thematic-maps.html#cb261-2" tabindex="-1"></a>  <span class="fu">stat_binhex</span>() <span class="sc">+</span>                                                         <span class="co">#add binhex layer (hexbin)</span></span>
 <span id="cb261-3"><a href="more-on-thematic-maps.html#cb261-3" tabindex="-1"></a>  <span class="fu">scale_fill_gradientn</span>(<span class="at">colours =</span> <span class="fu">c</span>(<span class="st">&quot;white&quot;</span>,<span class="st">&quot;red&quot;</span>), <span class="at">name =</span> <span class="st">&quot;Frequency&quot;</span>)    <span class="co">#add shading based on number of ASB incidents</span></span></code></pre></div>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-162-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-163-1.png" width="672" /></p>
 <p>Neat, but doesn’t quite tell us <em>where</em> that really dark hexbon actually is. So it would be much better if we could do this with a basemap as the backrgound, rather than our grey ggplot theme.</p>
 <p>Now, we can apply the same code as we used above, for the ggplot, to this ggmap, to add our hexbins on top of this basemap:</p>
 <div class="sourceCode" id="cb262"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb262-1"><a href="more-on-thematic-maps.html#cb262-1" tabindex="-1"></a><span class="fu">ggplot</span>(ma_spatial, <span class="fu">aes</span>(<span class="at">x =</span> lng, <span class="at">y =</span> lat)) <span class="sc">+</span></span>
@@ -925,7 +925,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb262-3"><a href="more-on-thematic-maps.html#cb262-3" tabindex="-1"></a>  <span class="fu">stat_binhex</span>(<span class="at">alpha=</span><span class="fl">0.7</span>) <span class="sc">+</span>                                                         <span class="co">#add binhex layer (hexbin)</span></span>
 <span id="cb262-4"><a href="more-on-thematic-maps.html#cb262-4" tabindex="-1"></a>  <span class="fu">scale_fill_gradientn</span>(<span class="at">colours =</span> <span class="fu">c</span>(<span class="st">&quot;white&quot;</span>,<span class="st">&quot;red&quot;</span>), <span class="at">name =</span> <span class="st">&quot;Frequency&quot;</span>)    <span class="co">#add shading based on number of ASB incidents </span></span></code></pre></div>
 <pre><code>## Zoom: 10</code></pre>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-163-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-164-1.png" width="672" /></p>
 <p>Now this should give you some more context! Woo!</p>
 <p>So I mentioned we’d go over some reasons why you should consider aggregating into a hexagon grid rather than other shape:</p>
 <ul>
@@ -951,7 +951,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb264-4"><a href="more-on-thematic-maps.html#cb264-4" tabindex="-1"></a>  <span class="fu">scale_fill_gradientn</span>(<span class="at">colours =</span> <span class="fu">c</span>(<span class="st">&quot;white&quot;</span>,<span class="st">&quot;red&quot;</span>), </span>
 <span id="cb264-5"><a href="more-on-thematic-maps.html#cb264-5" tabindex="-1"></a>                       <span class="at">name =</span> <span class="st">&quot;Frequency&quot;</span>) </span></code></pre></div>
 <pre><code>## Zoom: 10</code></pre>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-164-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-165-1.png" width="672" /></p>
 <ol start="2" style="list-style-type: lower-alpha">
 <li>hexagonal binning:</li>
 </ol>
@@ -961,7 +961,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb266-4"><a href="more-on-thematic-maps.html#cb266-4" tabindex="-1"></a>  <span class="fu">scale_fill_gradientn</span>(<span class="at">colours =</span> <span class="fu">c</span>(<span class="st">&quot;white&quot;</span>,<span class="st">&quot;red&quot;</span>), </span>
 <span id="cb266-5"><a href="more-on-thematic-maps.html#cb266-5" tabindex="-1"></a>                       <span class="at">name =</span> <span class="st">&quot;Frequency&quot;</span>)</span></code></pre></div>
 <pre><code>## Zoom: 10</code></pre>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-165-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-166-1.png" width="672" /></p>
 <ol start="3" style="list-style-type: lower-alpha">
 <li>a simple “heatmap” (we will discuss these more thoroughly next week):</li>
 </ol>
@@ -978,7 +978,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## This warning is displayed once every 8 hours.
 ## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was generated.</code></pre>
 <pre><code>## Zoom: 11</code></pre>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-166-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-167-1.png" width="672" /></p>
 <p>Look at the difference between the three maps (hex, rectangle, and density). How would your conclusions change if you were given these maps? Would you make different decisions about where to place your booths for the days of action? Why or why not? Discuss.</p>
 </div>
 </div>
@@ -1093,7 +1093,7 @@ aggregation.</li>
 <p>Now we can have a look at these data:</p>
 <div class="sourceCode" id="cb276"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb276-1"><a href="more-on-thematic-maps.html#cb276-1" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
 <span id="cb276-2"><a href="more-on-thematic-maps.html#cb276-2" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> eu_sf, <span class="fu">aes</span>(<span class="at">fill =</span> Pct_Leave)) </span></code></pre></div>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-170-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-171-1.png" width="672" /></p>
 <p>We can see that in smaller LAs we don’t even really see the result, as the boundary lines pretty much cover everything. Hmm. Now what we can do is transform the shapes.</p>
 <div id="activity-8-cartograms" class="section level4 hasAnchor" number="5.5.0.1">
 <h4><span class="header-section-number">5.5.0.1</span> Activity 8: Cartograms<a href="more-on-thematic-maps.html#activity-8-cartograms" class="anchor-section" aria-label="Anchor link to header"></a></h4>
@@ -1114,7 +1114,7 @@ aggregation.</li>
 <p>And if your cartogram has been created, you can now plot again the referendum results, but using the electorate to change the size of the locad authority:</p>
 <div class="sourceCode" id="cb280"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb280-1"><a href="more-on-thematic-maps.html#cb280-1" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
 <span id="cb280-2"><a href="more-on-thematic-maps.html#cb280-2" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> eu_cartogram, <span class="fu">aes</span>(<span class="at">fill =</span> Pct_Leave)) </span></code></pre></div>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-174-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-175-1.png" width="672" /></p>
 <p>We can now see London much better, and see that darker coloured cluster where much smaller percentage of people voted leave.</p>
 <p>Okay that’s probably enough for the day. Nice work crime mappers!</p>
 </div>

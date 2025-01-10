@@ -4,7 +4,6 @@ always_allow_html: yes
 
 # Spatial regression models
 
-
 ## Introduction
 
 Last week we provided you with an introduction to regression analysis with R. The data we used had a spatial component. We were modelling the geographical distribution of homicide across US counties. However, we did not incorporate this spatial component into our models. As we have explained throughout the semester criminal events often cluster geographically in space. So if we want to develop a regression model for crime we may have to recognise this spatial component. Remember as well, from last week, that regression models assume independence between the observations. That is, a regression model is formally assuming that what happens in area Xi is not in any way related (it is independent) of what happens in area Xii. But if those two areas are adjacent in geographical space we know that there is a good chance that this assumption may be violated. In previous weeks we covered formal tests for spatial autocorrelation, which allow us to test whether this assumption is met or not. So before we fit a regression model with spatial data we need to explore the issue of autocorrelation. We already know how to do this. In this session, we will examine the data from last week, explore whether autocorrelation is an issue, and then introduce models that allow us to take into account spatial autocorrelation. We will see that there are two basic ways of adjusting for spatial autocorrelation: through a spatial lag model or through a spatial error model.
@@ -26,15 +25,11 @@ library(lubridate)
 # library(transformr) - this needs to be installed, but doesn't need loading
 ```
 
-
 Then we will be using the ncovr data from last week. You can go back to last week's learning materials to download from Blackboard. 
 
-
-
-Last week we did not treat the data as spatial and, consequently, relied on the .csv file. But notice that in the unzip ncovr file there is also a shapefile that we can load as a spatial object into R:
+Last week we did not treat the data as spatial and, consequently, relied on the .csv file. But notice that in the unzipped ncovr file there is also a shapefile that we can load as a spatial object into R:
 
 ```{r}
-library(sf)
 shp_name <- "data/ncovr/NAT.shp"
 ncovr_sf <- st_read(shp_name)
 ```
@@ -42,8 +37,6 @@ ncovr_sf <- st_read(shp_name)
 We can indeed represent our variable of interest using a choropleth map.
 
 ```{r}
-library(tmap)
-
 current_style <- tmap_style("col_blind")
 
 tm_shape(ncovr_sf) + 
@@ -65,11 +58,8 @@ In order to explore the residuals we need to fit our model first. Let's look at 
 
 So here is the function `lm()` which we learned all about last week (or refreshed about...!). Anyway, here we model homicide rate in the 1990s (`HR90`) using all 6 variables of interest, `RD90`- Resource Deprivation/Affluence, `SOUTH` - Counties in the southern region scored 1, `DV90` divorce rate, `MA90` the median age, `PS90` - population structure, and `UE90` unemployment. Let's fit the model now: 
 
-
 ```{r}
-
 fit_1 <- lm(HR90 ~ RD90 + SOUTH + DV90 + MA90 + PS90 + UE90, data=ncovr_sf)
-
 ```
 
 Now that we have fitted the model we can extract the residuals. If you look at the fit_1 object in your RStudio environment or if you run the `str()` function to look inside this object you will see that this object is a list with different elements, one of which is the residuals. An element of this object then includes the residual for each of your observations (the difference between the observed value and the value predicted by your model). We can extract the residuals using the `residuals()` function and add them to our spatial data set.
@@ -78,7 +68,7 @@ Now that we have fitted the model we can extract the residuals. If you look at t
 ncovr_sf$res_fit1 <- residuals(fit_1)
 ```
 
-If you now look at the dataset you will see that there is a new variable with the residuals. In those cases where the residual is negative this is telling us that the observed value is lower than the predicted (that is, our model is *overpredicting* the level of homicide for that observation) when the residual is positive the observed value is higher than the predicted (that is, our model is *underpredicting* the level of homicide for that observation).
+If you now look at the dataset you will see that there is a new variable with the residuals. In those cases where the residual is negative this is telling us that the observed value is lower than the predicted (that is, our model is *overpredicting* the level of homicide for that observation) and when the residual is positive, the observed value is higher than the predicted (that is, our model is *underpredicting* the level of homicide for that observation).
 
 We could also extract the predicted values if we wanted. We would use the `fitted()` function.
 
@@ -95,14 +85,15 @@ We are going to produce a choropleth map for the residuals, but we will use a co
 In order to do that we will compute the mean and the standard deviation for the variable we want to plot and break the variable according to these values. The following code creates a new variable in which we will express the residuals in terms of standard deviations away from the mean. So, for each observation, we subtract the mean and divide by the standard deviation. Remember, this is exactly what the `scale` function does, which we have introduced in week 7:
 
 ```{r}
-ncovr_sf$sd_breaks <- scale(ncovr_sf$res_fit1)[,1] # because scale is made for matrices, we just need to get the first column using [,1]
+ncovr_sf$sd_breaks <- scale(ncovr_sf$res_fit1)[,1] 
+# because scale is made for matrices, we just need to get the first column using [,1]
 # this is equal to (ncovr_sf$res_fit1 - mean(ncovr_sf$res_fit1)) / sd(ncovr_sf$res_fit1)
 summary(ncovr_sf$sd_breaks)
 ```
 
 Next we use a new style, `fixed`, within the `tm_fill` function. When we break the variable into classes using the `fixed` argument we need to specify the boundaries of the classes. We do this using the breaks argument. In this case we are going to ask R to create 7 classes based on standard deviations away from the mean. Remember that a value of 1 would be 1 standard deviation (s.d.) higher than the mean, and -1 would be one s.d. lower. If we assume normal distribution, then 68% of all counties should lie within the middle band from -1 to +1 s.d. (you can find a refresher of this [on Wikipedia](https://en.wikipedia.org/wiki/68%E2%80%9395%E2%80%9399.7_rule)).
 
-```{r, message=FALSE}
+```{r}
 my_breaks <- c(-14,-3,-2,-1,1,2,3,14)
 
 tm_shape(ncovr_sf) + 
@@ -116,15 +107,11 @@ Notice  the  spatial  patterning  of  areas  of  over-prediction  (negative resi
 
 ### Activity 2: Spatial autocorrelation (again)
 
-Remember from week 7 that in order to do this first we need to turn our `sf` object into a `sp` class object and then create the spatial weight matrix. If the code below and what it does is not clear to you, revise the notes from week 7, when we first introduced it.
+Remember from week 7 that in order to do this, we first need to create the spatial weight matrix. If the code below and what it does is not clear to you, revise the notes from week 7, when we first introduced it.
 
 ```{r}
-library(sp)
-library(spdep)
-#We coerce the sf object into a new sp object
-ncovr_sp <- as(ncovr_sf, "Spatial")
-#Then we create a list of neighbours using the Queen criteria
-w <- poly2nb(ncovr_sp, row.names=ncovr_sp$FIPSNO)
+# We create a list of neighbours using the Queen criteria
+w <- poly2nb(ncovr_sf, row.names=ncovr_sf$FIPSNO)
 summary(w)
 ```
 
@@ -153,7 +140,7 @@ The difference between these two models is both technical and conceptual. The **
  
 *"spatial  dependence  observed  in  our  data  does  not  reflect  a  truly spatial  process,  but  merely  the geographical clustering of the sources of the behaviour of interest. For example, citizens in adjoining neighbourhoods may favour the same (political) candidate not because they talk to their neighbors, but because citizens  with  similar  incomes  tend to  cluster  geographically,  and  income  also  predicts  vote  choice. Such spatial dependence can be termed attributional dependence"* (Darmofal, 2015: 4)
  
-The **spatially lagged model**, on the other hand, incorporates spatial dependence explicitly by adding a  "spatially  lagged"  variable  *y* on  the  right  hand  side  of  our  regression  equation.  Its  distinctive characteristic  is  that  it  includes  a spatially  lagged  "dependent"  variable  among  the  explanatory factors. It's basically explicitly saying that the values of y in the neighbouring areas of observation *n~i* is an important predictor of y on each individual area *n~i* . This is one way of saying that the spatial dependence  may  be  produced  by  a  spatial  process  such as  the  diffusion  of  behaviour  between neighboring units:  
+The **spatially lagged model**, on the other hand, incorporates spatial dependence explicitly by adding a  "spatially  lagged"  variable  *y* on  the  right  hand  side  of  our  regression  equation.  Its  distinctive characteristic  is  that  it  includes  a spatially  lagged  "dependent"  variable  among  the  explanatory factors. It's basically explicitly saying that the values of y in the neighbouring areas of observation $i$ is an important predictor of y on each individual area $i$ . This is one way of saying that the spatial dependence  may  be  produced  by  a  spatial  process  such as  the  diffusion  of  behaviour  between neighboring units:  
  
 *"If so the behaviour is likely to be highly social in nature, and understanding the interactions between interdependent units is critical to understanding the behaviour in question. For example, citizens may discuss politics across adjoining neighbours such that an increase in support for a candidate in one neighbourhood  directly  leads  to  an  increase  in  support  for  the  candidate  in    adjoining neighbourhoods"* (Darmofal, 2015: 4)
 
@@ -163,18 +150,15 @@ Before  we  proceed  to  a  more  detailed  description  of  these  two models  
 
 We could have attempted to test other interaction effects between some of our other predictors and their geographical location in the South or the North. But we did not. 
  
-If you have read the Ballen et al. (2001) paper that we are replicating in the lab last week and this week, you will have noticed that they decided that they needed to run separate models for the South and the  North.  This kind of  situation,  where  sub-regions seem  to  display  different  patterns is often alluded with  the  name  of  spatial  regimes.  In  the  context of  regression  analysis,  spatial  regimes relate to the possibility that we may need to split our data into two (or more) sub-regions in order to run our models, because we presume that the relationship of the predictors to the outcome may play out differently in these sub-regions (spatial regimes). 
+If you have read the Ballen et al. (2001) paper that we are replicating in the lab last week and this week, you will have noticed that they decided that they needed to run separate models for the South and the  North.  This kind of  situation,  where  sub-regions seem  to  display  different  patterns is often alluded to by the  name  of  spatial  regimes.  In  the  context of  regression  analysis,  spatial  regimes relate to the possibility that we may need to split our data into two (or more) sub-regions in order to run our models, because we presume that the relationship of the predictors to the outcome may play out differently in these sub-regions (spatial regimes). 
  
 So  how  can  we  assess  whether  this  is  an  issue  in  our  data?  As with  many  other  diagnostics  of regression,  you  may  want  to  start  by  looking  at  your  residuals.  
 
 ### Activity 3: Assessing spatial regimes using residuals
 
-
 Look  at  the  residual  map  we produced earlier. Do you think that the residuals look different in the South and in the North? If the pattern is not clear to you, you may want to run other forms of visualisation. 
  
 ```{r}
-library(ggplot2)
-
 ggplot(ncovr_sf, aes(x = res_fit1, colour = as.factor(SOUTH))) + 
   geom_density() 
 ```
@@ -198,10 +182,8 @@ The Moran's I test statistic has high power against a range of spatial alternati
 In order to practice their computation and interpretation, let's run two separate OLS regression models (one for the South and one for the North), using the same predictors as we used last week and, first, focusing on homicide in the northern counties in the 1990s. We have split the data in two, so that means that before we do this we need to create new files for the spatial weight matrix: in particular we will create one using first order queen criteria.  
 
 ```{r}
-#We coerce the sf object into a new sp object
-ncovr_n_sp <- as(ncovr_n_sf, "Spatial")
-#Then we create a list of neighbours using the Queen criteria
-w_n <- poly2nb(ncovr_n_sp, row.names=ncovr_n_sp$FIPSNO)
+#Create a list of neighbours using the Queen criteria
+w_n <- poly2nb(ncovr_n_sf, row.names=ncovr_n_sf$FIPSNO)
 wm_n <- nb2mat(w_n, style='B')
 rwm_n <- mat2listw(wm_n, style='W')
 
@@ -221,7 +203,6 @@ The  p  (probability)  value  associated  with  this  Moran's  I  is below our s
 Both Lagrange multiplier tests (for the error and the lagged models, `LMerr` and `LMlag` respectively), as well as their robust forms (`RLMerr` and `RLMLag`, also respectively) are included in the `lm.LMtests` function. Again, a regression object and a spatial `listw` object must be passed as arguments. In addition, the tests must be specified as a character vector (the default is only `LMerror`), using the `c( )` operator (concatenate), as illustrated below. 
 
 ```{r}
-
 lm.LMtests(fit_2, rwm_n, test = c("LMerr","LMlag","RLMerr","RLMlag","SARMA"))
 ```
 
@@ -229,9 +210,7 @@ How do we interpret  the  Lagrange  Multipliers?  First  we  look  at the standa
 
 If the non-robust version is not significant, the mathematical properties of the robust tests may not hold, so we don't look at them in those scenarios. It is fairly common to find that both the lag (`LMlag`) and the error (`LMerr`) non-robust LM are significant. If only one of them are: problem solved. We would choose a spatial lag or a spatial error model according to this (i.e., if the lag LM was significant and the error LM was not we would run a spatial lag model or viceversa). 
 
-
 Here we see that the p-value for RLMlag is 0.2163, which means it is *not* significant. This should guide us to use the spatial error model. 
-
 
 **What happens if both of these are significant?** - if you look at the robust Lagrange multipliers (`RLMlag` and `RLMerr`) and encounter that both are significant Luc Anselin (2008: 199-200) proposes the following criteria: 
 
@@ -250,26 +229,18 @@ Now even though here we would run with the spatial error model, I want to show y
 
 Just to reiterate,the Lagrange Multiplier suggests this spatial lag test may not be appropriate, but that a spatial error test may be better. However, we can also make a theory-based argument for running this model. It may be the case that we believe that the values of $y$ in one county, $i$, are directly influenced by the values of $y$ that exist in the "neighbours" of $i$. This is an influence that goes beyond  other  explanatory  variables  that  are specific  to  $i$.  Remember  what  we  said  earlier  in  the spatial lag model we are simply adding as an additional explanatory variable the values of y in the surrounding area. What we mean by "surrounding" will be defined by our spatial weight matrix. It's important to emphasise that one has to think very carefully and explore appropriate definitions of "surrounding" (as we discussed, though just superficially, in the section on spatial clustering a few weeks ago). We are using here the first order queen criteria, but in real practice you would need to explore whether this is the best definition and one that makes theoretical sense. 
 
-
-
 ### Activity 5: Spatial lag model
-
 
 Maximum Likelihood (ML) estimation of the spatial lag model is carried out with the `lagsarlm()` function. The required arguments are a regression "formula", a data set and a `listw` spatial weights object. The default method uses Ord's eigenvalue decomposition of the spatial weights matrix. This function lives in the `spatialreg` package. 
 
-```{r, warning=  FALSE, message = FALSE}
-
-library(spatialreg)
-
+```{r}
 fit_2_lag <- lagsarlm(HR90 ~ RD90 + DV90 + MA90 + PS90 + UE90, data=ncovr_n_sf, rwm_n)
 summary(fit_2_lag)
 ```
 
 As expected, the spatial autoregressive parameter (Rho) is statistically significant, as indicated by the p-value of 0.003 on an asymptotic t-test (based on the asymptotic variance matrix). The Likelihood Ratio test (LR) on this parameter is also significant (p value 0.003).
-
-
  
-How  do  you  interpret  these  results?  First,  you  need  to  look at the  general measures  of  fit  of  the model. I know what you are thinking. Look at the R Square and compare them, right? Well, don't. This R Square is not a real R Square, but a pseudo-R Square and therefore is not comparable to the one  we  obtain  from  the  OLS  regression  model. Instead  we  can look at the Akaike Information Criterion (AIC). We see that the lag model has an AIC of 9414.9 whereas the linear model with no lags has an AIC of 9422 (AIC for lm: 9422), so this is telling us there is a better fit when we include the spatial lag.
+How  do  you  interpret  these  results?  First,  you  need  to  look at the  general measures  of  fit  of  the model. I know what you are thinking. Look at the R Square and compare them, right? Well, don't. This R Square is not a real R Square, but a pseudo-R Square and therefore is not comparable to the one  we  obtain  from  the  OLS  regression  model. Instead  we  can look at the Akaike Information Criterion (AIC). When comparing two models, a lower AIC indicates that a model fits the data better. We see that the lag model has an AIC of 9414.9 whereas the linear model with no lags has an AIC of 9422 (AIC for lm: 9422), so this is telling us there is a better fit when we include the spatial lag.
 
 In our spatial lag model you will notice that there is a new term Rho. What is this? This is our spatial lag. It is a variable that measures the homicide rate in the counties that are defined as surrounding each county in our spatial weights matrix. We are simply using this variable as an additional explanatory variable to our model, so that we can appropriately take into account  the  spatial  clustering  detected  by our  Moran's  I  test.  You will  notice  that  the  estimated coefficient  for  this  term is  both  positive and  statistically  significant.  In  other  words, when  the homicide rate in surrounding areas increases, so does the homicide rate in each county, even when we adjust for the other explanatory variables in our model. The fact the lag is significant adds further evidence that this is a better model than the OLS regression specification.
 
@@ -280,15 +251,13 @@ How about the coefficients? It may be tempting to look at the regression coeffic
 > "Interpreting  the substantive  effects  of  each  predictor  in  a spatial lag  model  is  much  more  complex  than  in  a nonspatial model (or in a spatial error model) because of the presence of the spatial multiplier that links  the  independent  variables  to  the  dependent.  In  the nonspatial model,  it  does  not  matter which unit is experiencing the change on the independent variable. The effect" in the dependent variable "of a change" in the value of an independent variable "is constant across all observations" 
 (Darmofal, 2015: 107). 
 
-Remember, when interpreting a regression coefficient for variable $X~i$, we say that they indicate how much $Y$ goes up or down for every one unit increase in $X~i$  when holding all other variables in the model constant. In our example, for the nonspatial model this effect is the same  for  every  county  in  our  dataset.  But  in  the  spatial  lag  model  things  are  not  the  same.  We cannot interpret the regression coefficients for the substantive predictors in the same way because the "substantive effects of the independent variables vary by observation as a result of the different neighbors for each unit in the data" (Darmofal, 2015: 107).
+Remember, when interpreting a regression coefficient for variable $X_i$, we say that they indicate how much $Y$ goes up or down for every one unit increase in $X_i$  when holding all other variables in the model constant. In our example, for the nonspatial model this effect is the same  for  every  county  in  our  dataset.  But  in  the  spatial  lag  model  things  are  not  the  same.  We cannot interpret the regression coefficients for the substantive predictors in the same way because the "substantive effects of the independent variables vary by observation as a result of the different neighbors for each unit in the data" (Darmofal, 2015: 107).
 
-In  the  OLS  regression  model,  the  coefficients  for  any  of  the  explanatory  variables  measure  the absolute impact of these variables. It is a simpler scenario. We look at the effect of X in Y within each county. So X in county A affects Y in county A. In the spatial lag model there are two components to how  X  affects  Y.  X  affects  Y  within  each  county  directly  but  remember  we  are  also  including  the spatial lag, the measure of Y in the surrounding counties (call them B, C, and D). So our model includes  the effect of X in county A in the level of Y in county A. By virtue of including the spatial lag (a measure of Y in county B, C and D) we are indirectly incorporating as well the effect that X has on Y in  counties  B,  C,  and  D.  So  the  effect  of  a  covariate  (independent  variable)  is  the  sum  of  two particular effects: a direct, local effect of the covariate in that unit, and an indirect, spillover effect due to the spatial lag.
+In  the  OLS  regression  model,  the  coefficients  for  any  of  the  explanatory  variables  measure  the absolute impact of these variables. It is a simpler scenario. We look at the effect of X on Y within each county. So X in county A affects Y in county A. In the spatial lag model there are two components to how  X  affects  Y.  X  affects  Y  within  each  county  directly  but  remember  we  are  also  including  the spatial lag, the measure of Y in the surrounding counties (call them B, C, and D). So our model includes  the effect of X in county A in the level of Y in county A. By virtue of including the spatial lag (a measure of Y in county B, C and D) we are indirectly incorporating as well the effect that X has on Y in  counties  B,  C,  and  D.  So  the  effect  of  a  covariate  (independent  variable)  is  the  sum  of  two particular effects: a direct, local effect of the covariate in that unit, and an indirect, spillover effect due to the spatial lag.
 
-In other words, in the spatial lag model, the coefficients only focus on the "short-run impact" of $x~i$ on $y~i$ , rather than the net effect. As Ward and Gleditsch (2008) explain "Since the value of  $y~i$  will influence the level of" homicide "in other" counties $y~j$  and these $y~j$ , in turn, feedback on to $y~i$ , we need to take into account the additional effects that the short impact of $x~i$  exerts on $y~i$  through its impact on the level of" homicide "in other" counties. You can still read the coefficients in the same way but need to keep in mind that they are not measuring the net effect. Part of their effect will be captured  by  the  spatial  lag.  Yet,  you  may  still  want  to  have  a  look  at  whether  things  change dramatically, particularly in terms of their significance (which is not the case in this example).
+In other words, in the spatial lag model, the coefficients only focus on the "short-run impact" of $x_i$ on $y_i$ , rather than the net effect. As Ward and Gleditsch (2008) explain "Since the value of  $y_i$  will influence the level of" homicide "in other" counties $y_j$  and these $y_j$ , in turn, feedback on to $y_i$ , we need to take into account the additional effects that the short impact of $x_i$  exerts on $y_i$  through its impact on the level of" homicide "in other" counties. You can still read the coefficients in the same way but need to keep in mind that they are not measuring the net effect. Part of their effect will be captured  by  the  spatial  lag.  Yet,  you  may  still  want  to  have  a  look  at  whether  things  change dramatically, particularly in terms of their significance (which is not the case in this example).
 
-
-In sum, this implies that a change in the ith region’s predictor can affect the jth region’s outcome. We have 2 situations: (a) the direct impact of an observation’s predictor on its own outcome, and (b) the indirect impact of an observation’s neighbour’s predictor on its outcome.This leads to three quantities that we want to know:
-
+In sum, this implies that a change in the $i^{th}$ region’s predictor can affect the $j^{th}$ region’s outcome. We have 2 situations: (a) the direct impact of an observation’s predictor on its own outcome, and (b) the indirect impact of an observation’s neighbour’s predictor on its outcome.This leads to three quantities that we want to know:
 
 - **Average Direct Impact**, which is similar to a traditional interpretation
 - **Average Total impact**, which would be the total of direct and indirect impacts of a predictor on one’s outcome
@@ -296,26 +265,21 @@ In sum, this implies that a change in the ith region’s predictor can affect th
 
 These quantities can be found using the `impacts()` function in the `spatialreg` library. This function performs the calculation of impacts for spatial lag, which is needed in order to interpret the regression coefficients correctly, because of the spillovers between the terms in these data generation processes 
 
-Impacts takes the argument of our model (`fit_2_lag`), as well as our spatial weights. Now we could specify our already existing spatial weights object `rwm_n` using the `listw=` parameter, however, we have a very large matrix, and this might mean our calculations will take all day (if you don't believe me, try it! but don't say I didn't warn you!)
+Impacts takes the argument of our model (`fit_2_lag`), as well as our spatial weights. Now we could specify our already existing spatial weights object `rwm_n` using the `listw=` parameter, however, we have a very large matrix, and this might mean our calculations will take all day (if you don't believe me, try it! But don't say I didn't warn you!).
 
-
-Instead, what we can do is follow the example that converts the spatial weight matrix into a “sparse” matrix, and power it up using the `trW()` function. This follows the approximation methods described in Lesage and Pace, 2009. It prepares a vector of traces of powers of a spatial weights matrix Here, we use Monte Carlo simulation to obtain simulated distributions of the various impacts. If we use this, our outcome will be much faster. The `trW()` function needs our spatial weights to be in a sparse matrix class object, so we can transform this using the `as()` function: 
+Instead, what we can do is follow the example that converts the spatial weight matrix into a “sparse” matrix, and power it up using the `trW()` function. This follows the approximation methods described in Lesage and Pace, 2009. It prepares a vector of traces of powers of a spatial weights matrix. Here, we use Monte Carlo simulation to obtain simulated distributions of the various impacts. If we use this, our outcome will be much faster. The `trW()` function needs our spatial weights to be in a sparse matrix class object, so we can transform this using the `as()` function: 
 
 ```{r}
-
 W <- as(rwm_n, "CsparseMatrix")
 trMC <- trW(W, type="MC")
-
 ```
-
 
 Finally, `R=` asks for the number of simulations used to compute the distribution for the impact measures. 
 
 ```{r}
-
 im<-impacts(fit_2_lag, tr = trMC, R=100)
 
-sums<-summary(im,  zstats=T)
+sums<-summary(im, zstats=T)
 
 data.frame(sums$res)
 ```
@@ -325,7 +289,7 @@ data.frame(sums$res)
 data.frame(sums$pzmat)
 ```
 
-We see that all the variables have significant direct, indirect and total effects. You may want to have a look at how things differ when you just run a non spatial model.
+We see that all the variables except unemployment have significant direct, indirect and total effects. You may want to have a look at how things differ when you just run a non spatial model.
 
 ```{r}
 fit_1_OLS <- lm(HR90 ~ RD90 + DV90 + MA90 + PS90 +UE90, data=ncovr_n_sf)
@@ -334,21 +298,19 @@ summary(fit_1_OLS)
 
 ## Fitting an interpreting a spatial error model
 
-We saw (well you should have seen!) that for the case of homicide in the 90s for Southern states the spatial error model was more appropriate when using the 1 st  order contiguity queen criteria. In this case then, we need to run a spatial error model.
+When we used Lagrange multipliers, we saw that for the case of homicide in the 90s for Southern states, the spatial error model was more appropriate when using the 1st  order contiguity queen criteria. In this case then, we need to run a spatial error model.
 
-The  spatial  lag  model  is  probably  the  most  common  specification  and  maybe  the  most  generally useful way to think about spatial dependence. But we can also enter the spatial dependence, as we mentioned through the error term in our regression equation. Whereas the spatial lag model sees the spatial dependence as substantively meaningful (in that y, say homicide, in county i is influenced by homicide  in  its  neighbours), the  spatial  error  model  simply  treats  the  spatial  dependence  as  a nuisance. 
+The  spatial  lag  model  is  probably  the  most  common  specification  and  maybe  the  most  generally useful way to think about spatial dependence. But we can also enter the spatial dependence through the error term in our regression equation. Whereas the spatial lag model sees the spatial dependence as substantively meaningful (in that y, say homicide, in county i is influenced by homicide  in  its  neighbours), the  spatial  error  model  simply  treats  the  spatial  dependence  as  a nuisance. 
 
-This model focuses on estimating the regression parameters for the explanatory variables of interest and disregards the possibility that the spatial clustering, the spatial autocorrelation, may reflect something meaningful (other than attributional dependence as explained earlier). So instead of assuming that a spatial lag influences the dependent variable we estimate a model that relaxes the  standard  regression model  assumption  about  the  need  for the  errors  to  be  independent.  It's beyond the scope of this introductory course to cover the mathematical details of this procedure, though you can use the suggested reading (particularly the highly accessible Ward and Gleditsch,2008, book or the more recent Darmofal, 2015) or some of the video lectures in the matter that are available in the GeoDa website.
+This model focuses on estimating the regression parameters for the explanatory variables of interest and disregards the possibility that the spatial clustering, the spatial autocorrelation, may reflect something meaningful (other than attributional dependence, as explained earlier). So instead of assuming that a spatial lag influences the dependent variable, we estimate a model that relaxes the  standard  regression model  assumption  about  the  need  for the  errors  to  be  independent.  It's beyond the scope of this introductory course to cover the mathematical details of this procedure, though you can use the suggested reading (particularly the highly accessible Ward and Gleditsch,2008 book or the more recent Darmofal, 2015) or some of the video lectures on the matter that are available on the GeoDa website.
 
 ### Activity 6: Spatial error model
 
 Maximum likelihood estimation of the spatial error model is similar to the lag procedure and implemented in the `errorsarlm()` function. Again, the formula, data set and a `listw` spatial weights object must be specified, as illustrated below.
 
 ```{r}
-#We coerce the sf object into a new sp object
-ncovr_s_sp <- as(ncovr_s_sf, "Spatial")
-#Then we create a list of neighbours using the Queen criteria
-w_s <- poly2nb(ncovr_s_sp, row.names=ncovr_s_sp$FIPSNO)
+#Create a list of neighbours using the Queen criteria
+w_s <- poly2nb(ncovr_s_sf, row.names=ncovr_s_sf$FIPSNO)
 wm_s <- nb2mat(w_s, style='B')
 rwm_s <- mat2listw(wm_s, style='W')
 
@@ -356,20 +318,15 @@ fit_3_err <- errorsarlm(HR90 ~ RD90 + DV90 + MA90 + PS90 + UE90, data=ncovr_s_sf
 summary(fit_3_err)
 ```
 
+As before, the AIC is better for the spatial model (8958.8) than for the non spatial model (9008.7). In this case, you can compare the regression coefficients with those from the OLS model, since we don't have a spatial lag capturing some of their effect. Compare the coefficient estimates for the two models and see what differences you notice. You will see the table includes a new parameter  (lambda)  but  you  don't  need  to  worry about  this for  the  purpose  of  this  course.  It  is something you would understand if you get into the mathematical estimation details.
 
-
-As before the AIC is better for the spatial model (8958.8) than for the non spatial model (9008.7). In this case, you can compare the regression coefficients with those from the OLS model, since we don't have a spatial lag capturing some of their effect. Notice how one of the most notable differences is the fact that unemployment nearly halves its impact in the new model. You will see the table includes a new parameter  (lambda)  but  you  don't  need  to  worry about  this for  the  purpose  of  this  course.  It  is something you would understand if you get into the mathematical estimation details.
-
-
-We have reached a point now where you are able to model spatial dependence. How exciting! No longer will you be using OLS models for your data with spatial elements, as now, finally we have learned how to account for Tobler's first law: (I imagine this all said together in chorus by this point...!!) *everything is related to everything else, but near things are more related to each other than far away things!* Remember - most of what you study as criminologists takes place in a particular place in a particular time. Now we haven't covered time in this module, but you can sure account for the space component now. Well done all!
-
+We have reached a point now where you are able to model spatial dependence. How exciting! No longer will you be using OLS models for your data with spatial elements, as now, finally, we have learned how to account for Tobler's first law: (I imagine this all said together in chorus by this point...!!) *everything is related to everything else, but near things are more related to each other than far away things!* Remember - most of what you study as criminologists takes place in a particular place in a particular time. Now we haven't covered time in this module, but you can sure account for the space component now. Well done all!
 
 Now I said we don't deal with time, but I cannot let you go without addressing this just a little tiny bit... So one more section to go!
 
 ## Time matters!
 
-All crimes occur at a specific date and time, however such definite temporal information is only available when victims or witnesses are present, alarms are triggered, etc., at the time of occurrence. This specific temporal data is most often collected in crimes against persons. In these cases, cross-tabulations or histogram of weekday and hour by count will suffice. The great majority of reported events are crimes against property. In these cases, there are seldom victims or witnesses present. These events present the analyst with ‘ranged’ temporal data, that is, an event reported as occurring over a range of hours or even days. In the case of ranged temporal data, analysis is possible through use of equal chance or probability methods. If an event was reported as having occurred from Monday to Tuesday, in the absence of evidence to the contrary, it is assumed the event had an equal chance or probability of occurring on each of the two days, or .5 (%50). In the same manner, if an event was reported as having occurred over a 10 hour span there is a 10% chance the event occurred during any one of the hours. This technique requires a reasonable number of events in the data set to be effective. The resulting probabilities are totalled in each category and graphed or cross-tabulated. This produces a comparison of relative frequency, by weekday or hour [source](http://cradpdf.drdc-rddc.gc.ca/PDFS/unc76/p530054.pdf).
-
+All crimes occur at a specific date and time, however such definite temporal information is only available when victims or witnesses are present, alarms are triggered, etc., at the time of occurrence. This specific temporal data is most often collected in crimes against persons. In these cases, cross-tabulations or histogram of weekday and hour by count will suffice. The great majority of reported events are crimes against property. In these cases, there are seldom victims or witnesses present. These events present the analyst with ‘ranged’ temporal data, that is, an event reported as occurring over a range of hours or even days. In the case of ranged temporal data, analysis is possible through use of equal chance or probability methods. If an event was reported as having occurred from Monday to Tuesday, in the absence of evidence to the contrary, it is assumed the event had an equal chance or probability of occurring on each of the two days, or 0.5 (50%). In the same manner, if an event was reported as having occurred over a 10 hour span there is a 10% chance the event occurred during any one of the hours. This technique requires a reasonable number of events in the data set to be effective. The resulting probabilities are totalled in each category and graphed or cross-tabulated. This produces a comparison of relative frequency, by weekday or hour [(source)](http://cradpdf.drdc-rddc.gc.ca/PDFS/unc76/p530054.pdf).
 
 **Temporal crime analysis** looks at trends in crime or incidents. A crime or incident trend is a broad direction or pattern that specific types or general crime and/or incidents are following.
 
@@ -381,96 +338,66 @@ Three types of trend can be identified:
 
 Decomposing these trends is an important part of what **time series** analysis is all about. This could be a whole other course (and it is, there are modules on this for example in the Economics department!) so we will not cover it here. HOWEVER, I will show you one super cool way to introduce *time* into your crime mapping practice. We'll try two things: small multiples, and animations. 
 
-
 ### Activity 7: Small multiples
 
 One way that we can represent change over time in our spatial data is to create small multiples of the same map. Faceting and small multiples is a format for comparing the geographical distribution of different social phenomena. For this session we will be using the spatial object of ASB in Manchester between 2016-2017 (`manchester_asb.csv`) which you can download from Blackboard. 
 
-
 ```{r}
-
-library(readr)
-library(janitor)
-
 mcr_asb <- read_csv("data/manchester_asb.csv") %>% clean_names()
-
 ```
 
 We'll also need our boundary data. Read in the city centre LSOAs geojson (also on Blackboard) `cc_lsoas.geojson`. 
 
 ```{r}
-
 cc_lsoas <- st_read("data/cc_lsoas.geojson")
-
 ```
 
 Create a frequency table of the number of ASB incidents by month and by LSOA, and select only the city centre LSOAs.
 
 ```{r}
-
-library(dplyr)
-
 asb_by_lsoa <- mcr_asb %>% 
   group_by(lsoa_code, month) %>% 
   count() %>% 
   filter(lsoa_code %in% cc_lsoas$code)
-
-
 ```
 
 
-Now you might notice that there should be 13 months in the data set (from `05-2016` to `05-2017`), however, the number of resulting rows is not 23*13 (), but instead `r nrow(asb_by_lsoa)`. This indicates that we have some missing observations. There are months when there were no ASBs in some of our areas, but here that is just an absence of recorded data, rather than a recorded value of 0. 
+Now you might notice that there should be 13 months in the data set (from `05-2016` to `05-2017`), however, the number of resulting rows is not $23\times13 = 299$ (which you might expect as there are 23 LSOAs in the city centre), but instead `r nrow(asb_by_lsoa)`. This indicates that we have some missing observations. There are months when there were no ASBs in some of our areas, but here that is just an absence of recorded data, rather than a recorded value of 0.
 
 To fix this, we can identify the LSOAs and the missing months by selecting those where we have fewer than 13 observations: 
 
 ```{r}
-
 asb_by_lsoa %>% group_by(lsoa_code) %>% count() %>% filter(n < 13) %>% pull(lsoa_code)
-
 ```
 
 There are two such LSOAs here. Let's see which months we have data or for each. 
 
-
 ```{r}
-
-asb_by_lsoa %>% 
+asb_by_lsoa %>%
   filter(lsoa_code %in% c("E01033673", "E01033684") ) %>% 
   group_by(lsoa_code, month) %>% count() 
-
 ```
 
 Looks like LSOA E01033673 is missing 2016-12 and 2017-05, while LSOA E01033684 is missing 2016-06, 2016-08, 2016-09, 2016-11, 2017-01, 2017-02, 2017-03, and 2017-05. Let's create a dataframe where we have for each observation each of these missing months for the LSOAs, and an n of 0, as these months we know there were 0 stop and searches: 
 
-
 ```{r}
-
 missing_months <- data.frame(lsoa_code = c("E01033673", "E01033673", "E01033684", "E01033684", "E01033684", "E01033684", "E01033684", "E01033684", "E01033684", "E01033684"), 
                              month = c("2016-12", "2017-05", "2016-06", "2016-08", "2016-09", "2016-11", "2017-01", "2017-02", "2017-03", "2017-05"), 
                              n = c(0,0,0,0,0,0,0,0,0,0) )
-
 ```
-
 
 And bind this to our existing dataframe with `rbind()`:
 
-
 ```{r}
-
 asb_by_lsoa <- rbind(asb_by_lsoa, missing_months)
 ```
 
 Now we see we have the required 299 observations!
 
-
 We can now join this to our cc_lsoas boundary file.
 
-
 ```{r}
-
 cc_lsoas_asb <- left_join(cc_lsoas, asb_by_lsoa, by = c("code" = "lsoa_code"))
-
-
 ```
 
 
@@ -479,86 +406,65 @@ Let's also make sure that any NAs are replaced by 0s (if you're unsure here, wat
 
 
 ```{r}
-
 cc_lsoas_asb %>% 
   mutate(n = ifelse(is.na(n), 0, n))
-
 ```
-
-
 
 We now have a simple features object which has in the attribute tables the number of ASB incidents (`n`) for each LSOA for each month in our data set. We can use the function `tm_facets()` from the tmap package to now try to produce the small multiples:
 
-
 ```{r}
-
 tm_shape(cc_lsoas_asb) + 
   tm_fill("n") +
   tm_borders() +
   tm_facets("month", free.coords=FALSE)
-
 ```
 
 We can now see how ASB varies across the months, and start to think about how this might change over seasons for example with seasonal patterns in routine activities!
 
 *PS: you can also use the `facet_wrap()` and `facet_grid()` functions in `ggplot2` package if you prefer - remember there are always many ways to solve the same problem in R!*
 
-
 Pretty cool though, eh? Well just wait until the next section...!
-
 
 ### Activity 8: Animations
 
 You want a data viz person to get excited? Mention animations! Now they are brought to `ggplot2` thanks to the `gganimate` extension.
 
-
 So first thing we do is to load the `gganimate` package: 
 
 ```{r}
 library(gganimate)
-
 ```
-
 
 Also, to apply `gganimate` to `sf` objects, you need to have a package called `transformr` installed. You don't need to load this, but make sure it's installed!
 
 Then, we need to make sure that our temporal variable is a date object. We can use the `ymd()` function, from the fantastic `lubridate` package (really I cannot praise this package enough, it makes handling dates so easy...!) to make sure that our Month variable is a date object. 
 
-But we have no day you say! Only month! How can we use `ymd()` which clearly requires *y*ear *m*onth ad *day*! Well, one approach is to make this up, and just say that everything in our data happened on the 1st of the month. We can use the `paste0()` function to do this: 
+But we have no day you say! Only month! How can we use `ymd()` which clearly requires *y*ear *m*onth and *day*! Well, one approach is to make this up, and just say that everything in our data happened on the 1st of the month. We can use the `paste0()` function to do this: 
 
 ```{r}
-
 library(lubridate)
 cc_lsoas_asb$date_month <- ymd(paste0(cc_lsoas_asb$month, "-01"))
-
 ```
 
 Now, we can create a simple static plot, the way we already know how. Let's plot the number of ASB incidents per LSOA, and save this in an object called `anim`:
 
-
 ```{r}
-
 anim <- ggplot() +
   geom_sf(data = cc_lsoas_asb, aes(fill = n))
 ```
 
-
-Now, finally, we can animate this graph. Take the object of the static graph (anim) and add a form of transition, which will be used to animate the graph. In this case, we can use `transition_states()`. This transition splits your data into multiple states based on the levels in a given column, much like how faceting splits up the data in multiple panels. It then shifts between the defined states and pauses at each state. Layers with data without the specified column will be kept constant during the animation (again, mimicking facet_wrap). States are the unquoted name of the column holding the state levels in the data. You can then use the `closest_state` to dynamically label the graph:
+Now, finally, we can animate this graph. Take the object of the static graph (anim) and add a form of transition, which will be used to animate the graph. In this case, we can use `transition_manual()`. This transition splits your data into multiple frames based on the levels in a given column, much like how faceting splits up the data in multiple panels. It then shifts between frames, with each frame representing one level of the frame variable. Frames are the unquoted name of the column holding the frame levels in the data. You can then use `current_frame` to dynamically label the graph:
 
 ```{r}
-anim + transition_states(date_month, transition_length = 1, state_length = 1) +
-  labs(title = "Month: {closest_state}")
-
+anim + transition_manual(date_month) +
+  labs(title = "Month: {current_frame}")
 ```
 
 How cool is that!?
 
 You can now make animations about transition over time to impress your friends, family, future employers, and so on. What a way to end this course!
 
-
-
 ## Recap
-
 
 Today we learned a lot! We finally reached the conclusion of our spatial analysis by applying spatial weights in order to account for dependence in our spatially explicit data. Specifically we explored how to do the following: 
 

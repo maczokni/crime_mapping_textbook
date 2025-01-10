@@ -52,6 +52,17 @@
 <link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
 <link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<link href="libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet" />
+<script src="libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<link href="libs/leaflet-1.3.1/leaflet.css" rel="stylesheet" />
+<script src="libs/leaflet-1.3.1/leaflet.js"></script>
+<link href="libs/leafletfix-1.0.0/leafletfix.css" rel="stylesheet" />
+<script src="libs/proj4-2.6.2/proj4.min.js"></script>
+<script src="libs/Proj4Leaflet-1.0.1/proj4leaflet.js"></script>
+<link href="libs/rstudio_leaflet-1.3.1/rstudio_leaflet.css" rel="stylesheet" />
+<script src="libs/leaflet-binding-2.2.2/leaflet.js"></script>
+<script src="libs/leaflet-providers-2.0.0/leaflet-providers_2.0.0.js"></script>
+<script src="libs/leaflet-providers-plugin-2.2.2/leaflet-providers-plugin.js"></script>
 
 
 <style type="text/css">
@@ -448,21 +459,21 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 As a default, R will install all the dependencies for a package when we install our package, manchesterR. So this way we might end up with some packages there that we didn’t realise we had.</p>
 <p>Why are we telling you this? Well you should always check if you have a package, before installing it. And I wanted to share with you some neat code from a Stackoverflow discussion (if you are not yet familiar with Stackoverflow you have not been Google-ing your error messages enough) <a href="https://stackoverflow.com/questions/4090169/elegant-way-to-check-for-missing-packages-and-install-them">here</a> to do this. We’ll comment it a bit, so you can follow along what it does <strong>but you don’t have to if you don’t want to</strong>. This is just an extra.</p>
 <p>So as a first step, you have to assign a list of all the packages you have to check to an object. Let’s say I tell you that today we will be using the following packaes: “sp”, “rgdal”, “classInt”, “RColorBrewer”, “ggplot2”, “hexbin”, “ggmap”, “XML”, and “dplyr”. Then you can add these to an object called <code>libs</code>, using the <code>c()</code> function:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="more-on-thematic-maps.html#cb1-1" tabindex="-1"></a>libs <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;sf&quot;</span>, <span class="st">&quot;tmap&quot;</span>, <span class="st">&quot;sp&quot;</span>, <span class="st">&quot;spdep&quot;</span>, <span class="st">&quot;DCluster&quot;</span>, <span class="st">&quot;cartogram&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb213"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb213-1"><a href="more-on-thematic-maps.html#cb213-1" tabindex="-1"></a>libs <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;sf&quot;</span>, <span class="st">&quot;tmap&quot;</span>, <span class="st">&quot;sp&quot;</span>, <span class="st">&quot;spdep&quot;</span>, <span class="st">&quot;DCluster&quot;</span>, <span class="st">&quot;cartogram&quot;</span>)</span></code></pre></div>
 <p>Now you can run the below bit of code, and you will see in the console an output of what is and isn’t installed, as well as install the packages that are not!</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="more-on-thematic-maps.html#cb2-1" tabindex="-1"></a><span class="cf">for</span> (x <span class="cf">in</span> libs) {</span>
-<span id="cb2-2"><a href="more-on-thematic-maps.html#cb2-2" tabindex="-1"></a>    <span class="co"># Check if the package is installed</span></span>
-<span id="cb2-3"><a href="more-on-thematic-maps.html#cb2-3" tabindex="-1"></a>    <span class="cf">if</span> (<span class="sc">!</span>(x <span class="sc">%in%</span> <span class="fu">rownames</span>(<span class="fu">installed.packages</span>()))) {</span>
-<span id="cb2-4"><a href="more-on-thematic-maps.html#cb2-4" tabindex="-1"></a>        <span class="co"># If not installed, print a message and install the package</span></span>
-<span id="cb2-5"><a href="more-on-thematic-maps.html#cb2-5" tabindex="-1"></a>        <span class="fu">cat</span>(<span class="st">&quot;Installing &quot;</span>, x, <span class="st">&quot;...</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
-<span id="cb2-6"><a href="more-on-thematic-maps.html#cb2-6" tabindex="-1"></a>        <span class="fu">install.packages</span>(x)</span>
-<span id="cb2-7"><a href="more-on-thematic-maps.html#cb2-7" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
-<span id="cb2-8"><a href="more-on-thematic-maps.html#cb2-8" tabindex="-1"></a>        <span class="co"># If installed, print a message</span></span>
-<span id="cb2-9"><a href="more-on-thematic-maps.html#cb2-9" tabindex="-1"></a>        <span class="fu">cat</span>(x, <span class="st">&quot;is already installed.</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
-<span id="cb2-10"><a href="more-on-thematic-maps.html#cb2-10" tabindex="-1"></a>    }</span>
-<span id="cb2-11"><a href="more-on-thematic-maps.html#cb2-11" tabindex="-1"></a>    <span class="co"># Load the package</span></span>
-<span id="cb2-12"><a href="more-on-thematic-maps.html#cb2-12" tabindex="-1"></a>    <span class="fu">library</span>(x, <span class="at">character.only =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb2-13"><a href="more-on-thematic-maps.html#cb2-13" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb214"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb214-1"><a href="more-on-thematic-maps.html#cb214-1" tabindex="-1"></a><span class="cf">for</span> (x <span class="cf">in</span> libs) {</span>
+<span id="cb214-2"><a href="more-on-thematic-maps.html#cb214-2" tabindex="-1"></a>    <span class="co"># Check if the package is installed</span></span>
+<span id="cb214-3"><a href="more-on-thematic-maps.html#cb214-3" tabindex="-1"></a>    <span class="cf">if</span> (<span class="sc">!</span>(x <span class="sc">%in%</span> <span class="fu">rownames</span>(<span class="fu">installed.packages</span>()))) {</span>
+<span id="cb214-4"><a href="more-on-thematic-maps.html#cb214-4" tabindex="-1"></a>        <span class="co"># If not installed, print a message and install the package</span></span>
+<span id="cb214-5"><a href="more-on-thematic-maps.html#cb214-5" tabindex="-1"></a>        <span class="fu">cat</span>(<span class="st">&quot;Installing &quot;</span>, x, <span class="st">&quot;...</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb214-6"><a href="more-on-thematic-maps.html#cb214-6" tabindex="-1"></a>        <span class="fu">install.packages</span>(x)</span>
+<span id="cb214-7"><a href="more-on-thematic-maps.html#cb214-7" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
+<span id="cb214-8"><a href="more-on-thematic-maps.html#cb214-8" tabindex="-1"></a>        <span class="co"># If installed, print a message</span></span>
+<span id="cb214-9"><a href="more-on-thematic-maps.html#cb214-9" tabindex="-1"></a>        <span class="fu">cat</span>(x, <span class="st">&quot;is already installed.</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb214-10"><a href="more-on-thematic-maps.html#cb214-10" tabindex="-1"></a>    }</span>
+<span id="cb214-11"><a href="more-on-thematic-maps.html#cb214-11" tabindex="-1"></a>    <span class="co"># Load the package</span></span>
+<span id="cb214-12"><a href="more-on-thematic-maps.html#cb214-12" tabindex="-1"></a>    <span class="fu">library</span>(x, <span class="at">character.only =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb214-13"><a href="more-on-thematic-maps.html#cb214-13" tabindex="-1"></a>}</span></code></pre></div>
 <pre><code>## sf is already installed.
 ## tmap is already installed.
 ## sp is already installed.
@@ -471,8 +482,8 @@ As a default, R will install all the dependencies for a package when we install 
 ## cartogram is already installed.</code></pre>
 <p>As you can see if you read through the comments there, this bit of code checks each package in the list you pass to tbe <code>libs</code> object when you create it, and if it is not installed it installs for you, and if it is, it just loads it for you. It can be a handy bit of code to keep around.</p>
 <p>We also want to introduce <code>pacmac</code>, developed by Dason Kurkiewicz, to make your life a lot easier in the realm of R packages. While the <code>library()</code> function does its job, but could be the tedious task, installing and loading each package one by one. The <code>p_load()</code> function, a single line code will automatically checks for missing missing packages and installs/loads all libraries into you R. So, try!</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="more-on-thematic-maps.html#cb4-1" tabindex="-1"></a><span class="fu">library</span>(pacman)</span>
-<span id="cb4-2"><a href="more-on-thematic-maps.html#cb4-2" tabindex="-1"></a><span class="fu">p_load</span>(cartogram, DCluster, dplyr, geogrid, ggplot2,  ggspatial, hexbin, janitor, sf, sp, spdep, tmap, readxl, readr)</span></code></pre></div>
+<div class="sourceCode" id="cb216"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb216-1"><a href="more-on-thematic-maps.html#cb216-1" tabindex="-1"></a><span class="fu">library</span>(pacman)</span>
+<span id="cb216-2"><a href="more-on-thematic-maps.html#cb216-2" tabindex="-1"></a><span class="fu">p_load</span>(cartogram, DCluster, dplyr, geogrid, ggplot2,  ggspatial, hexbin, janitor, sf, sp, spdep, tmap, readxl, readr)</span></code></pre></div>
 <div id="activity-1-getting-some-messy-data" class="section level3 hasAnchor" number="5.1.1">
 <h3><span class="header-section-number">5.1.1</span> Activity 1: Getting some messy data<a href="more-on-thematic-maps.html#activity-1-getting-some-messy-data" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>So far, we’ve really been spoilt by using neat and easy-to-access data typical of ‘western’ countries. This week we will have a little exercise in using data when there may not be such clear ways to access neat and tidy data. Specifically, we’re going to look at some data from India! We’ll be using two datasets:</p>
@@ -492,9 +503,9 @@ As a default, R will install all the dependencies for a package when we install 
 <p>There’s an amazing dataset called VDSA (Village Dynamics in South Asia) which covers much of India, containing both agricultural and socio-economic information. Unfortunately, the website interface isn’t great and downloading the data requires you to make a free account and download individual files for each state, which is a massive faff. So instead, I’ve already downloaded the crop production data for just one state, <strong>Bihar</strong>, and you can download it <a href="https://www.dropbox.com/s/jr9w7ejdqrft59p/Bihar.xlsx?dl=1">here</a> (this too is also on BlackBoard)</p>
 <p>Great, now let’s read that data into R and have a look!</p>
 <p>Just like we read ‘.csv’ files with read.csv, we can read ‘.xlsx’ (Excel) files with the <code>read_xlsx()</code> function from the <code>readxl</code> package:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="more-on-thematic-maps.html#cb5-1" tabindex="-1"></a><span class="co">#option 1: import data</span></span>
-<span id="cb5-2"><a href="more-on-thematic-maps.html#cb5-2" tabindex="-1"></a>yield_data <span class="ot">&lt;-</span> <span class="fu">read_xlsx</span>(<span class="st">&#39;data/Bihar.xlsx&#39;</span>)</span>
-<span id="cb5-3"><a href="more-on-thematic-maps.html#cb5-3" tabindex="-1"></a><span class="fu">glimpse</span>(yield_data)</span></code></pre></div>
+<div class="sourceCode" id="cb217"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb217-1"><a href="more-on-thematic-maps.html#cb217-1" tabindex="-1"></a><span class="co">#option 1: import data</span></span>
+<span id="cb217-2"><a href="more-on-thematic-maps.html#cb217-2" tabindex="-1"></a>yield_data <span class="ot">&lt;-</span> <span class="fu">read_xlsx</span>(<span class="st">&#39;data/Bihar.xlsx&#39;</span>)</span>
+<span id="cb217-3"><a href="more-on-thematic-maps.html#cb217-3" tabindex="-1"></a><span class="fu">glimpse</span>(yield_data)</span></code></pre></div>
 <pre><code>## Rows: 688
 ## Columns: 59
 ## $ STCODE   &lt;dbl&gt; 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2…
@@ -556,54 +567,54 @@ As a default, R will install all the dependencies for a package when we install 
 ## $ TFV_TA   &lt;dbl&gt; 33.72, 35.00, 39.16, 35.48, 39.48, 38.58, 38.39, 37.68, 38.89…
 ## $ POTA_TA  &lt;dbl&gt; 4.28, 4.79, 7.04, 7.10, 7.30, 6.96, 7.66, 7.23, 8.01, 8.36, 8…
 ## $ ONIO_TA  &lt;dbl&gt; 1.22, 1.39, 1.69, 1.63, 1.78, 1.56, 1.76, 1.74, 1.64, 1.95, 1…</code></pre>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="more-on-thematic-maps.html#cb7-1" tabindex="-1"></a><span class="co">#option 2: import data</span></span>
-<span id="cb7-2"><a href="more-on-thematic-maps.html#cb7-2" tabindex="-1"></a><span class="co">#Alternatively, you can download Bihar.xlsx from where we saved the data</span></span>
-<span id="cb7-3"><a href="more-on-thematic-maps.html#cb7-3" tabindex="-1"></a><span class="co">#Important! note that I store it in on my Data folder You HAVE TO change that if needed.</span></span>
-<span id="cb7-4"><a href="more-on-thematic-maps.html#cb7-4" tabindex="-1"></a><span class="fu">download.file</span>(<span class="st">&quot;https://www.dropbox.com/s/dddf1tjqg0l51gp/Bihar.zip?dl=1&quot;</span> , </span>
-<span id="cb7-5"><a href="more-on-thematic-maps.html#cb7-5" tabindex="-1"></a>              <span class="at">destfile=</span><span class="st">&quot;/data/Bihar.zip&quot;</span>)</span>
-<span id="cb7-6"><a href="more-on-thematic-maps.html#cb7-6" tabindex="-1"></a><span class="co">#Important! note that I extract file to the data folder. you HATE TO change exdir (the directory to extract files to)</span></span>
-<span id="cb7-7"><a href="more-on-thematic-maps.html#cb7-7" tabindex="-1"></a><span class="fu">unzip</span>(<span class="st">&quot;/data/Bihar.zip&quot;</span>, <span class="at">exdir =</span> <span class="st">&quot;/data/&quot;</span>)</span>
-<span id="cb7-8"><a href="more-on-thematic-maps.html#cb7-8" tabindex="-1"></a>yield_data <span class="ot">&lt;-</span> <span class="fu">read_xlsx</span>(<span class="st">&quot;data/Bihar.xlsx&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb219"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb219-1"><a href="more-on-thematic-maps.html#cb219-1" tabindex="-1"></a><span class="co">#option 2: import data</span></span>
+<span id="cb219-2"><a href="more-on-thematic-maps.html#cb219-2" tabindex="-1"></a><span class="co">#Alternatively, you can download Bihar.xlsx from where we saved the data</span></span>
+<span id="cb219-3"><a href="more-on-thematic-maps.html#cb219-3" tabindex="-1"></a><span class="co">#Important! note that I store it in on my Data folder You HAVE TO change that if needed.</span></span>
+<span id="cb219-4"><a href="more-on-thematic-maps.html#cb219-4" tabindex="-1"></a><span class="fu">download.file</span>(<span class="st">&quot;https://www.dropbox.com/s/dddf1tjqg0l51gp/Bihar.zip?dl=1&quot;</span> , </span>
+<span id="cb219-5"><a href="more-on-thematic-maps.html#cb219-5" tabindex="-1"></a>              <span class="at">destfile=</span><span class="st">&quot;/data/Bihar.zip&quot;</span>)</span>
+<span id="cb219-6"><a href="more-on-thematic-maps.html#cb219-6" tabindex="-1"></a><span class="co">#Important! note that I extract file to the data folder. you HATE TO change exdir (the directory to extract files to)</span></span>
+<span id="cb219-7"><a href="more-on-thematic-maps.html#cb219-7" tabindex="-1"></a><span class="fu">unzip</span>(<span class="st">&quot;/data/Bihar.zip&quot;</span>, <span class="at">exdir =</span> <span class="st">&quot;/data/&quot;</span>)</span>
+<span id="cb219-8"><a href="more-on-thematic-maps.html#cb219-8" tabindex="-1"></a>yield_data <span class="ot">&lt;-</span> <span class="fu">read_xlsx</span>(<span class="st">&quot;data/Bihar.xlsx&quot;</span>)</span></code></pre></div>
 <p>After looking at the yield data, you can see it’s quite massive! Each column represents the production in weight (’_TQ’ columns) and the area farmed (’_TA’ columns) for each crop, per district, per year. That’s too much information for us! We just want rice production and area, so we’ll use the ‘select’ function to just pick the columns we want: names of states and districts, the year, and the rice information.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="more-on-thematic-maps.html#cb8-1" tabindex="-1"></a>yield_data <span class="ot">&lt;-</span> <span class="fu">clean_names</span>(yield_data)</span>
-<span id="cb8-2"><a href="more-on-thematic-maps.html#cb8-2" tabindex="-1"></a>yield_data <span class="ot">&lt;-</span> yield_data <span class="sc">%&gt;%</span></span>
-<span id="cb8-3"><a href="more-on-thematic-maps.html#cb8-3" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(stname, distname, year, rice_ta, rice_tq)</span></code></pre></div>
+<div class="sourceCode" id="cb220"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb220-1"><a href="more-on-thematic-maps.html#cb220-1" tabindex="-1"></a>yield_data <span class="ot">&lt;-</span> <span class="fu">clean_names</span>(yield_data)</span>
+<span id="cb220-2"><a href="more-on-thematic-maps.html#cb220-2" tabindex="-1"></a>yield_data <span class="ot">&lt;-</span> yield_data <span class="sc">%&gt;%</span></span>
+<span id="cb220-3"><a href="more-on-thematic-maps.html#cb220-3" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(stname, distname, year, rice_ta, rice_tq)</span></code></pre></div>
 </div>
 </div>
 <div id="activity-3-comparing-shapefiles" class="section level3 hasAnchor" number="5.1.2">
 <h3><span class="header-section-number">5.1.2</span> Activity 3: Comparing shapefiles<a href="more-on-thematic-maps.html#activity-3-comparing-shapefiles" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Now we’ve read in our rice yield data, we can test which shapefile will work best with the district names in our yield data. For this, we’ll use a basic ‘for’ loop which will test each shapefile (1951/61/71/81/91/2001) individually. This will show us which shapefile has the most matching district names (across India) with the yield data. Don’t worry about loops in R, they’re something you can learn if you’re interested but otherwise you can copy + paste the code below - so long as you understand what it’s doing overall. Chris’ advanced R will cover loops this week. N.B. You may need to change ‘shapefile_location &lt;-’ to tell R where you have saved your shapefiles!</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="more-on-thematic-maps.html#cb9-1" tabindex="-1"></a><span class="co"># Make a list of years between 1951 and 2001 at intervals every 10 years and store them as</span></span>
-<span id="cb9-2"><a href="more-on-thematic-maps.html#cb9-2" tabindex="-1"></a><span class="co"># characters instead of numbers (so we can use them as names of files in the loop)</span></span>
-<span id="cb9-3"><a href="more-on-thematic-maps.html#cb9-3" tabindex="-1"></a>shapefile_years <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="fu">seq</span>(<span class="dv">1951</span>, <span class="dv">2001</span>, <span class="dv">10</span>), as.character)</span>
-<span id="cb9-4"><a href="more-on-thematic-maps.html#cb9-4" tabindex="-1"></a></span>
-<span id="cb9-5"><a href="more-on-thematic-maps.html#cb9-5" tabindex="-1"></a><span class="co"># Get a list of district names in the yield data to compare to each shapefile</span></span>
-<span id="cb9-6"><a href="more-on-thematic-maps.html#cb9-6" tabindex="-1"></a>yield_dist_names <span class="ot">&lt;-</span> <span class="fu">make_clean_names</span>(<span class="fu">unique</span>(yield_data<span class="sc">$</span>distname))</span>
-<span id="cb9-7"><a href="more-on-thematic-maps.html#cb9-7" tabindex="-1"></a></span>
-<span id="cb9-8"><a href="more-on-thematic-maps.html#cb9-8" tabindex="-1"></a><span class="co"># Prepare an output variable</span></span>
-<span id="cb9-9"><a href="more-on-thematic-maps.html#cb9-9" tabindex="-1"></a>district_match_results <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">shapefile_year =</span> <span class="fu">character</span>(),</span>
-<span id="cb9-10"><a href="more-on-thematic-maps.html#cb9-10" tabindex="-1"></a>                                 <span class="at">district_match_percent =</span> <span class="fu">numeric</span>())</span>
-<span id="cb9-11"><a href="more-on-thematic-maps.html#cb9-11" tabindex="-1"></a></span>
-<span id="cb9-12"><a href="more-on-thematic-maps.html#cb9-12" tabindex="-1"></a><span class="co"># Loop through each item in the &#39;shapefile_years&#39; list and call each item &#39;each_year&#39;</span></span>
-<span id="cb9-13"><a href="more-on-thematic-maps.html#cb9-13" tabindex="-1"></a><span class="cf">for</span> (each_year <span class="cf">in</span> shapefile_years){</span>
-<span id="cb9-14"><a href="more-on-thematic-maps.html#cb9-14" tabindex="-1"></a>  </span>
-<span id="cb9-15"><a href="more-on-thematic-maps.html#cb9-15" tabindex="-1"></a>  <span class="co"># Change this if you need to, give the path to the directory with your shapefiles in</span></span>
-<span id="cb9-16"><a href="more-on-thematic-maps.html#cb9-16" tabindex="-1"></a>  shapefile_location <span class="ot">&lt;-</span> <span class="st">&#39;data/IndiaBoundaryData/&#39;</span></span>
-<span id="cb9-17"><a href="more-on-thematic-maps.html#cb9-17" tabindex="-1"></a>  </span>
-<span id="cb9-18"><a href="more-on-thematic-maps.html#cb9-18" tabindex="-1"></a>  <span class="co"># Read in each shapefile</span></span>
-<span id="cb9-19"><a href="more-on-thematic-maps.html#cb9-19" tabindex="-1"></a>  each_shapefile <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="fu">paste0</span>(shapefile_location, each_year, <span class="st">&#39;.shp&#39;</span>))</span>
-<span id="cb9-20"><a href="more-on-thematic-maps.html#cb9-20" tabindex="-1"></a>  </span>
-<span id="cb9-21"><a href="more-on-thematic-maps.html#cb9-21" tabindex="-1"></a>  <span class="co"># Get lists of each shapefile&#39;s district names</span></span>
-<span id="cb9-22"><a href="more-on-thematic-maps.html#cb9-22" tabindex="-1"></a>  shpfile_dist_names <span class="ot">&lt;-</span> <span class="fu">make_clean_names</span>(<span class="fu">unique</span>(each_shapefile<span class="sc">$</span>NAME))</span>
-<span id="cb9-23"><a href="more-on-thematic-maps.html#cb9-23" tabindex="-1"></a>  </span>
-<span id="cb9-24"><a href="more-on-thematic-maps.html#cb9-24" tabindex="-1"></a>  <span class="co"># Get the percentage of matching district names between yield data and each shpfile</span></span>
-<span id="cb9-25"><a href="more-on-thematic-maps.html#cb9-25" tabindex="-1"></a>  dist_match <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">length</span>(dplyr<span class="sc">::</span><span class="fu">intersect</span>(yield_dist_names, shpfile_dist_names))<span class="sc">/</span><span class="fu">length</span>(yield_dist_names)<span class="sc">*</span><span class="dv">100</span>, <span class="dv">0</span>)</span>
-<span id="cb9-26"><a href="more-on-thematic-maps.html#cb9-26" tabindex="-1"></a>  </span>
-<span id="cb9-27"><a href="more-on-thematic-maps.html#cb9-27" tabindex="-1"></a>  <span class="co"># Store results in output variable</span></span>
-<span id="cb9-28"><a href="more-on-thematic-maps.html#cb9-28" tabindex="-1"></a>  district_match_results <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(district_match_results, <span class="fu">tibble</span>(<span class="at">shapefile_year =</span> each_year, </span>
-<span id="cb9-29"><a href="more-on-thematic-maps.html#cb9-29" tabindex="-1"></a>                                                                     <span class="at">district_match_percent =</span> dist_match))</span>
-<span id="cb9-30"><a href="more-on-thematic-maps.html#cb9-30" tabindex="-1"></a>  </span>
-<span id="cb9-31"><a href="more-on-thematic-maps.html#cb9-31" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb221"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb221-1"><a href="more-on-thematic-maps.html#cb221-1" tabindex="-1"></a><span class="co"># Make a list of years between 1951 and 2001 at intervals every 10 years and store them as</span></span>
+<span id="cb221-2"><a href="more-on-thematic-maps.html#cb221-2" tabindex="-1"></a><span class="co"># characters instead of numbers (so we can use them as names of files in the loop)</span></span>
+<span id="cb221-3"><a href="more-on-thematic-maps.html#cb221-3" tabindex="-1"></a>shapefile_years <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="fu">seq</span>(<span class="dv">1951</span>, <span class="dv">2001</span>, <span class="dv">10</span>), as.character)</span>
+<span id="cb221-4"><a href="more-on-thematic-maps.html#cb221-4" tabindex="-1"></a></span>
+<span id="cb221-5"><a href="more-on-thematic-maps.html#cb221-5" tabindex="-1"></a><span class="co"># Get a list of district names in the yield data to compare to each shapefile</span></span>
+<span id="cb221-6"><a href="more-on-thematic-maps.html#cb221-6" tabindex="-1"></a>yield_dist_names <span class="ot">&lt;-</span> <span class="fu">make_clean_names</span>(<span class="fu">unique</span>(yield_data<span class="sc">$</span>distname))</span>
+<span id="cb221-7"><a href="more-on-thematic-maps.html#cb221-7" tabindex="-1"></a></span>
+<span id="cb221-8"><a href="more-on-thematic-maps.html#cb221-8" tabindex="-1"></a><span class="co"># Prepare an output variable</span></span>
+<span id="cb221-9"><a href="more-on-thematic-maps.html#cb221-9" tabindex="-1"></a>district_match_results <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">shapefile_year =</span> <span class="fu">character</span>(),</span>
+<span id="cb221-10"><a href="more-on-thematic-maps.html#cb221-10" tabindex="-1"></a>                                 <span class="at">district_match_percent =</span> <span class="fu">numeric</span>())</span>
+<span id="cb221-11"><a href="more-on-thematic-maps.html#cb221-11" tabindex="-1"></a></span>
+<span id="cb221-12"><a href="more-on-thematic-maps.html#cb221-12" tabindex="-1"></a><span class="co"># Loop through each item in the &#39;shapefile_years&#39; list and call each item &#39;each_year&#39;</span></span>
+<span id="cb221-13"><a href="more-on-thematic-maps.html#cb221-13" tabindex="-1"></a><span class="cf">for</span> (each_year <span class="cf">in</span> shapefile_years){</span>
+<span id="cb221-14"><a href="more-on-thematic-maps.html#cb221-14" tabindex="-1"></a>  </span>
+<span id="cb221-15"><a href="more-on-thematic-maps.html#cb221-15" tabindex="-1"></a>  <span class="co"># Change this if you need to, give the path to the directory with your shapefiles in</span></span>
+<span id="cb221-16"><a href="more-on-thematic-maps.html#cb221-16" tabindex="-1"></a>  shapefile_location <span class="ot">&lt;-</span> <span class="st">&#39;data/IndiaBoundaryData/&#39;</span></span>
+<span id="cb221-17"><a href="more-on-thematic-maps.html#cb221-17" tabindex="-1"></a>  </span>
+<span id="cb221-18"><a href="more-on-thematic-maps.html#cb221-18" tabindex="-1"></a>  <span class="co"># Read in each shapefile</span></span>
+<span id="cb221-19"><a href="more-on-thematic-maps.html#cb221-19" tabindex="-1"></a>  each_shapefile <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="fu">paste0</span>(shapefile_location, each_year, <span class="st">&#39;.shp&#39;</span>))</span>
+<span id="cb221-20"><a href="more-on-thematic-maps.html#cb221-20" tabindex="-1"></a>  </span>
+<span id="cb221-21"><a href="more-on-thematic-maps.html#cb221-21" tabindex="-1"></a>  <span class="co"># Get lists of each shapefile&#39;s district names</span></span>
+<span id="cb221-22"><a href="more-on-thematic-maps.html#cb221-22" tabindex="-1"></a>  shpfile_dist_names <span class="ot">&lt;-</span> <span class="fu">make_clean_names</span>(<span class="fu">unique</span>(each_shapefile<span class="sc">$</span>NAME))</span>
+<span id="cb221-23"><a href="more-on-thematic-maps.html#cb221-23" tabindex="-1"></a>  </span>
+<span id="cb221-24"><a href="more-on-thematic-maps.html#cb221-24" tabindex="-1"></a>  <span class="co"># Get the percentage of matching district names between yield data and each shpfile</span></span>
+<span id="cb221-25"><a href="more-on-thematic-maps.html#cb221-25" tabindex="-1"></a>  dist_match <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">length</span>(dplyr<span class="sc">::</span><span class="fu">intersect</span>(yield_dist_names, shpfile_dist_names))<span class="sc">/</span><span class="fu">length</span>(yield_dist_names)<span class="sc">*</span><span class="dv">100</span>, <span class="dv">0</span>)</span>
+<span id="cb221-26"><a href="more-on-thematic-maps.html#cb221-26" tabindex="-1"></a>  </span>
+<span id="cb221-27"><a href="more-on-thematic-maps.html#cb221-27" tabindex="-1"></a>  <span class="co"># Store results in output variable</span></span>
+<span id="cb221-28"><a href="more-on-thematic-maps.html#cb221-28" tabindex="-1"></a>  district_match_results <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(district_match_results, <span class="fu">tibble</span>(<span class="at">shapefile_year =</span> each_year, </span>
+<span id="cb221-29"><a href="more-on-thematic-maps.html#cb221-29" tabindex="-1"></a>                                                                     <span class="at">district_match_percent =</span> dist_match))</span>
+<span id="cb221-30"><a href="more-on-thematic-maps.html#cb221-30" tabindex="-1"></a>  </span>
+<span id="cb221-31"><a href="more-on-thematic-maps.html#cb221-31" tabindex="-1"></a>}</span></code></pre></div>
 <pre><code>## Reading layer `1951&#39; from data source 
 ##   `/Users/user/Desktop/resquant/crime_mapping_textbook/data/IndiaBoundaryData/1951.shp&#39; 
 ##   using driver `ESRI Shapefile&#39;
@@ -653,7 +664,7 @@ As a default, R will install all the dependencies for a package when we install 
 ## Bounding box:  xmin: 68.11009 ymin: 6.755698 xmax: 97.4091 ymax: 37.0503
 ## Geodetic CRS:  WGS 84</code></pre>
 <p>And now to check the output to see which shapefile has the highest proportion of district name matches:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="more-on-thematic-maps.html#cb11-1" tabindex="-1"></a><span class="fu">print</span>(district_match_results)</span></code></pre></div>
+<div class="sourceCode" id="cb223"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb223-1"><a href="more-on-thematic-maps.html#cb223-1" tabindex="-1"></a><span class="fu">print</span>(district_match_results)</span></code></pre></div>
 <pre><code>## # A tibble: 6 × 2
 ##   shapefile_year district_match_percent
 ##   &lt;chr&gt;                           &lt;dbl&gt;
@@ -663,17 +674,17 @@ As a default, R will install all the dependencies for a package when we install 
 ## 4 1981                               61
 ## 5 1991                               61
 ## 6 2001                               56</code></pre>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="more-on-thematic-maps.html#cb13-1" tabindex="-1"></a><span class="co"># And plot it with ggplot</span></span>
-<span id="cb13-2"><a href="more-on-thematic-maps.html#cb13-2" tabindex="-1"></a><span class="fu">ggplot</span>(district_match_results) <span class="sc">+</span></span>
-<span id="cb13-3"><a href="more-on-thematic-maps.html#cb13-3" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="fu">aes</span>(<span class="at">x =</span> shapefile_year, <span class="at">y =</span> district_match_percent), <span class="at">stat =</span> <span class="st">&#39;identity&#39;</span>)</span></code></pre></div>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<div class="sourceCode" id="cb225"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb225-1"><a href="more-on-thematic-maps.html#cb225-1" tabindex="-1"></a><span class="co"># And plot it with ggplot</span></span>
+<span id="cb225-2"><a href="more-on-thematic-maps.html#cb225-2" tabindex="-1"></a><span class="fu">ggplot</span>(district_match_results) <span class="sc">+</span></span>
+<span id="cb225-3"><a href="more-on-thematic-maps.html#cb225-3" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="fu">aes</span>(<span class="at">x =</span> shapefile_year, <span class="at">y =</span> district_match_percent), <span class="at">stat =</span> <span class="st">&#39;identity&#39;</span>)</span></code></pre></div>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-145-1.png" width="672" /></p>
 <p>So, before continuing you should look at the table and graph you’ve just made and decide which shapefile we should use now. Which one will be the best for representing your attribute table?</p>
 </div>
 <div id="activity-4-joining-datasets" class="section level3 hasAnchor" number="5.1.3">
 <h3><span class="header-section-number">5.1.3</span> Activity 4: Joining datasets<a href="more-on-thematic-maps.html#activity-4-joining-datasets" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>One last thing before we can continue mapping - joining our yield and shapefile datasets together! Some name cleaning is required first, to make sure they match up. Hopefully you found before that the 1971 shapefile has the highest percentage of district name matches with our yield data - so we’ll read that one in now:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="more-on-thematic-maps.html#cb14-1" tabindex="-1"></a><span class="co"># Read in the 1971 shapefile</span></span>
-<span id="cb14-2"><a href="more-on-thematic-maps.html#cb14-2" tabindex="-1"></a>shapefile <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">&#39;data/IndiaBoundaryData/1971.shp&#39;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb226"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb226-1"><a href="more-on-thematic-maps.html#cb226-1" tabindex="-1"></a><span class="co"># Read in the 1971 shapefile</span></span>
+<span id="cb226-2"><a href="more-on-thematic-maps.html#cb226-2" tabindex="-1"></a>shapefile <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">&#39;data/IndiaBoundaryData/1971.shp&#39;</span>)</span></code></pre></div>
 <pre><code>## Reading layer `1971&#39; from data source 
 ##   `/Users/user/Desktop/resquant/crime_mapping_textbook/data/IndiaBoundaryData/1971.shp&#39; 
 ##   using driver `ESRI Shapefile&#39;
@@ -682,27 +693,27 @@ As a default, R will install all the dependencies for a package when we install 
 ## Dimension:     XY
 ## Bounding box:  xmin: 68.11009 ymin: 6.755698 xmax: 97.4091 ymax: 37.0503
 ## Geodetic CRS:  WGS 84</code></pre>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="more-on-thematic-maps.html#cb16-1" tabindex="-1"></a><span class="co"># Clean the shapefile state and district names</span></span>
-<span id="cb16-2"><a href="more-on-thematic-maps.html#cb16-2" tabindex="-1"></a>shapefile <span class="ot">&lt;-</span> janitor<span class="sc">::</span><span class="fu">clean_names</span>(shapefile)</span>
-<span id="cb16-3"><a href="more-on-thematic-maps.html#cb16-3" tabindex="-1"></a>shapefile<span class="sc">$</span>name <span class="ot">&lt;-</span> <span class="fu">make_clean_names</span>(shapefile<span class="sc">$</span>name)</span>
-<span id="cb16-4"><a href="more-on-thematic-maps.html#cb16-4" tabindex="-1"></a>shapefile<span class="sc">$</span>state_ut <span class="ot">&lt;-</span> <span class="fu">tolower</span>(shapefile<span class="sc">$</span>state_ut)</span>
-<span id="cb16-5"><a href="more-on-thematic-maps.html#cb16-5" tabindex="-1"></a></span>
-<span id="cb16-6"><a href="more-on-thematic-maps.html#cb16-6" tabindex="-1"></a><span class="co"># Clean the yield data&#39;s state and district names in the same way</span></span>
-<span id="cb16-7"><a href="more-on-thematic-maps.html#cb16-7" tabindex="-1"></a><span class="co"># Using allow_dupes = TRUE means that repeated district names are not made into unique names</span></span>
-<span id="cb16-8"><a href="more-on-thematic-maps.html#cb16-8" tabindex="-1"></a>yield_data<span class="sc">$</span>distname <span class="ot">&lt;-</span> <span class="fu">make_clean_names</span>(<span class="fu">tolower</span>(yield_data<span class="sc">$</span>distname), <span class="at">allow_dupes =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb16-9"><a href="more-on-thematic-maps.html#cb16-9" tabindex="-1"></a>yield_data<span class="sc">$</span>stname <span class="ot">&lt;-</span> <span class="fu">tolower</span>(yield_data<span class="sc">$</span>stname)</span>
-<span id="cb16-10"><a href="more-on-thematic-maps.html#cb16-10" tabindex="-1"></a></span>
-<span id="cb16-11"><a href="more-on-thematic-maps.html#cb16-11" tabindex="-1"></a><span class="co"># Join the two datasets together, the &#39;by&#39; argument in right_join describes which columns</span></span>
-<span id="cb16-12"><a href="more-on-thematic-maps.html#cb16-12" tabindex="-1"></a><span class="co"># are equivalent in each dataset</span></span>
-<span id="cb16-13"><a href="more-on-thematic-maps.html#cb16-13" tabindex="-1"></a>district_yields <span class="ot">&lt;-</span> shapefile <span class="sc">%&gt;%</span></span>
-<span id="cb16-14"><a href="more-on-thematic-maps.html#cb16-14" tabindex="-1"></a>  <span class="fu">right_join</span>(yield_data, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&#39;name&#39;</span> <span class="ot">=</span> <span class="st">&#39;distname&#39;</span>, <span class="st">&#39;state_ut&#39;</span> <span class="ot">=</span> <span class="st">&#39;stname&#39;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb16-15"><a href="more-on-thematic-maps.html#cb16-15" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(year, name, state_ut, rice_ta, rice_tq) <span class="sc">%&gt;%</span> <span class="co"># &#39;select&#39; only selects the columns we&#39;re interested in (specify select from dplyr!)</span></span>
-<span id="cb16-16"><a href="more-on-thematic-maps.html#cb16-16" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rice_yield =</span> rice_tq<span class="sc">/</span>rice_ta) <span class="sc">%&gt;%</span></span>
-<span id="cb16-17"><a href="more-on-thematic-maps.html#cb16-17" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">district =</span> name,</span>
-<span id="cb16-18"><a href="more-on-thematic-maps.html#cb16-18" tabindex="-1"></a>         <span class="at">state =</span> state_ut)</span>
-<span id="cb16-19"><a href="more-on-thematic-maps.html#cb16-19" tabindex="-1"></a></span>
-<span id="cb16-20"><a href="more-on-thematic-maps.html#cb16-20" tabindex="-1"></a><span class="co"># Check output</span></span>
-<span id="cb16-21"><a href="more-on-thematic-maps.html#cb16-21" tabindex="-1"></a><span class="fu">head</span>(district_yields)</span></code></pre></div>
+<div class="sourceCode" id="cb228"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb228-1"><a href="more-on-thematic-maps.html#cb228-1" tabindex="-1"></a><span class="co"># Clean the shapefile state and district names</span></span>
+<span id="cb228-2"><a href="more-on-thematic-maps.html#cb228-2" tabindex="-1"></a>shapefile <span class="ot">&lt;-</span> janitor<span class="sc">::</span><span class="fu">clean_names</span>(shapefile)</span>
+<span id="cb228-3"><a href="more-on-thematic-maps.html#cb228-3" tabindex="-1"></a>shapefile<span class="sc">$</span>name <span class="ot">&lt;-</span> <span class="fu">make_clean_names</span>(shapefile<span class="sc">$</span>name)</span>
+<span id="cb228-4"><a href="more-on-thematic-maps.html#cb228-4" tabindex="-1"></a>shapefile<span class="sc">$</span>state_ut <span class="ot">&lt;-</span> <span class="fu">tolower</span>(shapefile<span class="sc">$</span>state_ut)</span>
+<span id="cb228-5"><a href="more-on-thematic-maps.html#cb228-5" tabindex="-1"></a></span>
+<span id="cb228-6"><a href="more-on-thematic-maps.html#cb228-6" tabindex="-1"></a><span class="co"># Clean the yield data&#39;s state and district names in the same way</span></span>
+<span id="cb228-7"><a href="more-on-thematic-maps.html#cb228-7" tabindex="-1"></a><span class="co"># Using allow_dupes = TRUE means that repeated district names are not made into unique names</span></span>
+<span id="cb228-8"><a href="more-on-thematic-maps.html#cb228-8" tabindex="-1"></a>yield_data<span class="sc">$</span>distname <span class="ot">&lt;-</span> <span class="fu">make_clean_names</span>(<span class="fu">tolower</span>(yield_data<span class="sc">$</span>distname), <span class="at">allow_dupes =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb228-9"><a href="more-on-thematic-maps.html#cb228-9" tabindex="-1"></a>yield_data<span class="sc">$</span>stname <span class="ot">&lt;-</span> <span class="fu">tolower</span>(yield_data<span class="sc">$</span>stname)</span>
+<span id="cb228-10"><a href="more-on-thematic-maps.html#cb228-10" tabindex="-1"></a></span>
+<span id="cb228-11"><a href="more-on-thematic-maps.html#cb228-11" tabindex="-1"></a><span class="co"># Join the two datasets together, the &#39;by&#39; argument in right_join describes which columns</span></span>
+<span id="cb228-12"><a href="more-on-thematic-maps.html#cb228-12" tabindex="-1"></a><span class="co"># are equivalent in each dataset</span></span>
+<span id="cb228-13"><a href="more-on-thematic-maps.html#cb228-13" tabindex="-1"></a>district_yields <span class="ot">&lt;-</span> shapefile <span class="sc">%&gt;%</span></span>
+<span id="cb228-14"><a href="more-on-thematic-maps.html#cb228-14" tabindex="-1"></a>  <span class="fu">right_join</span>(yield_data, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&#39;name&#39;</span> <span class="ot">=</span> <span class="st">&#39;distname&#39;</span>, <span class="st">&#39;state_ut&#39;</span> <span class="ot">=</span> <span class="st">&#39;stname&#39;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb228-15"><a href="more-on-thematic-maps.html#cb228-15" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(year, name, state_ut, rice_ta, rice_tq) <span class="sc">%&gt;%</span> <span class="co"># &#39;select&#39; only selects the columns we&#39;re interested in (specify select from dplyr!)</span></span>
+<span id="cb228-16"><a href="more-on-thematic-maps.html#cb228-16" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rice_yield =</span> rice_tq<span class="sc">/</span>rice_ta) <span class="sc">%&gt;%</span></span>
+<span id="cb228-17"><a href="more-on-thematic-maps.html#cb228-17" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">district =</span> name,</span>
+<span id="cb228-18"><a href="more-on-thematic-maps.html#cb228-18" tabindex="-1"></a>         <span class="at">state =</span> state_ut)</span>
+<span id="cb228-19"><a href="more-on-thematic-maps.html#cb228-19" tabindex="-1"></a></span>
+<span id="cb228-20"><a href="more-on-thematic-maps.html#cb228-20" tabindex="-1"></a><span class="co"># Check output</span></span>
+<span id="cb228-21"><a href="more-on-thematic-maps.html#cb228-21" tabindex="-1"></a><span class="fu">head</span>(district_yields)</span></code></pre></div>
 <pre><code>## Simple feature collection with 6 features and 6 fields
 ## Geometry type: MULTIPOLYGON
 ## Dimension:     XY
@@ -723,12 +734,12 @@ As a default, R will install all the dependencies for a package when we install 
 <div id="activity-5-the-case-of-saharsa" class="section level3 hasAnchor" number="5.2.1">
 <h3><span class="header-section-number">5.2.1</span> Activity 5: The case of Saharsa<a href="more-on-thematic-maps.html#activity-5-the-case-of-saharsa" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Let’s look at our yield data, here yield means the amount of rice produced (in tonnes, 1 tonne = 1000kg) per hectare (a square of land with 100 metre-long sides) of rice farmland.</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="more-on-thematic-maps.html#cb18-1" tabindex="-1"></a><span class="fu">summary</span>(district_yields<span class="sc">$</span>rice_yield)</span></code></pre></div>
+<div class="sourceCode" id="cb230"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb230-1"><a href="more-on-thematic-maps.html#cb230-1" tabindex="-1"></a><span class="fu">summary</span>(district_yields<span class="sc">$</span>rice_yield)</span></code></pre></div>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ##  0.0000  0.7690  0.9935  1.0560  1.2223  5.5423</code></pre>
 <p>We can see that the district with the highest rice production rate in 1971 had a rate of 55,423 kilograms of rice for each 100,000m<span class="math inline">\(^2\)</span> area. That’s really high! Where is that place? I can tell you it’s a place call Saharsa. Check it out:</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="more-on-thematic-maps.html#cb20-1" tabindex="-1"></a><span class="co"># This will show us the row with the highest yield</span></span>
-<span id="cb20-2"><a href="more-on-thematic-maps.html#cb20-2" tabindex="-1"></a>district_yields <span class="sc">%&gt;%</span> <span class="fu">filter</span>(rice_yield <span class="sc">==</span> <span class="fu">max</span>(rice_yield)) </span></code></pre></div>
+<div class="sourceCode" id="cb232"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb232-1"><a href="more-on-thematic-maps.html#cb232-1" tabindex="-1"></a><span class="co"># This will show us the row with the highest yield</span></span>
+<span id="cb232-2"><a href="more-on-thematic-maps.html#cb232-2" tabindex="-1"></a>district_yields <span class="sc">%&gt;%</span> <span class="fu">filter</span>(rice_yield <span class="sc">==</span> <span class="fu">max</span>(rice_yield)) </span></code></pre></div>
 <pre><code>## Simple feature collection with 1 feature and 6 fields
 ## Geometry type: MULTIPOLYGON
 ## Dimension:     XY
@@ -736,44 +747,44 @@ As a default, R will install all the dependencies for a package when we install 
 ## Geodetic CRS:  WGS 84
 ##   year district state rice_ta rice_tq rice_yield                       geometry
 ## 1 1971  saharsa bihar  204.86  1135.4   5.542322 MULTIPOLYGON (((87.04089 26...</code></pre>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="more-on-thematic-maps.html#cb22-1" tabindex="-1"></a><span class="co"># Subset the &#39;Saharsa&#39; district data</span></span>
-<span id="cb22-2"><a href="more-on-thematic-maps.html#cb22-2" tabindex="-1"></a>saharsa <span class="ot">&lt;-</span> <span class="fu">subset</span>(district_yields, district <span class="sc">==</span> <span class="st">&quot;saharsa&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb234"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb234-1"><a href="more-on-thematic-maps.html#cb234-1" tabindex="-1"></a><span class="co"># Subset the &#39;Saharsa&#39; district data</span></span>
+<span id="cb234-2"><a href="more-on-thematic-maps.html#cb234-2" tabindex="-1"></a>saharsa <span class="ot">&lt;-</span> <span class="fu">subset</span>(district_yields, district <span class="sc">==</span> <span class="st">&quot;saharsa&quot;</span>)</span></code></pre></div>
 <p><a href="https://en.wikipedia.org/wiki/Saharsa_district">Saharsa district</a> in Bihar, India is known for high quality corn, much of which is exported out here to the UK! But Saharsa isn’t particularly known for its great rice production. So, what’s going on here? Why do we have a high production rate (yield) in Saharsa that makes it look like the rice capital of India?</p>
 <p>Well, we can see from the output above that this happened in 1971 in Saharsa, so let’s map out the yields of all districts in Bihar in 1971 to investigate:</p>
 <p>(note for the next part with neighbours to work we have to remove the one polygon with the empty geometry with <code>st_is_empty()</code></p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="more-on-thematic-maps.html#cb23-1" tabindex="-1"></a><span class="co"># remove district with empty geometry</span></span>
-<span id="cb23-2"><a href="more-on-thematic-maps.html#cb23-2" tabindex="-1"></a>district_yields <span class="ot">&lt;-</span> district_yields <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">st_is_empty</span>(.))</span>
-<span id="cb23-3"><a href="more-on-thematic-maps.html#cb23-3" tabindex="-1"></a></span>
-<span id="cb23-4"><a href="more-on-thematic-maps.html#cb23-4" tabindex="-1"></a>bihar_1971 <span class="ot">&lt;-</span> <span class="fu">filter</span>(district_yields, year <span class="sc">==</span> <span class="st">&#39;1971&#39;</span>)</span>
-<span id="cb23-5"><a href="more-on-thematic-maps.html#cb23-5" tabindex="-1"></a></span>
-<span id="cb23-6"><a href="more-on-thematic-maps.html#cb23-6" tabindex="-1"></a><span class="fu">tm_shape</span>(bihar_1971)<span class="sc">+</span></span>
-<span id="cb23-7"><a href="more-on-thematic-maps.html#cb23-7" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="st">&#39;rice_yield&#39;</span>)</span></code></pre></div>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<div class="sourceCode" id="cb235"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb235-1"><a href="more-on-thematic-maps.html#cb235-1" tabindex="-1"></a><span class="co"># remove district with empty geometry</span></span>
+<span id="cb235-2"><a href="more-on-thematic-maps.html#cb235-2" tabindex="-1"></a>district_yields <span class="ot">&lt;-</span> district_yields <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">st_is_empty</span>(.))</span>
+<span id="cb235-3"><a href="more-on-thematic-maps.html#cb235-3" tabindex="-1"></a></span>
+<span id="cb235-4"><a href="more-on-thematic-maps.html#cb235-4" tabindex="-1"></a>bihar_1971 <span class="ot">&lt;-</span> <span class="fu">filter</span>(district_yields, year <span class="sc">==</span> <span class="st">&#39;1971&#39;</span>)</span>
+<span id="cb235-5"><a href="more-on-thematic-maps.html#cb235-5" tabindex="-1"></a></span>
+<span id="cb235-6"><a href="more-on-thematic-maps.html#cb235-6" tabindex="-1"></a><span class="fu">tm_shape</span>(bihar_1971)<span class="sc">+</span></span>
+<span id="cb235-7"><a href="more-on-thematic-maps.html#cb235-7" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="st">&#39;rice_yield&#39;</span>)</span></code></pre></div>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-149-1.png" width="672" /></p>
 <p>Saharsa is the darkly-shaded district in the top-right, it stands out massively from all other districts! Let’s plot the following year, 1972, for comparison:</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="more-on-thematic-maps.html#cb24-1" tabindex="-1"></a>bihar_1972 <span class="ot">&lt;-</span> <span class="fu">filter</span>(district_yields, year <span class="sc">==</span> <span class="st">&#39;1972&#39;</span>)</span>
-<span id="cb24-2"><a href="more-on-thematic-maps.html#cb24-2" tabindex="-1"></a></span>
-<span id="cb24-3"><a href="more-on-thematic-maps.html#cb24-3" tabindex="-1"></a><span class="fu">tm_shape</span>(bihar_1972)<span class="sc">+</span></span>
-<span id="cb24-4"><a href="more-on-thematic-maps.html#cb24-4" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="st">&#39;rice_yield&#39;</span>)</span></code></pre></div>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<div class="sourceCode" id="cb236"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb236-1"><a href="more-on-thematic-maps.html#cb236-1" tabindex="-1"></a>bihar_1972 <span class="ot">&lt;-</span> <span class="fu">filter</span>(district_yields, year <span class="sc">==</span> <span class="st">&#39;1972&#39;</span>)</span>
+<span id="cb236-2"><a href="more-on-thematic-maps.html#cb236-2" tabindex="-1"></a></span>
+<span id="cb236-3"><a href="more-on-thematic-maps.html#cb236-3" tabindex="-1"></a><span class="fu">tm_shape</span>(bihar_1972)<span class="sc">+</span></span>
+<span id="cb236-4"><a href="more-on-thematic-maps.html#cb236-4" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="st">&#39;rice_yield&#39;</span>)</span></code></pre></div>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-150-1.png" width="672" /></p>
 <p>Now Saharsa is in the lowest yield bracket - 0.2 to 0.4, pretty far off 5.5! Why does its yield value swing so far?</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="more-on-thematic-maps.html#cb25-1" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">filter</span>(district_yields, district <span class="sc">==</span> <span class="st">&#39;saharsa&#39;</span>, year <span class="sc">==</span> <span class="st">&#39;1971&#39;</span>) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(rice_ta))</span></code></pre></div>
+<div class="sourceCode" id="cb237"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb237-1"><a href="more-on-thematic-maps.html#cb237-1" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">filter</span>(district_yields, district <span class="sc">==</span> <span class="st">&#39;saharsa&#39;</span>, year <span class="sc">==</span> <span class="st">&#39;1971&#39;</span>) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(rice_ta))</span></code></pre></div>
 <pre><code>## [1] 204.86</code></pre>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="more-on-thematic-maps.html#cb27-1" tabindex="-1"></a>area_comparison <span class="ot">&lt;-</span> district_yields <span class="sc">%&gt;%</span></span>
-<span id="cb27-2"><a href="more-on-thematic-maps.html#cb27-2" tabindex="-1"></a>  <span class="fu">group_by</span>(district) <span class="sc">%&gt;%</span></span>
-<span id="cb27-3"><a href="more-on-thematic-maps.html#cb27-3" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">mean_area =</span> <span class="fu">mean</span>(rice_ta)) <span class="sc">%&gt;%</span></span>
-<span id="cb27-4"><a href="more-on-thematic-maps.html#cb27-4" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(district, mean_area)</span>
-<span id="cb27-5"><a href="more-on-thematic-maps.html#cb27-5" tabindex="-1"></a></span>
-<span id="cb27-6"><a href="more-on-thematic-maps.html#cb27-6" tabindex="-1"></a><span class="fu">ggplot</span>(area_comparison) <span class="sc">+</span> </span>
-<span id="cb27-7"><a href="more-on-thematic-maps.html#cb27-7" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="fu">aes</span>(<span class="at">x =</span> district, <span class="at">y =</span> mean_area)) <span class="sc">+</span> </span>
-<span id="cb27-8"><a href="more-on-thematic-maps.html#cb27-8" tabindex="-1"></a>  <span class="fu">coord_flip</span>()</span></code></pre></div>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<div class="sourceCode" id="cb239"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb239-1"><a href="more-on-thematic-maps.html#cb239-1" tabindex="-1"></a>area_comparison <span class="ot">&lt;-</span> district_yields <span class="sc">%&gt;%</span></span>
+<span id="cb239-2"><a href="more-on-thematic-maps.html#cb239-2" tabindex="-1"></a>  <span class="fu">group_by</span>(district) <span class="sc">%&gt;%</span></span>
+<span id="cb239-3"><a href="more-on-thematic-maps.html#cb239-3" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">mean_area =</span> <span class="fu">mean</span>(rice_ta)) <span class="sc">%&gt;%</span></span>
+<span id="cb239-4"><a href="more-on-thematic-maps.html#cb239-4" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(district, mean_area)</span>
+<span id="cb239-5"><a href="more-on-thematic-maps.html#cb239-5" tabindex="-1"></a></span>
+<span id="cb239-6"><a href="more-on-thematic-maps.html#cb239-6" tabindex="-1"></a><span class="fu">ggplot</span>(area_comparison) <span class="sc">+</span> </span>
+<span id="cb239-7"><a href="more-on-thematic-maps.html#cb239-7" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="fu">aes</span>(<span class="at">x =</span> district, <span class="at">y =</span> mean_area)) <span class="sc">+</span> </span>
+<span id="cb239-8"><a href="more-on-thematic-maps.html#cb239-8" tabindex="-1"></a>  <span class="fu">coord_flip</span>()</span></code></pre></div>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-151-1.png" width="672" /></p>
 <p>Although it doesn’t have the smallest rice farmland area, Saharsa’s rice land is pretty small. Remember that the rate is simply dividing the number of relevant events (rice production) by the exposure variable (in this case area of rice farmland). Most times Saharsa has very low yields ( &lt; 1 tonne per hectare):</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="more-on-thematic-maps.html#cb28-1" tabindex="-1"></a>saharsa_rice_yield <span class="ot">&lt;-</span> <span class="fu">filter</span>(district_yields, district <span class="sc">==</span> <span class="st">&#39;saharsa&#39;</span>)</span>
-<span id="cb28-2"><a href="more-on-thematic-maps.html#cb28-2" tabindex="-1"></a></span>
-<span id="cb28-3"><a href="more-on-thematic-maps.html#cb28-3" tabindex="-1"></a><span class="fu">ggplot</span>(saharsa_rice_yield) <span class="sc">+</span></span>
-<span id="cb28-4"><a href="more-on-thematic-maps.html#cb28-4" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="fu">aes</span>(<span class="at">x =</span> year, <span class="at">y =</span> rice_yield)) <span class="sc">+</span></span>
-<span id="cb28-5"><a href="more-on-thematic-maps.html#cb28-5" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Year&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Saharsa rice yield&quot;</span>)</span></code></pre></div>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<div class="sourceCode" id="cb240"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb240-1"><a href="more-on-thematic-maps.html#cb240-1" tabindex="-1"></a>saharsa_rice_yield <span class="ot">&lt;-</span> <span class="fu">filter</span>(district_yields, district <span class="sc">==</span> <span class="st">&#39;saharsa&#39;</span>)</span>
+<span id="cb240-2"><a href="more-on-thematic-maps.html#cb240-2" tabindex="-1"></a></span>
+<span id="cb240-3"><a href="more-on-thematic-maps.html#cb240-3" tabindex="-1"></a><span class="fu">ggplot</span>(saharsa_rice_yield) <span class="sc">+</span></span>
+<span id="cb240-4"><a href="more-on-thematic-maps.html#cb240-4" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="fu">aes</span>(<span class="at">x =</span> year, <span class="at">y =</span> rice_yield)) <span class="sc">+</span></span>
+<span id="cb240-5"><a href="more-on-thematic-maps.html#cb240-5" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Year&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Saharsa rice yield&quot;</span>)</span></code></pre></div>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-152-1.png" width="672" /></p>
 <p>Saharsa’s rice production is around 130 tonnes in most years. But it only takes one good year of rice growth and, bang, it goes to the top of the league. So a standard map of rates is bound to be noisy. There is the instability that is introduced by virtue of having areas that may be sparsely populated and in which one single event, like in this case a bumper crop, will produce a very noticeable change in the rate. In fact, if you look at the counties with the highest yields in the yield dataset you will notice all of them are places like Saharsa, areas that have small areas of rice farmland (RICE_TA). So they have high yields not because they produce massive amounts of rice, but because of the instability of rates.</p>
 <p>This is a problem that was first noted by epidemiologists doing disease mapping. But a number of other disciplines have now noted this and used some of the approaches developed by public health researchers that confronted this problem when producing maps of disease (techniques and approaches used by spatial epidemiologists are very similar to those used by criminologists -in case you ever think of changing careers or need inspiration for how to solve a crime analysis problem).</p>
 </div>
@@ -784,45 +795,45 @@ As a default, R will install all the dependencies for a package when we install 
 <p>What does this mean? Essentially, we compute a weighted average between the raw rate for each area and the global average across all areas, with weights proportional to the underlying population at risk. What this procedure does is to have the rates of smaller areas (those with a small population at risk) to have their rates adjusted considerably (brought closer to the global average), whereas the rates for the larger areas will barely change.</p>
 <p>Here we are going to introduce the approach implemented in <code>DCluster</code>, a package developed for epidemiological research and detection of <a href="https://www.r-project.org/conferences/DSC-2003/Proceedings/GomezRubioEtAl.pdf">clusters of disease</a>.</p>
 <p>Specifically, we use the <code>empbaysmooth(Observed, Expected)</code> function, where we specify two values, the <strong>expected</strong> value (the global average) and the <strong>observed</strong> value (the rate we actually see).</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="more-on-thematic-maps.html#cb29-1" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">empbaysmooth</span>(bihar_1971<span class="sc">$</span>rice_yield, bihar_1971<span class="sc">$</span>rice_ta<span class="sc">*</span>(<span class="fu">sum</span>(bihar_1971<span class="sc">$</span>rice_yield)<span class="sc">/</span><span class="fu">sum</span>(bihar_1971<span class="sc">$</span>rice_ta)))</span></code></pre></div>
+<div class="sourceCode" id="cb241"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb241-1"><a href="more-on-thematic-maps.html#cb241-1" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">empbaysmooth</span>(bihar_1971<span class="sc">$</span>rice_yield, bihar_1971<span class="sc">$</span>rice_ta<span class="sc">*</span>(<span class="fu">sum</span>(bihar_1971<span class="sc">$</span>rice_yield)<span class="sc">/</span><span class="fu">sum</span>(bihar_1971<span class="sc">$</span>rice_ta)))</span></code></pre></div>
 <p>In the new object we generate, which is a list, you have an element which contains the computed rates. We can add those to our dataset:</p>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="more-on-thematic-maps.html#cb30-1" tabindex="-1"></a>bihar_1971<span class="sc">$</span>rice_yieldEBS <span class="ot">&lt;-</span> res<span class="sc">$</span>smthrr</span></code></pre></div>
+<div class="sourceCode" id="cb242"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb242-1"><a href="more-on-thematic-maps.html#cb242-1" tabindex="-1"></a>bihar_1971<span class="sc">$</span>rice_yieldEBS <span class="ot">&lt;-</span> res<span class="sc">$</span>smthrr</span></code></pre></div>
 <p><strong>Alternatively</strong> instead of shrinking to the global rate, we can shrink to a rate based on the neighbours of each county. In this case, instead of shrinking to a global rate, we shrink to a <em>local rate</em>. We then may be able to take unobserved heterogeneity into account. For this we need the list of neighbours, therefore we can compute the rate of the areas that surround each county:</p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="more-on-thematic-maps.html#cb31-1" tabindex="-1"></a>bihar_1971 <span class="ot">&lt;-</span> bihar_1971 <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">neighbour =</span> <span class="fu">st_intersects</span>(.))</span>
-<span id="cb31-2"><a href="more-on-thematic-maps.html#cb31-2" tabindex="-1"></a></span>
-<span id="cb31-3"><a href="more-on-thematic-maps.html#cb31-3" tabindex="-1"></a><span class="co">#create the list of neighbours</span></span>
-<span id="cb31-4"><a href="more-on-thematic-maps.html#cb31-4" tabindex="-1"></a>w_sf <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
-<span id="cb31-5"><a href="more-on-thematic-maps.html#cb31-5" tabindex="-1"></a>w_sf <span class="ot">&lt;-</span> bihar_1971<span class="sc">$</span>neighbour</span>
-<span id="cb31-6"><a href="more-on-thematic-maps.html#cb31-6" tabindex="-1"></a><span class="fu">class</span>(w_sf) <span class="ot">&lt;-</span> <span class="st">&quot;nb&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb243"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb243-1"><a href="more-on-thematic-maps.html#cb243-1" tabindex="-1"></a>bihar_1971 <span class="ot">&lt;-</span> bihar_1971 <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">neighbour =</span> <span class="fu">st_intersects</span>(.))</span>
+<span id="cb243-2"><a href="more-on-thematic-maps.html#cb243-2" tabindex="-1"></a></span>
+<span id="cb243-3"><a href="more-on-thematic-maps.html#cb243-3" tabindex="-1"></a><span class="co">#create the list of neighbours</span></span>
+<span id="cb243-4"><a href="more-on-thematic-maps.html#cb243-4" tabindex="-1"></a>w_sf <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb243-5"><a href="more-on-thematic-maps.html#cb243-5" tabindex="-1"></a>w_sf <span class="ot">&lt;-</span> bihar_1971<span class="sc">$</span>neighbour</span>
+<span id="cb243-6"><a href="more-on-thematic-maps.html#cb243-6" tabindex="-1"></a><span class="fu">class</span>(w_sf) <span class="ot">&lt;-</span> <span class="st">&quot;nb&quot;</span></span></code></pre></div>
 <p>And now that we have the list of neighbours, we can use the <code>EBlocal()</code> function, and here specify the count of cases (observed), the population at risk (or rice_TA in the case of our crop yields) and then finally the neighbours list we just created above (<code>w_sf</code>). The object produced (<code>eb2</code>) consists of two columns - the raw rates (equivalent to the <code>rice_yield</code> we already calculated) and the newly estimated rates:</p>
-<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="more-on-thematic-maps.html#cb32-1" tabindex="-1"></a>eb2 <span class="ot">&lt;-</span> <span class="fu">EBlocal</span>(bihar_1971<span class="sc">$</span>rice_tq, bihar_1971<span class="sc">$</span>rice_ta, w_sf)</span>
-<span id="cb32-2"><a href="more-on-thematic-maps.html#cb32-2" tabindex="-1"></a>bihar_1971<span class="sc">$</span>rice_yieldEBSL <span class="ot">&lt;-</span> eb2<span class="sc">$</span>est </span>
-<span id="cb32-3"><a href="more-on-thematic-maps.html#cb32-3" tabindex="-1"></a>bihar_1971<span class="sc">$</span>neighbour <span class="ot">&lt;-</span> <span class="cn">NULL</span></span></code></pre></div>
+<div class="sourceCode" id="cb244"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb244-1"><a href="more-on-thematic-maps.html#cb244-1" tabindex="-1"></a>eb2 <span class="ot">&lt;-</span> <span class="fu">EBlocal</span>(bihar_1971<span class="sc">$</span>rice_tq, bihar_1971<span class="sc">$</span>rice_ta, w_sf)</span>
+<span id="cb244-2"><a href="more-on-thematic-maps.html#cb244-2" tabindex="-1"></a>bihar_1971<span class="sc">$</span>rice_yieldEBSL <span class="ot">&lt;-</span> eb2<span class="sc">$</span>est </span>
+<span id="cb244-3"><a href="more-on-thematic-maps.html#cb244-3" tabindex="-1"></a>bihar_1971<span class="sc">$</span>neighbour <span class="ot">&lt;-</span> <span class="cn">NULL</span></span></code></pre></div>
 <p>We can now plot the maps and compare them :</p>
-<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="more-on-thematic-maps.html#cb33-1" tabindex="-1"></a>current_style <span class="ot">&lt;-</span> <span class="fu">tmap_style</span>(<span class="st">&quot;col_blind&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb245"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb245-1"><a href="more-on-thematic-maps.html#cb245-1" tabindex="-1"></a>current_style <span class="ot">&lt;-</span> <span class="fu">tmap_style</span>(<span class="st">&quot;col_blind&quot;</span>)</span></code></pre></div>
 <pre><code>## tmap style set to &quot;col_blind&quot;</code></pre>
 <pre><code>## other available styles are: &quot;white&quot;, &quot;gray&quot;, &quot;natural&quot;, &quot;cobalt&quot;, &quot;albatross&quot;, &quot;beaver&quot;, &quot;bw&quot;, &quot;classic&quot;, &quot;watercolor&quot;</code></pre>
-<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="more-on-thematic-maps.html#cb36-1" tabindex="-1"></a><span class="co">#map1: rice_yield, raw value</span></span>
-<span id="cb36-2"><a href="more-on-thematic-maps.html#cb36-2" tabindex="-1"></a>map1 <span class="ot">&lt;-</span> <span class="fu">tm_shape</span>(bihar_1971) <span class="sc">+</span> </span>
-<span id="cb36-3"><a href="more-on-thematic-maps.html#cb36-3" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="st">&quot;rice_yield&quot;</span>, <span class="at">style=</span><span class="st">&quot;quantile&quot;</span>, <span class="at">title =</span> <span class="st">&quot;Raw rate&quot;</span>, <span class="at">palette =</span> <span class="st">&quot;Reds&quot;</span>) <span class="sc">+</span></span>
-<span id="cb36-4"><a href="more-on-thematic-maps.html#cb36-4" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">legend.position =</span> <span class="fu">c</span>(<span class="st">&quot;left&quot;</span>, <span class="st">&quot;bottom&quot;</span>), </span>
-<span id="cb36-5"><a href="more-on-thematic-maps.html#cb36-5" tabindex="-1"></a>            <span class="at">legend.title.size =</span> <span class="fl">0.8</span>,</span>
-<span id="cb36-6"><a href="more-on-thematic-maps.html#cb36-6" tabindex="-1"></a>            <span class="at">legend.text.size =</span> <span class="fl">0.5</span>)</span>
-<span id="cb36-7"><a href="more-on-thematic-maps.html#cb36-7" tabindex="-1"></a><span class="co">#map2: rice_yieldEBS, global</span></span>
-<span id="cb36-8"><a href="more-on-thematic-maps.html#cb36-8" tabindex="-1"></a>map2<span class="ot">&lt;-</span> <span class="fu">tm_shape</span>(bihar_1971) <span class="sc">+</span> </span>
-<span id="cb36-9"><a href="more-on-thematic-maps.html#cb36-9" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="st">&quot;rice_yieldEBS&quot;</span>, <span class="at">style=</span><span class="st">&quot;quantile&quot;</span>, <span class="at">title =</span> <span class="st">&quot;EB Smooth&quot;</span>, <span class="at">palette =</span> <span class="st">&quot;Reds&quot;</span>) <span class="sc">+</span></span>
-<span id="cb36-10"><a href="more-on-thematic-maps.html#cb36-10" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">legend.position =</span> <span class="fu">c</span>(<span class="st">&quot;left&quot;</span>, <span class="st">&quot;bottom&quot;</span>), </span>
-<span id="cb36-11"><a href="more-on-thematic-maps.html#cb36-11" tabindex="-1"></a>            <span class="at">legend.title.size =</span> <span class="fl">0.8</span>,</span>
-<span id="cb36-12"><a href="more-on-thematic-maps.html#cb36-12" tabindex="-1"></a>            <span class="at">legend.text.size =</span> <span class="fl">0.5</span>)</span>
-<span id="cb36-13"><a href="more-on-thematic-maps.html#cb36-13" tabindex="-1"></a><span class="co">#map3: rice_yieldEBSL, local</span></span>
-<span id="cb36-14"><a href="more-on-thematic-maps.html#cb36-14" tabindex="-1"></a>map3<span class="ot">&lt;-</span> <span class="fu">tm_shape</span>(bihar_1971) <span class="sc">+</span> </span>
-<span id="cb36-15"><a href="more-on-thematic-maps.html#cb36-15" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="st">&quot;rice_yieldEBSL&quot;</span>, <span class="at">style=</span><span class="st">&quot;quantile&quot;</span>, <span class="at">title =</span> <span class="st">&quot;Local Smooth&quot;</span>, <span class="at">palette =</span> <span class="st">&quot;Reds&quot;</span>) <span class="sc">+</span></span>
-<span id="cb36-16"><a href="more-on-thematic-maps.html#cb36-16" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">legend.position =</span> <span class="fu">c</span>(<span class="st">&quot;left&quot;</span>, <span class="st">&quot;bottom&quot;</span>), </span>
-<span id="cb36-17"><a href="more-on-thematic-maps.html#cb36-17" tabindex="-1"></a>            <span class="at">legend.title.size =</span> <span class="fl">0.8</span>,</span>
-<span id="cb36-18"><a href="more-on-thematic-maps.html#cb36-18" tabindex="-1"></a>            <span class="at">legend.text.size =</span> <span class="fl">0.5</span>)</span>
-<span id="cb36-19"><a href="more-on-thematic-maps.html#cb36-19" tabindex="-1"></a></span>
-<span id="cb36-20"><a href="more-on-thematic-maps.html#cb36-20" tabindex="-1"></a><span class="fu">tmap_arrange</span>(map1, map2, map3) </span></code></pre></div>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-22-1.png" width="672" /></p>
+<div class="sourceCode" id="cb248"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb248-1"><a href="more-on-thematic-maps.html#cb248-1" tabindex="-1"></a><span class="co">#map1: rice_yield, raw value</span></span>
+<span id="cb248-2"><a href="more-on-thematic-maps.html#cb248-2" tabindex="-1"></a>map1 <span class="ot">&lt;-</span> <span class="fu">tm_shape</span>(bihar_1971) <span class="sc">+</span> </span>
+<span id="cb248-3"><a href="more-on-thematic-maps.html#cb248-3" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="st">&quot;rice_yield&quot;</span>, <span class="at">style=</span><span class="st">&quot;quantile&quot;</span>, <span class="at">title =</span> <span class="st">&quot;Raw rate&quot;</span>, <span class="at">palette =</span> <span class="st">&quot;Reds&quot;</span>) <span class="sc">+</span></span>
+<span id="cb248-4"><a href="more-on-thematic-maps.html#cb248-4" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">legend.position =</span> <span class="fu">c</span>(<span class="st">&quot;left&quot;</span>, <span class="st">&quot;bottom&quot;</span>), </span>
+<span id="cb248-5"><a href="more-on-thematic-maps.html#cb248-5" tabindex="-1"></a>            <span class="at">legend.title.size =</span> <span class="fl">0.8</span>,</span>
+<span id="cb248-6"><a href="more-on-thematic-maps.html#cb248-6" tabindex="-1"></a>            <span class="at">legend.text.size =</span> <span class="fl">0.5</span>)</span>
+<span id="cb248-7"><a href="more-on-thematic-maps.html#cb248-7" tabindex="-1"></a><span class="co">#map2: rice_yieldEBS, global</span></span>
+<span id="cb248-8"><a href="more-on-thematic-maps.html#cb248-8" tabindex="-1"></a>map2<span class="ot">&lt;-</span> <span class="fu">tm_shape</span>(bihar_1971) <span class="sc">+</span> </span>
+<span id="cb248-9"><a href="more-on-thematic-maps.html#cb248-9" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="st">&quot;rice_yieldEBS&quot;</span>, <span class="at">style=</span><span class="st">&quot;quantile&quot;</span>, <span class="at">title =</span> <span class="st">&quot;EB Smooth&quot;</span>, <span class="at">palette =</span> <span class="st">&quot;Reds&quot;</span>) <span class="sc">+</span></span>
+<span id="cb248-10"><a href="more-on-thematic-maps.html#cb248-10" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">legend.position =</span> <span class="fu">c</span>(<span class="st">&quot;left&quot;</span>, <span class="st">&quot;bottom&quot;</span>), </span>
+<span id="cb248-11"><a href="more-on-thematic-maps.html#cb248-11" tabindex="-1"></a>            <span class="at">legend.title.size =</span> <span class="fl">0.8</span>,</span>
+<span id="cb248-12"><a href="more-on-thematic-maps.html#cb248-12" tabindex="-1"></a>            <span class="at">legend.text.size =</span> <span class="fl">0.5</span>)</span>
+<span id="cb248-13"><a href="more-on-thematic-maps.html#cb248-13" tabindex="-1"></a><span class="co">#map3: rice_yieldEBSL, local</span></span>
+<span id="cb248-14"><a href="more-on-thematic-maps.html#cb248-14" tabindex="-1"></a>map3<span class="ot">&lt;-</span> <span class="fu">tm_shape</span>(bihar_1971) <span class="sc">+</span> </span>
+<span id="cb248-15"><a href="more-on-thematic-maps.html#cb248-15" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="st">&quot;rice_yieldEBSL&quot;</span>, <span class="at">style=</span><span class="st">&quot;quantile&quot;</span>, <span class="at">title =</span> <span class="st">&quot;Local Smooth&quot;</span>, <span class="at">palette =</span> <span class="st">&quot;Reds&quot;</span>) <span class="sc">+</span></span>
+<span id="cb248-16"><a href="more-on-thematic-maps.html#cb248-16" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">legend.position =</span> <span class="fu">c</span>(<span class="st">&quot;left&quot;</span>, <span class="st">&quot;bottom&quot;</span>), </span>
+<span id="cb248-17"><a href="more-on-thematic-maps.html#cb248-17" tabindex="-1"></a>            <span class="at">legend.title.size =</span> <span class="fl">0.8</span>,</span>
+<span id="cb248-18"><a href="more-on-thematic-maps.html#cb248-18" tabindex="-1"></a>            <span class="at">legend.text.size =</span> <span class="fl">0.5</span>)</span>
+<span id="cb248-19"><a href="more-on-thematic-maps.html#cb248-19" tabindex="-1"></a></span>
+<span id="cb248-20"><a href="more-on-thematic-maps.html#cb248-20" tabindex="-1"></a><span class="fu">tmap_arrange</span>(map1, map2, map3) </span></code></pre></div>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-158-1.png" width="672" /></p>
 <p>Notice that the quantiles are not the same, so that will make your comparison difficult!</p>
 </div>
 </div>
@@ -867,40 +878,41 @@ As a default, R will install all the dependencies for a package when we install 
 <p>So how can we use hexbinning to solve our antisocial behaviour days of action task? Well let’s say we split Manchester city centre into hexagons, and count the number of antisocial behaviour instances in these. We can then identify the top hexagons, and locate our booths somewhere within these.</p>
 <p>Also let’s get some data. You could go and get this data yourself from police.uk, we’ve been through all the steps for downloading data from there a few times now. But for now, I have a tidied set of data ready for you. This data is one year’s worth of antisocial behaviour from the <a href="data.police.uk">police.uk</a> data, from May 2016 to May 2017, for the borough of Manchester.</p>
 <p>We can take our GMP crimes data, and select only the cases from ASB using the crime.type variable. If you want, however, I have already done this, so you can also download from my dropbox using the link here, (or get it from Blackboard):</p>
-<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="more-on-thematic-maps.html#cb37-1" tabindex="-1"></a>mcr_asb <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;https://www.dropbox.com/s/93a0ovgcxz6pgiz/manchester_asb.csv?dl=1&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb249"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb249-1"><a href="more-on-thematic-maps.html#cb249-1" tabindex="-1"></a>mcr_asb <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;https://www.dropbox.com/s/93a0ovgcxz6pgiz/manchester_asb.csv?dl=1&quot;</span>)</span></code></pre></div>
 <pre><code>## New names:
 ## Rows: 32162 Columns: 15
 ## ── Column specification
-## ──────────────────────────────────────────────────────── Delimiter: &quot;,&quot; chr
-## (8): Month, Reported.by, Falls.within, Location, LSOA.code, LSOA.name, C... dbl
-## (4): ...1, X, Longitude, Latitude lgl (3): Crime.ID, Last.outcome.category,
-## Context
-## ℹ Use `spec()` to retrieve the full column specification for this data. ℹ
-## Specify the column types or set `show_col_types = FALSE` to quiet this message.
+## ───────────────────────────────────────────── Delimiter: &quot;,&quot; chr
+## (8): Month, Reported.by, Falls.within, Location, LSOA.code,
+## LSOA.name, C... dbl (4): ...1, X, Longitude, Latitude lgl (3):
+## Crime.ID, Last.outcome.category, Context
+## ℹ Use `spec()` to retrieve the full column specification for this
+## data. ℹ Specify the column types or set `show_col_types = FALSE` to
+## quiet this message.
 ## • `` -&gt; `...1`</code></pre>
 <p>This is currently just a text dataframe, so we need to let R know that actually this is a spatial object, who’s geometry can be find in its longitude and latitude coordinates. As we have long/lat we can assure it’s in WGS 84 projection.</p>
-<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="more-on-thematic-maps.html#cb39-1" tabindex="-1"></a>sf_mcr_asb <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(mcr_asb, <span class="at">coords =</span> <span class="fu">c</span>(<span class="st">&quot;Longitude&quot;</span>, <span class="st">&quot;Latitude&quot;</span>), </span>
-<span id="cb39-2"><a href="more-on-thematic-maps.html#cb39-2" tabindex="-1"></a>                 <span class="at">crs =</span> <span class="dv">4326</span>, <span class="at">agr =</span> <span class="st">&quot;constant&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb251"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb251-1"><a href="more-on-thematic-maps.html#cb251-1" tabindex="-1"></a>sf_mcr_asb <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(mcr_asb, <span class="at">coords =</span> <span class="fu">c</span>(<span class="st">&quot;Longitude&quot;</span>, <span class="st">&quot;Latitude&quot;</span>), </span>
+<span id="cb251-2"><a href="more-on-thematic-maps.html#cb251-2" tabindex="-1"></a>                 <span class="at">crs =</span> <span class="dv">4326</span>, <span class="at">agr =</span> <span class="st">&quot;constant&quot;</span>)</span></code></pre></div>
 <p>Now one thing that this does is it consumes our lng and lat columns into a geometry attribute. This is generally OK, but for the binning we will do, we would like to have them as separate coordinates. We can do this by adding the argument <code>remove = FALSE</code> to our <code>st_as_sf</code> function. We will also rename these coordinate columns to be <code>lng</code> and <code>lat</code>.</p>
-<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="more-on-thematic-maps.html#cb40-1" tabindex="-1"></a><span class="co">#extract the coords to some columns, &quot;lng&quot; and &quot;lat&quot;</span></span>
-<span id="cb40-2"><a href="more-on-thematic-maps.html#cb40-2" tabindex="-1"></a>sf_mcr_asb<span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(mcr_asb, <span class="at">coords =</span> <span class="fu">c</span>(<span class="st">&quot;Longitude&quot;</span>, <span class="st">&quot;Latitude&quot;</span>), </span>
-<span id="cb40-3"><a href="more-on-thematic-maps.html#cb40-3" tabindex="-1"></a>                       <span class="at">crs =</span> <span class="dv">4326</span>, <span class="at">agr =</span> <span class="st">&quot;constant&quot;</span>, <span class="at">remove =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb40-4"><a href="more-on-thematic-maps.html#cb40-4" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">lng =</span> Longitude,</span>
-<span id="cb40-5"><a href="more-on-thematic-maps.html#cb40-5" tabindex="-1"></a>         <span class="at">lat =</span> Latitude)</span></code></pre></div>
+<div class="sourceCode" id="cb252"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb252-1"><a href="more-on-thematic-maps.html#cb252-1" tabindex="-1"></a><span class="co">#extract the coords to some columns, &quot;lng&quot; and &quot;lat&quot;</span></span>
+<span id="cb252-2"><a href="more-on-thematic-maps.html#cb252-2" tabindex="-1"></a>sf_mcr_asb<span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(mcr_asb, <span class="at">coords =</span> <span class="fu">c</span>(<span class="st">&quot;Longitude&quot;</span>, <span class="st">&quot;Latitude&quot;</span>), </span>
+<span id="cb252-3"><a href="more-on-thematic-maps.html#cb252-3" tabindex="-1"></a>                       <span class="at">crs =</span> <span class="dv">4326</span>, <span class="at">agr =</span> <span class="st">&quot;constant&quot;</span>, <span class="at">remove =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb252-4"><a href="more-on-thematic-maps.html#cb252-4" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">lng =</span> Longitude,</span>
+<span id="cb252-5"><a href="more-on-thematic-maps.html#cb252-5" tabindex="-1"></a>         <span class="at">lat =</span> Latitude)</span></code></pre></div>
 <p>As a first step, we can plot asb in the borough of Manchester using simple ggplot! Remember the data visualisation session from weeks ago? We discussed how ggplot is such a great tool for building visualisations, because you can apply whatever geometry best suits your data. So for us to just have a look at the hexbinned version of our point data of antisocial behaviour, we can use the <code>stat_binhex()</code> function. We can also recreate the thematic map element, as we can use the frequency of points in each hex to shade each hexbin from white (least number of incidents) to red (most nuber of incidents).</p>
 <p>So let’s have a go:</p>
-<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="more-on-thematic-maps.html#cb41-1" tabindex="-1"></a><span class="fu">ggplot</span>(sf_mcr_asb, <span class="fu">aes</span>(lng, lat)) <span class="sc">+</span>                        <span class="co">#define data and variables for x and y axes</span></span>
-<span id="cb41-2"><a href="more-on-thematic-maps.html#cb41-2" tabindex="-1"></a>  <span class="fu">stat_binhex</span>() <span class="sc">+</span>                                                         <span class="co">#add binhex layer (hexbin)</span></span>
-<span id="cb41-3"><a href="more-on-thematic-maps.html#cb41-3" tabindex="-1"></a>  <span class="fu">scale_fill_gradientn</span>(<span class="at">colours =</span> <span class="fu">c</span>(<span class="st">&quot;white&quot;</span>,<span class="st">&quot;red&quot;</span>), <span class="at">name =</span> <span class="st">&quot;Frequency&quot;</span>)    <span class="co">#add shading based on number of ASB incidents</span></span></code></pre></div>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-27-1.png" width="672" /></p>
+<div class="sourceCode" id="cb253"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb253-1"><a href="more-on-thematic-maps.html#cb253-1" tabindex="-1"></a><span class="fu">ggplot</span>(sf_mcr_asb, <span class="fu">aes</span>(lng, lat)) <span class="sc">+</span>                        <span class="co">#define data and variables for x and y axes</span></span>
+<span id="cb253-2"><a href="more-on-thematic-maps.html#cb253-2" tabindex="-1"></a>  <span class="fu">stat_binhex</span>() <span class="sc">+</span>                                                         <span class="co">#add binhex layer (hexbin)</span></span>
+<span id="cb253-3"><a href="more-on-thematic-maps.html#cb253-3" tabindex="-1"></a>  <span class="fu">scale_fill_gradientn</span>(<span class="at">colours =</span> <span class="fu">c</span>(<span class="st">&quot;white&quot;</span>,<span class="st">&quot;red&quot;</span>), <span class="at">name =</span> <span class="st">&quot;Frequency&quot;</span>)    <span class="co">#add shading based on number of ASB incidents</span></span></code></pre></div>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-163-1.png" width="672" /></p>
 <p>Neat, but doesn’t quite tell us <em>where</em> that really dark hexbon actually is. So it would be much better if we could do this with a basemap as the background, rather than our grey ggplot theme.</p>
 <p>Now, we can apply the same code as we used above, for the ggplot, to this ggmap, to add our hexbins on top of this basemap:</p>
-<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="more-on-thematic-maps.html#cb42-1" tabindex="-1"></a><span class="fu">ggplot</span>(sf_mcr_asb, <span class="fu">aes</span>(<span class="at">x =</span> lng, <span class="at">y =</span> lat)) <span class="sc">+</span></span>
-<span id="cb42-2"><a href="more-on-thematic-maps.html#cb42-2" tabindex="-1"></a>  <span class="fu">annotation_map_tile</span>() <span class="sc">+</span> </span>
-<span id="cb42-3"><a href="more-on-thematic-maps.html#cb42-3" tabindex="-1"></a>  <span class="fu">stat_binhex</span>(<span class="at">alpha=</span><span class="fl">0.7</span>) <span class="sc">+</span>                                                <span class="co">#add binhex layer (hexbin)</span></span>
-<span id="cb42-4"><a href="more-on-thematic-maps.html#cb42-4" tabindex="-1"></a>  <span class="fu">scale_fill_gradientn</span>(<span class="at">colours =</span> <span class="fu">c</span>(<span class="st">&quot;white&quot;</span>,<span class="st">&quot;red&quot;</span>), <span class="at">name =</span> <span class="st">&quot;Frequency&quot;</span>)    <span class="co">#add shading based on number of ASB incidents</span></span></code></pre></div>
+<div class="sourceCode" id="cb254"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb254-1"><a href="more-on-thematic-maps.html#cb254-1" tabindex="-1"></a><span class="fu">ggplot</span>(sf_mcr_asb, <span class="fu">aes</span>(<span class="at">x =</span> lng, <span class="at">y =</span> lat)) <span class="sc">+</span></span>
+<span id="cb254-2"><a href="more-on-thematic-maps.html#cb254-2" tabindex="-1"></a>  <span class="fu">annotation_map_tile</span>() <span class="sc">+</span> </span>
+<span id="cb254-3"><a href="more-on-thematic-maps.html#cb254-3" tabindex="-1"></a>  <span class="fu">stat_binhex</span>(<span class="at">alpha=</span><span class="fl">0.7</span>) <span class="sc">+</span>                                                <span class="co">#add binhex layer (hexbin)</span></span>
+<span id="cb254-4"><a href="more-on-thematic-maps.html#cb254-4" tabindex="-1"></a>  <span class="fu">scale_fill_gradientn</span>(<span class="at">colours =</span> <span class="fu">c</span>(<span class="st">&quot;white&quot;</span>,<span class="st">&quot;red&quot;</span>), <span class="at">name =</span> <span class="st">&quot;Frequency&quot;</span>)    <span class="co">#add shading based on number of ASB incidents</span></span></code></pre></div>
 <pre><code>## Zoom: 10</code></pre>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-28-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-164-1.png" width="672" /></p>
 <p>Now this should give you some more context! Woo!</p>
 <p>So I mentioned we’d go over some reasons why you should consider aggregating into a hexagon grid rather than other shape:</p>
 <ul>
@@ -920,41 +932,41 @@ As a default, R will install all the dependencies for a package when we install 
 <ol style="list-style-type: lower-alpha">
 <li>rectangular binning:</li>
 </ol>
-<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="more-on-thematic-maps.html#cb44-1" tabindex="-1"></a><span class="fu">ggplot</span>(sf_mcr_asb, <span class="fu">aes</span>(<span class="at">x =</span> lng, <span class="at">y =</span> lat)) <span class="sc">+</span> </span>
-<span id="cb44-2"><a href="more-on-thematic-maps.html#cb44-2" tabindex="-1"></a>  <span class="fu">annotation_map_tile</span>() <span class="sc">+</span> </span>
-<span id="cb44-3"><a href="more-on-thematic-maps.html#cb44-3" tabindex="-1"></a>  <span class="fu">stat_bin2d</span>(<span class="at">alpha=</span><span class="fl">0.7</span>) <span class="sc">+</span> </span>
-<span id="cb44-4"><a href="more-on-thematic-maps.html#cb44-4" tabindex="-1"></a>  <span class="fu">scale_fill_gradientn</span>(<span class="at">colours =</span> <span class="fu">c</span>(<span class="st">&quot;white&quot;</span>,<span class="st">&quot;red&quot;</span>), </span>
-<span id="cb44-5"><a href="more-on-thematic-maps.html#cb44-5" tabindex="-1"></a>                       <span class="at">name =</span> <span class="st">&quot;Frequency&quot;</span>) </span></code></pre></div>
+<div class="sourceCode" id="cb256"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb256-1"><a href="more-on-thematic-maps.html#cb256-1" tabindex="-1"></a><span class="fu">ggplot</span>(sf_mcr_asb, <span class="fu">aes</span>(<span class="at">x =</span> lng, <span class="at">y =</span> lat)) <span class="sc">+</span> </span>
+<span id="cb256-2"><a href="more-on-thematic-maps.html#cb256-2" tabindex="-1"></a>  <span class="fu">annotation_map_tile</span>() <span class="sc">+</span> </span>
+<span id="cb256-3"><a href="more-on-thematic-maps.html#cb256-3" tabindex="-1"></a>  <span class="fu">stat_bin2d</span>(<span class="at">alpha=</span><span class="fl">0.7</span>) <span class="sc">+</span> </span>
+<span id="cb256-4"><a href="more-on-thematic-maps.html#cb256-4" tabindex="-1"></a>  <span class="fu">scale_fill_gradientn</span>(<span class="at">colours =</span> <span class="fu">c</span>(<span class="st">&quot;white&quot;</span>,<span class="st">&quot;red&quot;</span>), </span>
+<span id="cb256-5"><a href="more-on-thematic-maps.html#cb256-5" tabindex="-1"></a>                       <span class="at">name =</span> <span class="st">&quot;Frequency&quot;</span>) </span></code></pre></div>
 <pre><code>## Zoom: 10</code></pre>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-29-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-165-1.png" width="672" /></p>
 <ol start="2" style="list-style-type: lower-alpha">
 <li>hexagonal binning:</li>
 </ol>
-<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="more-on-thematic-maps.html#cb46-1" tabindex="-1"></a><span class="fu">ggplot</span>(sf_mcr_asb, <span class="fu">aes</span>(<span class="at">x =</span> lng, <span class="at">y =</span> lat)) <span class="sc">+</span> </span>
-<span id="cb46-2"><a href="more-on-thematic-maps.html#cb46-2" tabindex="-1"></a>  <span class="fu">annotation_map_tile</span>() <span class="sc">+</span> </span>
-<span id="cb46-3"><a href="more-on-thematic-maps.html#cb46-3" tabindex="-1"></a>  <span class="fu">stat_binhex</span>(<span class="at">alpha=</span><span class="fl">0.7</span>) <span class="sc">+</span> </span>
-<span id="cb46-4"><a href="more-on-thematic-maps.html#cb46-4" tabindex="-1"></a>  <span class="fu">scale_fill_gradientn</span>(<span class="at">colours =</span> <span class="fu">c</span>(<span class="st">&quot;white&quot;</span>,<span class="st">&quot;red&quot;</span>), </span>
-<span id="cb46-5"><a href="more-on-thematic-maps.html#cb46-5" tabindex="-1"></a>                       <span class="at">name =</span> <span class="st">&quot;Frequency&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb258"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb258-1"><a href="more-on-thematic-maps.html#cb258-1" tabindex="-1"></a><span class="fu">ggplot</span>(sf_mcr_asb, <span class="fu">aes</span>(<span class="at">x =</span> lng, <span class="at">y =</span> lat)) <span class="sc">+</span> </span>
+<span id="cb258-2"><a href="more-on-thematic-maps.html#cb258-2" tabindex="-1"></a>  <span class="fu">annotation_map_tile</span>() <span class="sc">+</span> </span>
+<span id="cb258-3"><a href="more-on-thematic-maps.html#cb258-3" tabindex="-1"></a>  <span class="fu">stat_binhex</span>(<span class="at">alpha=</span><span class="fl">0.7</span>) <span class="sc">+</span> </span>
+<span id="cb258-4"><a href="more-on-thematic-maps.html#cb258-4" tabindex="-1"></a>  <span class="fu">scale_fill_gradientn</span>(<span class="at">colours =</span> <span class="fu">c</span>(<span class="st">&quot;white&quot;</span>,<span class="st">&quot;red&quot;</span>), </span>
+<span id="cb258-5"><a href="more-on-thematic-maps.html#cb258-5" tabindex="-1"></a>                       <span class="at">name =</span> <span class="st">&quot;Frequency&quot;</span>)</span></code></pre></div>
 <pre><code>## Zoom: 10</code></pre>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-30-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-166-1.png" width="672" /></p>
 <ol start="3" style="list-style-type: lower-alpha">
 <li>a simple “heatmap” (we will discuss these more thoroughly next week):</li>
 </ol>
-<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="more-on-thematic-maps.html#cb48-1" tabindex="-1"></a><span class="fu">ggplot</span>(sf_mcr_asb, <span class="fu">aes</span>(<span class="at">x =</span> lng, <span class="at">y =</span> lat)) <span class="sc">+</span> </span>
-<span id="cb48-2"><a href="more-on-thematic-maps.html#cb48-2" tabindex="-1"></a>  <span class="fu">annotation_map_tile</span>() <span class="sc">+</span> </span>
-<span id="cb48-3"><a href="more-on-thematic-maps.html#cb48-3" tabindex="-1"></a>  <span class="fu">stat_density2d</span>(<span class="fu">aes</span>(<span class="at">fill =</span> ..level.., <span class="co"># value corresponding to discretized density estimates </span></span>
-<span id="cb48-4"><a href="more-on-thematic-maps.html#cb48-4" tabindex="-1"></a>                     <span class="at">alpha =</span> ..level..), </span>
-<span id="cb48-5"><a href="more-on-thematic-maps.html#cb48-5" tabindex="-1"></a>                 <span class="at">geom =</span> <span class="st">&quot;polygon&quot;</span>) <span class="sc">+</span>  <span class="co"># creates the bands of differenc colors</span></span>
-<span id="cb48-6"><a href="more-on-thematic-maps.html#cb48-6" tabindex="-1"></a>  <span class="do">## Configure the colors, transparency and panel</span></span>
-<span id="cb48-7"><a href="more-on-thematic-maps.html#cb48-7" tabindex="-1"></a>  <span class="fu">scale_fill_gradientn</span>(<span class="at">colours =</span> <span class="fu">c</span>(<span class="st">&quot;white&quot;</span>,<span class="st">&quot;red&quot;</span>), </span>
-<span id="cb48-8"><a href="more-on-thematic-maps.html#cb48-8" tabindex="-1"></a>                       <span class="at">name =</span> <span class="st">&quot;Frequency&quot;</span>) </span></code></pre></div>
+<div class="sourceCode" id="cb260"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb260-1"><a href="more-on-thematic-maps.html#cb260-1" tabindex="-1"></a><span class="fu">ggplot</span>(sf_mcr_asb, <span class="fu">aes</span>(<span class="at">x =</span> lng, <span class="at">y =</span> lat)) <span class="sc">+</span> </span>
+<span id="cb260-2"><a href="more-on-thematic-maps.html#cb260-2" tabindex="-1"></a>  <span class="fu">annotation_map_tile</span>() <span class="sc">+</span> </span>
+<span id="cb260-3"><a href="more-on-thematic-maps.html#cb260-3" tabindex="-1"></a>  <span class="fu">stat_density2d</span>(<span class="fu">aes</span>(<span class="at">fill =</span> ..level.., <span class="co"># value corresponding to discretized density estimates </span></span>
+<span id="cb260-4"><a href="more-on-thematic-maps.html#cb260-4" tabindex="-1"></a>                     <span class="at">alpha =</span> ..level..), </span>
+<span id="cb260-5"><a href="more-on-thematic-maps.html#cb260-5" tabindex="-1"></a>                 <span class="at">geom =</span> <span class="st">&quot;polygon&quot;</span>) <span class="sc">+</span>  <span class="co"># creates the bands of differenc colors</span></span>
+<span id="cb260-6"><a href="more-on-thematic-maps.html#cb260-6" tabindex="-1"></a>  <span class="do">## Configure the colors, transparency and panel</span></span>
+<span id="cb260-7"><a href="more-on-thematic-maps.html#cb260-7" tabindex="-1"></a>  <span class="fu">scale_fill_gradientn</span>(<span class="at">colours =</span> <span class="fu">c</span>(<span class="st">&quot;white&quot;</span>,<span class="st">&quot;red&quot;</span>), </span>
+<span id="cb260-8"><a href="more-on-thematic-maps.html#cb260-8" tabindex="-1"></a>                       <span class="at">name =</span> <span class="st">&quot;Frequency&quot;</span>) </span></code></pre></div>
 <pre><code>## Warning: The dot-dot notation (`..level..`) was deprecated in ggplot2 3.4.0.
 ## ℹ Please use `after_stat(level)` instead.
 ## This warning is displayed once every 8 hours.
-## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-## generated.</code></pre>
+## Call `lifecycle::last_lifecycle_warnings()` to see where this
+## warning was generated.</code></pre>
 <pre><code>## Zoom: 11</code></pre>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-31-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-167-1.png" width="672" /></p>
 <p>Look at the difference between the three maps (hex, rectangle, and density). How would your conclusions change if you were given these maps? Would you make different decisions about where to place your booths for the days of action? Why or why not? Discuss.</p>
 </div>
 <div id="multivariate-binning" class="section level3 hasAnchor" number="5.3.5">
@@ -1037,9 +1049,9 @@ aggregation.</li>
 <p>Selecting the appropriate method might depend on the research question being posed (e.g. clustering) and the data itself. Even once a method has been selected, there are different ways of operationalising them.</p>
 <p>Let’s explore this using the example of the results of the 2016 EU referendum at Local Authority level, where remain areas clustered in London. A simple thematic map does not necessarily communicate this well because Local Authorities are both small and densely populated in London.</p>
 <p>You can download the full set of EU referendum result data as a csv from <a href="https://www.electoralcommission.org.uk/find-information-by-subject/elections-and-referendums/past-elections-and-referendums/eu-referendum/eu-referendum-result-visualisations">the Electoral Commission webside</a>. Let’s read it straight into R:</p>
-<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="more-on-thematic-maps.html#cb51-1" tabindex="-1"></a>eu_ref <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;https://www.electoralcommission.org.uk/sites/default/files/2019-07/EU-referendum-result-data.csv&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb263"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb263-1"><a href="more-on-thematic-maps.html#cb263-1" tabindex="-1"></a>eu_ref <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;https://www.electoralcommission.org.uk/sites/default/files/2019-07/EU-referendum-result-data.csv&quot;</span>)</span></code></pre></div>
 <pre><code>## Rows: 382 Columns: 21
-## ── Column specification ────────────────────────────────────────────────────────
+## ── Column specification ─────────────────────────────────────────────
 ## Delimiter: &quot;,&quot;
 ## chr  (4): Region_Code, Region, Area_Code, Area
 ## dbl (17): id, Electorate, ExpectedBallots, VerifiedBallotPapers, Pct_Turnout...
@@ -1050,7 +1062,7 @@ aggregation.</li>
 <p>In this case that means select “English Districts, UAs and London Boroughs, 2011”:</p>
 <p><img src="img/la_shp_dl.png" /></p>
 <p>Once you have the file, download, extract (unzip) and put the folder in your working directory. Mine is in a subfolder in my working directory called data, so I point R inside that folder to find my shape file.</p>
-<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="more-on-thematic-maps.html#cb53-1" tabindex="-1"></a>las <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">&quot;data/England_lad_2011_gen/england_lad_2011_gen.shp&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb265"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb265-1"><a href="more-on-thematic-maps.html#cb265-1" tabindex="-1"></a>las <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">&quot;data/England_lad_2011_gen/england_lad_2011_gen.shp&quot;</span>)</span></code></pre></div>
 <pre><code>## Reading layer `england_lad_2011_gen&#39; from data source 
 ##   `/Users/user/Desktop/resquant/crime_mapping_textbook/data/England_lad_2011_gen/england_lad_2011_gen.shp&#39; 
 ##   using driver `ESRI Shapefile&#39;
@@ -1060,11 +1072,11 @@ aggregation.</li>
 ## Bounding box:  xmin: 82644.8 ymin: 5349.399 xmax: 655976.9 ymax: 657599.5
 ## Projected CRS: OSGB36 / British National Grid</code></pre>
 <p>We can now join the EU referendum data, as we have learned in the past weeks:</p>
-<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="more-on-thematic-maps.html#cb55-1" tabindex="-1"></a>eu_sf <span class="ot">&lt;-</span> <span class="fu">left_join</span>(las, eu_ref, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;name&quot;</span> <span class="ot">=</span> <span class="st">&quot;Area&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb267"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb267-1"><a href="more-on-thematic-maps.html#cb267-1" tabindex="-1"></a>eu_sf <span class="ot">&lt;-</span> <span class="fu">left_join</span>(las, eu_ref, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;name&quot;</span> <span class="ot">=</span> <span class="st">&quot;Area&quot;</span>))</span></code></pre></div>
 <p>Now we can have a look at these data:</p>
-<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="more-on-thematic-maps.html#cb56-1" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb56-2"><a href="more-on-thematic-maps.html#cb56-2" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> eu_sf, <span class="fu">aes</span>(<span class="at">fill =</span> Pct_Leave)) </span></code></pre></div>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-35-1.png" width="672" /></p>
+<div class="sourceCode" id="cb268"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb268-1"><a href="more-on-thematic-maps.html#cb268-1" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb268-2"><a href="more-on-thematic-maps.html#cb268-2" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> eu_sf, <span class="fu">aes</span>(<span class="at">fill =</span> Pct_Leave)) </span></code></pre></div>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-171-1.png" width="672" /></p>
 <p>We can see that in smaller LAs we don’t even really see the result, as the boundary lines pretty much cover everything. Hmm. Now what we can do is transform the shapes.</p>
 <div id="activity-9-cartograms" class="section level3 hasAnchor" number="5.5.1">
 <h3><span class="header-section-number">5.5.1</span> Activity 9: Cartograms<a href="more-on-thematic-maps.html#activity-9-cartograms" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -1073,20 +1085,20 @@ aggregation.</li>
 <p>Density-equalizing (contiguous) cartograms are your traditional cartograms. In density-equalizing cartograms, map features bulge out a specific variable. Even though it distorts each feature, it remains connected during its creation. On the other hand, you can have Non-Contiguous Cartograms, where features in non-contiguous cartograms don’t have to stay connected. Finally, Dorling Cartogram (named after professor <a href="https://www.geog.ox.ac.uk/staff/ddorling.html">Danny Dorling</a>) uses shapes like circles and rectangles to depict area. These types of cartograms make it easy to recognize patterns!</p>
 <p><img src="img/notNaAll3CartogramNewFrame.png" /></p>
 <p>Now we can make our own as well, using the cartogram package.</p>
-<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="more-on-thematic-maps.html#cb57-1" tabindex="-1"></a><span class="fu">library</span>(cartogram)</span></code></pre></div>
+<div class="sourceCode" id="cb269"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb269-1"><a href="more-on-thematic-maps.html#cb269-1" tabindex="-1"></a><span class="fu">library</span>(cartogram)</span></code></pre></div>
 <p>Within that there is the <code>cartogram()</code> function, which takes 2 arguments, 1 - the shape file (it can be a SpatialPolygonDataFrame or an sf object), and 2 - the variable which it should use to distort the polygon by.</p>
 <p>In our data set we have a variable “electorate” which refers to the total number of registered electors, which we will use to distort the polygons:</p>
-<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="more-on-thematic-maps.html#cb58-1" tabindex="-1"></a><span class="co"># construct a cartogram using the size of the electorate in each LA</span></span>
-<span id="cb58-2"><a href="more-on-thematic-maps.html#cb58-2" tabindex="-1"></a>eu_cartogram <span class="ot">&lt;-</span> <span class="fu">cartogram</span>(eu_sf, <span class="st">&quot;Electorate&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb270"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb270-1"><a href="more-on-thematic-maps.html#cb270-1" tabindex="-1"></a><span class="co"># construct a cartogram using the size of the electorate in each LA</span></span>
+<span id="cb270-2"><a href="more-on-thematic-maps.html#cb270-2" tabindex="-1"></a>eu_cartogram <span class="ot">&lt;-</span> <span class="fu">cartogram</span>(eu_sf, <span class="st">&quot;Electorate&quot;</span>)</span></code></pre></div>
 <p>Again this is some labour intensive work, much like the grid making, you have some time to chill now. Maybe read up on the maths behind this tranformation as well, in the paper <a href="https://onlinelibrary.wiley.com/doi/abs/10.1111/j.0033-0124.1985.00075.x">Dougenik, J. A., Chrisman, N. R., &amp; Niemeyer, D. R. (1985). An Algorithm To Construct Continuous Area Cartograms. In The Professional Geographer, 37(1), 75-81.</a>.</p>
 <p>I do have a tip for you if you want to make sure the process does not take too long. You can set a parameter in the cartogram function which is the “itermax” parameter. This specifies the maximum number of iterations we are happy with. If you don’t specify it’s set to 15. Let’s set to 5 for the sake of speed:</p>
-<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="more-on-thematic-maps.html#cb59-1" tabindex="-1"></a><span class="co"># construct a cartogram using the size of the electorate in each LA</span></span>
-<span id="cb59-2"><a href="more-on-thematic-maps.html#cb59-2" tabindex="-1"></a>eu_cartogram <span class="ot">&lt;-</span> <span class="fu">cartogram_cont</span>(eu_sf, <span class="st">&quot;Electorate&quot;</span>, <span class="at">itermax =</span> <span class="dv">5</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb271"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb271-1"><a href="more-on-thematic-maps.html#cb271-1" tabindex="-1"></a><span class="co"># construct a cartogram using the size of the electorate in each LA</span></span>
+<span id="cb271-2"><a href="more-on-thematic-maps.html#cb271-2" tabindex="-1"></a>eu_cartogram <span class="ot">&lt;-</span> <span class="fu">cartogram_cont</span>(eu_sf, <span class="st">&quot;Electorate&quot;</span>, <span class="at">itermax =</span> <span class="dv">5</span>)</span></code></pre></div>
 <p>And if your cartogram has been created, you can now plot again the referendum results, but using the electorate to change the size of the local authority:</p>
-<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="more-on-thematic-maps.html#cb60-1" tabindex="-1"></a><span class="co"># plot the percentage voting leave onto our cartogram</span></span>
-<span id="cb60-2"><a href="more-on-thematic-maps.html#cb60-2" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb60-3"><a href="more-on-thematic-maps.html#cb60-3" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> eu_cartogram, <span class="fu">aes</span>(<span class="at">fill =</span> Pct_Leave)) </span></code></pre></div>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-39-1.png" width="672" /></p>
+<div class="sourceCode" id="cb272"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb272-1"><a href="more-on-thematic-maps.html#cb272-1" tabindex="-1"></a><span class="co"># plot the percentage voting leave onto our cartogram</span></span>
+<span id="cb272-2"><a href="more-on-thematic-maps.html#cb272-2" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb272-3"><a href="more-on-thematic-maps.html#cb272-3" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> eu_cartogram, <span class="fu">aes</span>(<span class="at">fill =</span> Pct_Leave)) </span></code></pre></div>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-175-1.png" width="672" /></p>
 <p>We can now see London much better, and see that darker coloured cluster where much smaller percentage of people voted leave.</p>
 <p>Okay that’s probably enough for the day. Nice work crime mappers!</p>
 </div>

@@ -191,3 +191,8 @@ criminality-of-place
 getting-data-of-this-week
 activity-1-subsetting-using-pattern-matching
 adding-data
+activity-5-the-case-of-saharsa
+activity-6-smoothing-as-a-way-to-address-insensitivity-to-sample-size
+activity-7-hexbinning
+activity-8-rectangular-binning
+activity-9-cartograms

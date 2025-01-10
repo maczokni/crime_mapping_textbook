@@ -187,3 +187,7 @@ activity-7-small-multiples
 activity-8-animations
 recap-2
 introduction-4
+criminality-of-place
+getting-data-of-this-week
+activity-1-subsetting-using-pattern-matching
+adding-data

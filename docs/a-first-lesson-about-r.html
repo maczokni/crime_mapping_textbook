@@ -6,11 +6,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 1 A first lesson about R | Crime Mapping in R</title>
   <meta name="description" content="Worksheets for labs of Crime Mapping course" />
-  <meta name="generator" content="bookdown 0.22 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.39 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 1 A first lesson about R | Crime Mapping in R" />
   <meta property="og:type" content="book" />
-  
   
   <meta property="og:description" content="Worksheets for labs of Crime Mapping course" />
   <meta name="github-repo" content="maczokni/crime_mapping_textbook" />
@@ -24,7 +23,7 @@
 <meta name="author" content="Reka Solymosi and Juanjo Medina" />
 
 
-<meta name="date" content="2022-02-18" />
+<meta name="date" content="2025-01-10" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,8 +32,8 @@
   
 <link rel="prev" href="index.html"/>
 <link rel="next" href="making-maps-in-r.html"/>
-<script src="libs/header-attrs-2.9/header-attrs.js"></script>
-<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -50,25 +49,27 @@
 
 
 
-
-<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
-<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
-<script src="libs/htmlwidgets-1.5.3/htmlwidgets.js"></script>
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<link href="libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet" />
+<script src="libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
 <link href="libs/leaflet-1.3.1/leaflet.css" rel="stylesheet" />
 <script src="libs/leaflet-1.3.1/leaflet.js"></script>
 <link href="libs/leafletfix-1.0.0/leafletfix.css" rel="stylesheet" />
 <script src="libs/proj4-2.6.2/proj4.min.js"></script>
 <script src="libs/Proj4Leaflet-1.0.1/proj4leaflet.js"></script>
 <link href="libs/rstudio_leaflet-1.3.1/rstudio_leaflet.css" rel="stylesheet" />
-<script src="libs/leaflet-binding-2.0.4.1/leaflet.js"></script>
-<script src="libs/leaflet-providers-1.9.0/leaflet-providers_1.9.0.js"></script>
-<script src="libs/leaflet-providers-plugin-2.0.4.1/leaflet-providers-plugin.js"></script>
+<script src="libs/leaflet-binding-2.2.2/leaflet.js"></script>
+<script src="libs/leaflet-providers-2.0.0/leaflet-providers_2.0.0.js"></script>
+<script src="libs/leaflet-providers-plugin-2.2.2/leaflet-providers-plugin.js"></script>
 
 
 <style type="text/css">
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
 pre.sourceCode { margin: 0; }
 @media screen {
@@ -102,7 +103,7 @@ code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
 code span.at { color: #7d9029; } /* Attribute */
 code span.bn { color: #40a070; } /* BaseN */
-code span.bu { } /* BuiltIn */
+code span.bu { color: #008000; } /* BuiltIn */
 code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
 code span.ch { color: #4070a0; } /* Char */
 code span.cn { color: #880000; } /* Constant */
@@ -115,7 +116,7 @@ code span.er { color: #ff0000; font-weight: bold; } /* Error */
 code span.ex { } /* Extension */
 code span.fl { color: #40a070; } /* Float */
 code span.fu { color: #06287e; } /* Function */
-code span.im { } /* Import */
+code span.im { color: #008000; font-weight: bold; } /* Import */
 code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
 code span.kw { color: #007020; font-weight: bold; } /* Keyword */
 code span.op { color: #666666; } /* Operator */
@@ -129,6 +130,10 @@ code span.vs { color: #4070a0; } /* VerbatimString */
 code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
 
 <link rel="stylesheet" href="style.css" type="text/css" />
 </head>
@@ -160,7 +165,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="1.2" data-path="a-first-lesson-about-r.html"><a href="a-first-lesson-about-r.html#open-up-and-explore-rstudio"><i class="fa fa-check"></i><b>1.2</b> Open up and explore RStudio</a>
 <ul>
-<li class="chapter" data-level="1.2.1" data-path="a-first-lesson-about-r.html"><a href="a-first-lesson-about-r.html#the-four-panes-of-r-studio"><i class="fa fa-check"></i><b>1.2.1</b> The four panes of R Studio</a></li>
+<li class="chapter" data-level="1.2.1" data-path="a-first-lesson-about-r.html"><a href="a-first-lesson-about-r.html#activity-3-opening-up-the-script-pane"><i class="fa fa-check"></i><b>1.2.1</b> Activity 3: Opening up the script pane</a></li>
+<li class="chapter" data-level="1.2.2" data-path="a-first-lesson-about-r.html"><a href="a-first-lesson-about-r.html#the-four-panes-of-r-studio"><i class="fa fa-check"></i><b>1.2.2</b> The four panes of R Studio</a></li>
+<li class="chapter" data-level="1.2.3" data-path="a-first-lesson-about-r.html"><a href="a-first-lesson-about-r.html#activity-4-interacting-with-the-4-panes"><i class="fa fa-check"></i><b>1.2.3</b> Activity 4: Interacting with the 4 panes</a></li>
 </ul></li>
 <li class="chapter" data-level="1.3" data-path="a-first-lesson-about-r.html"><a href="a-first-lesson-about-r.html#customising-the-rstudio-look"><i class="fa fa-check"></i><b>1.3</b> Customising the RStudio look</a>
 <ul>
@@ -202,57 +209,80 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="3" data-path="thematic-maps-in-r.html"><a href="thematic-maps-in-r.html"><i class="fa fa-check"></i><b>3</b> Thematic maps in R</a>
 <ul>
-<li class="chapter" data-level="3.1" data-path="thematic-maps-in-r.html"><a href="thematic-maps-in-r.html#intro-and-recap"><i class="fa fa-check"></i><b>3.1</b> Intro and recap</a></li>
+<li class="chapter" data-level="3.1" data-path="thematic-maps-in-r.html"><a href="thematic-maps-in-r.html#introduction-1"><i class="fa fa-check"></i><b>3.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="3.1.1" data-path="thematic-maps-in-r.html"><a href="thematic-maps-in-r.html#activity-1-spot-the-difference"><i class="fa fa-check"></i><b>3.1.1</b> Activity 1: Spot the difference</a></li>
+</ul></li>
 <li class="chapter" data-level="3.2" data-path="thematic-maps-in-r.html"><a href="thematic-maps-in-r.html#creating-thematic-maps"><i class="fa fa-check"></i><b>3.2</b> Creating thematic maps</a></li>
-<li class="chapter" data-level="3.3" data-path="thematic-maps-in-r.html"><a href="thematic-maps-in-r.html#classification-systems-for-thematic-maps"><i class="fa fa-check"></i><b>3.3</b> Classification systems for thematic maps</a></li>
+<li class="chapter" data-level="3.3" data-path="thematic-maps-in-r.html"><a href="thematic-maps-in-r.html#classification-systems-for-thematic-maps"><i class="fa fa-check"></i><b>3.3</b> Classification systems for thematic maps</a>
+<ul>
+<li class="chapter" data-level="3.3.1" data-path="thematic-maps-in-r.html"><a href="thematic-maps-in-r.html#activity-2-comparing-classifications"><i class="fa fa-check"></i><b>3.3.1</b> Activity 2: Comparing classifications</a></li>
+</ul></li>
 <li class="chapter" data-level="3.4" data-path="thematic-maps-in-r.html"><a href="thematic-maps-in-r.html#using-graduated-symbols"><i class="fa fa-check"></i><b>3.4</b> Using graduated symbols</a></li>
-<li class="chapter" data-level="3.5" data-path="thematic-maps-in-r.html"><a href="thematic-maps-in-r.html#mapping-rates-rather-than-counts"><i class="fa fa-check"></i><b>3.5</b> Mapping rates rather than counts</a></li>
+<li class="chapter" data-level="3.5" data-path="thematic-maps-in-r.html"><a href="thematic-maps-in-r.html#mapping-rates-rather-than-counts"><i class="fa fa-check"></i><b>3.5</b> Mapping rates rather than counts</a>
+<ul>
+<li class="chapter" data-level="3.5.1" data-path="thematic-maps-in-r.html"><a href="thematic-maps-in-r.html#activity-3-getting-population-data-from-the-census"><i class="fa fa-check"></i><b>3.5.1</b> Activity 3: Getting population data from the census</a></li>
+<li class="chapter" data-level="3.5.2" data-path="thematic-maps-in-r.html"><a href="thematic-maps-in-r.html#activity-5-mapping-crime-rates"><i class="fa fa-check"></i><b>3.5.2</b> Activity 5: Mapping crime rates</a></li>
+</ul></li>
 <li class="chapter" data-level="3.6" data-path="thematic-maps-in-r.html"><a href="thematic-maps-in-r.html#summary-2"><i class="fa fa-check"></i><b>3.6</b> Summary</a></li>
 </ul></li>
 <li class="chapter" data-level="4" data-path="performing-spatial-operations-in-r.html"><a href="performing-spatial-operations-in-r.html"><i class="fa fa-check"></i><b>4</b> Performing spatial operations in R</a>
 <ul>
-<li class="chapter" data-level="4.1" data-path="performing-spatial-operations-in-r.html"><a href="performing-spatial-operations-in-r.html#getting-some-more-data"><i class="fa fa-check"></i><b>4.1</b> Getting some (more) data</a>
+<li class="chapter" data-level="4.1" data-path="performing-spatial-operations-in-r.html"><a href="performing-spatial-operations-in-r.html#criminality-of-place"><i class="fa fa-check"></i><b>4.1</b> Criminality of place</a></li>
+<li class="chapter" data-level="4.2" data-path="performing-spatial-operations-in-r.html"><a href="performing-spatial-operations-in-r.html#getting-data-of-this-week"><i class="fa fa-check"></i><b>4.2</b> Getting data of this week</a>
 <ul>
-<li class="chapter" data-level="4.1.1" data-path="performing-spatial-operations-in-r.html"><a href="performing-spatial-operations-in-r.html#subsetting-using-pattern-matching"><i class="fa fa-check"></i><b>4.1.1</b> Subsetting using pattern matching</a></li>
-<li class="chapter" data-level="4.1.2" data-path="performing-spatial-operations-in-r.html"><a href="performing-spatial-operations-in-r.html#geocoding-from-an-address"><i class="fa fa-check"></i><b>4.1.2</b> Geocoding from an address</a></li>
+<li class="chapter" data-level="4.2.1" data-path="performing-spatial-operations-in-r.html"><a href="performing-spatial-operations-in-r.html#activity-1-subsetting-using-pattern-matching"><i class="fa fa-check"></i><b>4.2.1</b> Activity 1: Subsetting using pattern matching</a></li>
+<li class="chapter" data-level="4.2.2" data-path="performing-spatial-operations-in-r.html"><a href="performing-spatial-operations-in-r.html#activity-2-pattern-matching-to-find-city-centre-premises"><i class="fa fa-check"></i><b>4.2.2</b> Activity 2: Pattern matching to find city centre premises</a></li>
 </ul></li>
-<li class="chapter" data-level="4.2" data-path="performing-spatial-operations-in-r.html"><a href="performing-spatial-operations-in-r.html#making-interactive-maps-with-leaflet"><i class="fa fa-check"></i><b>4.2</b> Making interactive maps with leaflet</a>
+<li class="chapter" data-level="4.3" data-path="performing-spatial-operations-in-r.html"><a href="performing-spatial-operations-in-r.html#geocoding-from-an-address"><i class="fa fa-check"></i><b>4.3</b> Geocoding from an address</a>
 <ul>
-<li class="chapter" data-level="4.2.1" data-path="performing-spatial-operations-in-r.html"><a href="performing-spatial-operations-in-r.html#activity-4-making-an-interactive-map"><i class="fa fa-check"></i><b>4.2.1</b> Activity 4: Making an interactive map</a></li>
+<li class="chapter" data-level="4.3.1" data-path="performing-spatial-operations-in-r.html"><a href="performing-spatial-operations-in-r.html#activity-3-getting-address-from-post-code-using-an-api"><i class="fa fa-check"></i><b>4.3.1</b> Activity 3: Getting address from post code using an API</a></li>
 </ul></li>
-<li class="chapter" data-level="4.3" data-path="performing-spatial-operations-in-r.html"><a href="performing-spatial-operations-in-r.html#spatial-operations"><i class="fa fa-check"></i><b>4.3</b> Spatial operations</a>
+<li class="chapter" data-level="4.4" data-path="performing-spatial-operations-in-r.html"><a href="performing-spatial-operations-in-r.html#making-interactive-maps-with-leaflet"><i class="fa fa-check"></i><b>4.4</b> Making interactive maps with leaflet</a>
 <ul>
-<li class="chapter" data-level="4.3.1" data-path="performing-spatial-operations-in-r.html"><a href="performing-spatial-operations-in-r.html#coordinate-reference-systems-revisited"><i class="fa fa-check"></i><b>4.3.1</b> Coordinate reference systems revisited</a></li>
-<li class="chapter" data-level="4.3.2" data-path="performing-spatial-operations-in-r.html"><a href="performing-spatial-operations-in-r.html#meet-a-new-format-of-shapefile-geojson"><i class="fa fa-check"></i><b>4.3.2</b> Meet a new format of shapefile: geojson</a></li>
+<li class="chapter" data-level="4.4.1" data-path="performing-spatial-operations-in-r.html"><a href="performing-spatial-operations-in-r.html#activity-4-making-an-interactive-map"><i class="fa fa-check"></i><b>4.4.1</b> Activity 4: Making an interactive map</a></li>
 </ul></li>
-<li class="chapter" data-level="4.4" data-path="performing-spatial-operations-in-r.html"><a href="performing-spatial-operations-in-r.html#recap"><i class="fa fa-check"></i><b>4.4</b> Recap</a></li>
+<li class="chapter" data-level="4.5" data-path="performing-spatial-operations-in-r.html"><a href="performing-spatial-operations-in-r.html#spatial-operations"><i class="fa fa-check"></i><b>4.5</b> Spatial operations</a>
+<ul>
+<li class="chapter" data-level="4.5.1" data-path="performing-spatial-operations-in-r.html"><a href="performing-spatial-operations-in-r.html#coordinate-reference-systems-revisited"><i class="fa fa-check"></i><b>4.5.1</b> Coordinate reference systems revisited</a></li>
+<li class="chapter" data-level="4.5.2" data-path="performing-spatial-operations-in-r.html"><a href="performing-spatial-operations-in-r.html#meet-a-new-format-of-shapefile-geojson"><i class="fa fa-check"></i><b>4.5.2</b> Meet a new format of shapefile: geojson</a></li>
+<li class="chapter" data-level="4.5.3" data-path="performing-spatial-operations-in-r.html"><a href="performing-spatial-operations-in-r.html#activity-5-subset-points-to-those-within-a-polygon"><i class="fa fa-check"></i><b>4.5.3</b> Activity 5: Subset points to those within a polygon</a></li>
+<li class="chapter" data-level="4.5.4" data-path="performing-spatial-operations-in-r.html"><a href="performing-spatial-operations-in-r.html#activity-6-building-buffers"><i class="fa fa-check"></i><b>4.5.4</b> Activity 6: Building buffers</a></li>
+<li class="chapter" data-level="4.5.5" data-path="performing-spatial-operations-in-r.html"><a href="performing-spatial-operations-in-r.html#activity-7-counting-points-in-polygon"><i class="fa fa-check"></i><b>4.5.5</b> Activity 7: Counting Points in Polygon</a></li>
+</ul></li>
 </ul></li>
 <li class="chapter" data-level="5" data-path="more-on-thematic-maps.html"><a href="more-on-thematic-maps.html"><i class="fa fa-check"></i><b>5</b> More on thematic maps</a>
 <ul>
-<li class="chapter" data-level="5.1" data-path="more-on-thematic-maps.html"><a href="more-on-thematic-maps.html#introduction-1"><i class="fa fa-check"></i><b>5.1</b> Introduction</a>
+<li class="chapter" data-level="5.1" data-path="more-on-thematic-maps.html"><a href="more-on-thematic-maps.html#pro-tip-do-i-need-to-install-this-package"><i class="fa fa-check"></i><b>5.1</b> Pro-tip: do I need to install this package?</a>
 <ul>
-<li class="chapter" data-level="5.1.1" data-path="more-on-thematic-maps.html"><a href="more-on-thematic-maps.html#pro-tip-do-i-need-to-install-this-package"><i class="fa fa-check"></i><b>5.1.1</b> Pro-tip: do I need to install this package?</a></li>
+<li class="chapter" data-level="5.1.1" data-path="more-on-thematic-maps.html"><a href="more-on-thematic-maps.html#activity-1-getting-some-messy-data"><i class="fa fa-check"></i><b>5.1.1</b> Activity 1: Getting some messy data</a></li>
+<li class="chapter" data-level="5.1.2" data-path="more-on-thematic-maps.html"><a href="more-on-thematic-maps.html#activity-3-comparing-shapefiles"><i class="fa fa-check"></i><b>5.1.2</b> Activity 3: Comparing shapefiles</a></li>
+<li class="chapter" data-level="5.1.3" data-path="more-on-thematic-maps.html"><a href="more-on-thematic-maps.html#activity-4-joining-datasets"><i class="fa fa-check"></i><b>5.1.3</b> Activity 4: Joining datasets</a></li>
 </ul></li>
 <li class="chapter" data-level="5.2" data-path="more-on-thematic-maps.html"><a href="more-on-thematic-maps.html#mapping-rates-learning-from-yield-mapping"><i class="fa fa-check"></i><b>5.2</b> Mapping rates, learning from yield mapping</a>
 <ul>
-<li class="chapter" data-level="5.2.1" data-path="more-on-thematic-maps.html"><a href="more-on-thematic-maps.html#activity-4-the-case-of-saharsa"><i class="fa fa-check"></i><b>5.2.1</b> Activity 4: The case of Saharsa</a></li>
-<li class="chapter" data-level="5.2.2" data-path="more-on-thematic-maps.html"><a href="more-on-thematic-maps.html#activity-5-smoothing-as-a-way-to-address-insensitivity-to-sample-size"><i class="fa fa-check"></i><b>5.2.2</b> Activity 5: Smoothing as a way to address insensitivity to sample size</a></li>
+<li class="chapter" data-level="5.2.1" data-path="more-on-thematic-maps.html"><a href="more-on-thematic-maps.html#activity-5-the-case-of-saharsa"><i class="fa fa-check"></i><b>5.2.1</b> Activity 5: The case of Saharsa</a></li>
+<li class="chapter" data-level="5.2.2" data-path="more-on-thematic-maps.html"><a href="more-on-thematic-maps.html#activity-6-smoothing-as-a-way-to-address-insensitivity-to-sample-size"><i class="fa fa-check"></i><b>5.2.2</b> Activity 6: Smoothing as a way to address insensitivity to sample size</a></li>
 </ul></li>
 <li class="chapter" data-level="5.3" data-path="more-on-thematic-maps.html"><a href="more-on-thematic-maps.html#binning-points"><i class="fa fa-check"></i><b>5.3</b> Binning points</a>
 <ul>
 <li class="chapter" data-level="5.3.1" data-path="more-on-thematic-maps.html"><a href="more-on-thematic-maps.html#the-binning-process"><i class="fa fa-check"></i><b>5.3.1</b> The Binning Process</a></li>
 <li class="chapter" data-level="5.3.2" data-path="more-on-thematic-maps.html"><a href="more-on-thematic-maps.html#different-binning-techniques"><i class="fa fa-check"></i><b>5.3.2</b> Different Binning Techniques</a></li>
-<li class="chapter" data-level="5.3.3" data-path="more-on-thematic-maps.html"><a href="more-on-thematic-maps.html#multivariate-binning"><i class="fa fa-check"></i><b>5.3.3</b> Multivariate binning</a></li>
-<li class="chapter" data-level="5.3.4" data-path="more-on-thematic-maps.html"><a href="more-on-thematic-maps.html#benefits-of-binning"><i class="fa fa-check"></i><b>5.3.4</b> Benefits of Binning</a></li>
+<li class="chapter" data-level="5.3.3" data-path="more-on-thematic-maps.html"><a href="more-on-thematic-maps.html#activity-7-hexbinning"><i class="fa fa-check"></i><b>5.3.3</b> Activity 7: Hexbinning</a></li>
+<li class="chapter" data-level="5.3.4" data-path="more-on-thematic-maps.html"><a href="more-on-thematic-maps.html#activity-8-rectangular-binning"><i class="fa fa-check"></i><b>5.3.4</b> Activity 8: Rectangular binning</a></li>
+<li class="chapter" data-level="5.3.5" data-path="more-on-thematic-maps.html"><a href="more-on-thematic-maps.html#multivariate-binning"><i class="fa fa-check"></i><b>5.3.5</b> Multivariate binning</a></li>
+<li class="chapter" data-level="5.3.6" data-path="more-on-thematic-maps.html"><a href="more-on-thematic-maps.html#benefits-of-binning"><i class="fa fa-check"></i><b>5.3.6</b> Benefits of Binning</a></li>
 </ul></li>
 <li class="chapter" data-level="5.4" data-path="more-on-thematic-maps.html"><a href="more-on-thematic-maps.html#a-note-of-caution-maup"><i class="fa fa-check"></i><b>5.4</b> A note of caution: MAUP</a>
 <ul>
 <li class="chapter" data-level="5.4.1" data-path="more-on-thematic-maps.html"><a href="more-on-thematic-maps.html#what-is-maup"><i class="fa fa-check"></i><b>5.4.1</b> What is MAUP?</a></li>
 <li class="chapter" data-level="5.4.2" data-path="more-on-thematic-maps.html"><a href="more-on-thematic-maps.html#why-does-maup-matter"><i class="fa fa-check"></i><b>5.4.2</b> Why does MAUP matter?</a></li>
 <li class="chapter" data-level="5.4.3" data-path="more-on-thematic-maps.html"><a href="more-on-thematic-maps.html#what-can-we-do"><i class="fa fa-check"></i><b>5.4.3</b> What can we do?</a></li>
-<li class="chapter" data-level="5.4.4" data-path="more-on-thematic-maps.html"><a href="more-on-thematic-maps.html#activity-7-considering-maup"><i class="fa fa-check"></i><b>5.4.4</b> Activity 7: Considering MAUP</a></li>
 </ul></li>
-<li class="chapter" data-level="5.5" data-path="more-on-thematic-maps.html"><a href="more-on-thematic-maps.html#transforming-polygons"><i class="fa fa-check"></i><b>5.5</b> Transforming polygons</a></li>
+<li class="chapter" data-level="5.5" data-path="more-on-thematic-maps.html"><a href="more-on-thematic-maps.html#transforming-polygons"><i class="fa fa-check"></i><b>5.5</b> Transforming polygons</a>
+<ul>
+<li class="chapter" data-level="5.5.1" data-path="more-on-thematic-maps.html"><a href="more-on-thematic-maps.html#activity-9-cartograms"><i class="fa fa-check"></i><b>5.5.1</b> Activity 9: Cartograms</a></li>
+</ul></li>
 <li class="chapter" data-level="5.6" data-path="more-on-thematic-maps.html"><a href="more-on-thematic-maps.html#references-and-further-reading"><i class="fa fa-check"></i><b>5.6</b> References and further reading</a>
 <ul>
 <li class="chapter" data-level="5.6.1" data-path="more-on-thematic-maps.html"><a href="more-on-thematic-maps.html#binning"><i class="fa fa-check"></i><b>5.6.1</b> Binning</a></li>
@@ -277,7 +307,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <ul>
 <li class="chapter" data-level="6.4.1" data-path="studying-spatial-point-patterns.html"><a href="studying-spatial-point-patterns.html#activity-5-spatial-point-pattern-processes-along-networks"><i class="fa fa-check"></i><b>6.4.1</b> Activity 5: Spatial point pattern processes along networks</a></li>
 </ul></li>
-<li class="chapter" data-level="6.5" data-path="studying-spatial-point-patterns.html"><a href="studying-spatial-point-patterns.html#recap-1"><i class="fa fa-check"></i><b>6.5</b> Recap</a></li>
+<li class="chapter" data-level="6.5" data-path="studying-spatial-point-patterns.html"><a href="studying-spatial-point-patterns.html#recap"><i class="fa fa-check"></i><b>6.5</b> Recap</a></li>
 </ul></li>
 <li class="chapter" data-level="7" data-path="global-and-local-spatial-autocorrelation.html"><a href="global-and-local-spatial-autocorrelation.html"><i class="fa fa-check"></i><b>7</b> Global and local spatial autocorrelation</a>
 <ul>
@@ -380,7 +410,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="9.8.1" data-path="spatial-regression-models.html"><a href="spatial-regression-models.html#activity-7-small-multiples"><i class="fa fa-check"></i><b>9.8.1</b> Activity 7: Small multiples</a></li>
 <li class="chapter" data-level="9.8.2" data-path="spatial-regression-models.html"><a href="spatial-regression-models.html#activity-8-animations"><i class="fa fa-check"></i><b>9.8.2</b> Activity 8: Animations</a></li>
 </ul></li>
-<li class="chapter" data-level="9.9" data-path="spatial-regression-models.html"><a href="spatial-regression-models.html#recap-2"><i class="fa fa-check"></i><b>9.9</b> Recap</a></li>
+<li class="chapter" data-level="9.9" data-path="spatial-regression-models.html"><a href="spatial-regression-models.html#recap-1"><i class="fa fa-check"></i><b>9.9</b> Recap</a></li>
 </ul></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
@@ -402,16 +432,16 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="a-first-lesson-about-r" class="section level1" number="1">
-<h1><span class="header-section-number">Chapter 1</span> A first lesson about R</h1>
+<div id="a-first-lesson-about-r" class="section level1 hasAnchor" number="1">
+<h1><span class="header-section-number">Chapter 1</span> A first lesson about R<a href="a-first-lesson-about-r.html#a-first-lesson-about-r" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>In this lesson, you will be introduced to the programming language, <code>R</code>. After installing the related software and getting a basic idea of the R Studio interface, you will learn three <code>R</code> basics: operators, objects, and packages.</p>
 <p>Unlike other statistical software like SPSS and STATA, <code>R</code> is a free, open-source software for performing statistical analysis and data visualization. In addition, <code>R</code> offers more analytical solutions, flexibility, and customization than these commonly used statistical software, and its popularity has increased substantially over the years.</p>
 <p>We learn <code>R</code> because we hope that this is an important tool that you will continue to use in future. As it is free and has a community feel to it where anyone can create and upload new techniques, the idea is that you can use <code>R</code> long after this course. Even if data analysis is not in the future for you, learning how to conduct and interpret statistical output is a good skill to have – much of our knowledge of the world includes statistics, so understanding the numbers and how they were derived are advantages. <code>R</code> uses a language called <strong>object-oriented programming</strong>, and though it may seem daunting at first, practice makes familiarity. Also, you can impress your friends with all your coding.</p>
-<div id="install-r-r-studio" class="section level2" number="1.1">
-<h2><span class="header-section-number">1.1</span> Install R &amp; R Studio</h2>
+<div id="install-r-r-studio" class="section level2 hasAnchor" number="1.1">
+<h2><span class="header-section-number">1.1</span> Install R &amp; R Studio<a href="a-first-lesson-about-r.html#install-r-r-studio" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>As <code>R</code> and <code>R Studio</code> are free software, you should be able to install these on your own machines at home. You may be working with different IT, so there are different options to allow a successful install. Our first activity will be to decide what approach to working with <code>R</code> and <code>R Studio</code> will be best for you.</p>
-<div id="activity-1-identifying-your-operating-system" class="section level3" number="1.1.1">
-<h3><span class="header-section-number">1.1.1</span> Activity 1: Identifying your operating system</h3>
+<div id="activity-1-identifying-your-operating-system" class="section level3 hasAnchor" number="1.1.1">
+<h3><span class="header-section-number">1.1.1</span> Activity 1: Identifying your operating system<a href="a-first-lesson-about-r.html#activity-1-identifying-your-operating-system" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>In this activity, you need to answer a question about your computer/IT that you will be working with for this class. That question is:</p>
 <ul>
 <li><p><strong>What is your operating system</strong>? Operating system refers to the software that your computer is running to deliver the basic functions. You may have, for example:</p>
@@ -422,12 +452,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><em>Chromebook</em> - Installing <code>R</code> and <code>R Studio</code> on a Chromebook involves installing Linux. Like with a Mac, there are some additional steps you will need to take, and some patience.</li>
 </ul></li>
 </ul>
-<p>In your group google sheets, write down which operating system you have. This will guide which directions to follow later.</p>
 </div>
-<div id="activity-2-install-r-r-studio" class="section level3" number="1.1.2">
-<h3><span class="header-section-number">1.1.2</span> Activity 2: Install R &amp; R Studio</h3>
-<div id="some-notes-specific-to-your-operating-system." class="section level4" number="1.1.2.1">
-<h4><span class="header-section-number">1.1.2.1</span> Some notes specific to your operating system.</h4>
+<div id="activity-2-install-r-r-studio" class="section level3 hasAnchor" number="1.1.2">
+<h3><span class="header-section-number">1.1.2</span> Activity 2: Install R &amp; R Studio<a href="a-first-lesson-about-r.html#activity-2-install-r-r-studio" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="some-notes-specific-to-your-operating-system." class="section level4 hasAnchor" number="1.1.2.1">
+<h4><span class="header-section-number">1.1.2.1</span> Some notes specific to your operating system.<a href="a-first-lesson-about-r.html#some-notes-specific-to-your-operating-system." class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>Before you move on to the installation steps, look at your answer from Activity 1, and read or watch the advice specific to your operating system:</p>
 <ul>
 <li>Windows: click <a href="https://www.youtube.com/watch?v=VLWaED9jTiA">here</a> for instructions</li>
@@ -437,8 +466,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul>
 <p>Once you have watched or read the instructions for your relevant operating system, you are now ready to actually have a go at downloading the software for yourself. Before you start, make sure to ask us any questions or concerns, and once ready, install!</p>
 </div>
-<div id="install-r" class="section level4 unnumbered">
-<h4>Install <code>R</code>:</h4>
+<div id="install-r" class="section level4 unnumbered hasAnchor">
+<h4>Install <code>R</code>:<a href="a-first-lesson-about-r.html#install-r" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <ol style="list-style-type: decimal">
 <li><p>Go to <a href="https://www.r-project.org/">https://www.r-project.org/</a></p></li>
 <li><p>Click the <a href="https://cran.r-project.org/mirrors.html">download R</a> link under the <em>Getting Started</em> heading</p></li>
@@ -447,8 +476,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><p>Then click the <em>install R for the first-time</em> link and proceed to install <code>R</code></p></li>
 </ol>
 </div>
-<div id="install-r-studio" class="section level4 unnumbered">
-<h4>Install R Studio:</h4>
+<div id="install-r-studio" class="section level4 unnumbered hasAnchor">
+<h4>Install R Studio:<a href="a-first-lesson-about-r.html#install-r-studio" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <ol style="list-style-type: decimal">
 <li><p>Go to <a href="https://rstudio.com/">https://rstudio.com/</a></p></li>
 <li><p>Click the <em>Download</em> link</p></li>
@@ -457,58 +486,54 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><p>You will be taken to a website to download the free version of <code>RStudio</code> that is appropriate for your computer. Download and then install it.</p></li>
 </ol>
 </div>
-<div id="plan-b-accessing-r-studio-remotely-throught-a-web-browser" class="section level4" number="1.1.2.2">
-<h4><span class="header-section-number">1.1.2.2</span> Plan B: accessing R Studio remotely throught a web browser</h4>
+<div id="plan-b-accessing-r-studio-remotely-throught-a-web-browser" class="section level4 hasAnchor" number="1.1.2.2">
+<h4><span class="header-section-number">1.1.2.2</span> Plan B: accessing R Studio remotely throught a web browser<a href="a-first-lesson-about-r.html#plan-b-accessing-r-studio-remotely-throught-a-web-browser" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>It might be that the above does not work and you find that there are some issues specific to your computer, or something just is not working. In that case, you have two options:</p>
 <ul>
 <li><p><em>Option 1:</em> You can remotely access one of the university PCs from your browser (Firefox, Chrome, Safari, etc). You can find instructions how to do this <a href="https://www.itservices.manchester.ac.uk/students/pc-on-campus/remote-cluster-access/">here</a> , and the university IT helpdesk can help you access this too. If you do this, you will be able to use the version of <code>RStudio</code> installed in the computer clusters.</p></li>
-<li><p><em>Option 2</em>: You can access an online version of <code>R Studio</code>, which you can access through any web browser (Firefox, Chrome, Safari, etc). To do this, you visit <a href="https://rstudio.cloud/">https://rstudio.cloud/</a>, click on ‘get started for free,’ choose the free account, and click on ‘sign up.’ Then you can always visit this website and log in to use <code>R Studio</code> in the cloud. Note that you should start a <code>New Project</code> and name it <em>Modelling Crime Data</em>, and then all your work will be saved in this project.</p></li>
+<li><p><em>Option 2</em>: You can access an online version of <code>R Studio</code>, which you can access through any web browser (Firefox, Chrome, Safari, etc). To do this, you visit <a href="https://rstudio.cloud/">https://rstudio.cloud/</a>, click on ‘get started for free’, choose the free account, and click on ‘sign up’. Then you can always visit this website and log in to use <code>R Studio</code> in the cloud. Note that you should start a <code>New Project</code> and name it <em>Modelling Crime Data</em>, and then all your work will be saved in this project.</p></li>
 </ul>
 </div>
 </div>
 </div>
-<div id="open-up-and-explore-rstudio" class="section level2" number="1.2">
-<h2><span class="header-section-number">1.2</span> Open up and explore RStudio</h2>
+<div id="open-up-and-explore-rstudio" class="section level2 hasAnchor" number="1.2">
+<h2><span class="header-section-number">1.2</span> Open up and explore RStudio<a href="a-first-lesson-about-r.html#open-up-and-explore-rstudio" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>In this session we will focus in developing basic familiarity with R Studio. You can use R without using R Studio, but R Studio is an app that makes it easier to work with R.</p>
 <p>R Studio is what we call an IDE, an <strong>integrated development environment</strong>. It is a fancy way of saying that it is a cool interface designed to write programming code. Every time you open up R Studio you are in fact starting a R session. R Studio automatically runs R in the background. We will be interacting with R in this course unit via R Studio.</p>
 <p><img src="img/rstudio.png" /></p>
 <p>When you first open R Studio, you will see (as in the image above) that there are 3 main windows. The bigger one to your left is the console. If you read the text in the console you will see that R Studio is indeed opening R and you can see what version of R you are running. Since R is constantly being updated the version you installed is likely more recent that the one we used at time of writing.</p>
-<div id="activity-3-opening-up-the-script-pane" class="section level4" number="1.2.0.1">
-<h4><span class="header-section-number">1.2.0.1</span> Activity 3: Opening up the script pane</h4>
+<div id="activity-3-opening-up-the-script-pane" class="section level3 hasAnchor" number="1.2.1">
+<h3><span class="header-section-number">1.2.1</span> Activity 3: Opening up the script pane<a href="a-first-lesson-about-r.html#activity-3-opening-up-the-script-pane" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>The view in R Studio is structured so that you have 4 open windows in a regular session. However when you first open, you might be starting with only 3. To open the script pane (the one missing) click in the <em>File</em> drop down Menu, select <em>New File</em>, then <em>R Script</em>.</p>
 <p><img src="img/openscript.png" /></p>
 <p>You will now see the 4 window areas in display. On each of these areas you can shift between different views and panels. You can also use your mouse to re-size the different windows if that is convenient.</p>
 <p><img src="img/the4views.png" /></p>
 </div>
-<div id="the-four-panes-of-r-studio" class="section level3" number="1.2.1">
-<h3><span class="header-section-number">1.2.1</span> The four panes of R Studio</h3>
+<div id="the-four-panes-of-r-studio" class="section level3 hasAnchor" number="1.2.2">
+<h3><span class="header-section-number">1.2.2</span> The four panes of R Studio<a href="a-first-lesson-about-r.html#the-four-panes-of-r-studio" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>The purposes of the four panes in Figure above are the following:</p>
-<ol style="list-style-type: decimal">
-<li><p><strong>Script and data view</strong>: where you type your programming code that tells <code>R</code> what you want to do. These are essentially instructions that you type and save as a <strong>script</strong>, so that you can return to it later to remember what you did and to share it with others so that they can reproduce what you did.</p></li>
-<li><p><strong>Environment and history view</strong>:</p></li>
+<p>Window 1. <strong>Script and data view</strong>: where you type your programming code that tells <code>R</code> what you want to do. These are essentially instructions that you type and save as a <strong>script</strong>, so that you can return to it later to remember what you did and to share it with others so that they can reproduce what you did.</p>
+<p>Window 2. <strong>Environment and history view</strong>:
+a) <em>2.1 Environment</em> tab- gives you the names of all the (data) objects that you have defined during your current <code>R</code> session, including number of observations and rows in those objects. We learn more about objects later.</p>
+<ol start="2" style="list-style-type: lower-alpha">
+<li><em>2.2 History</em> tab- shows you a history of all the code you have previously evaluated in the main console. One of the key advantages of doing data analysis this way - with code versus with a point and click interface like Excel or ArcGIS is that you are producing a written record of every step you take in the analysis. First time around it will take you time to write these instructions, it may be slower than pointing and clicking. And unlike with pointing and clicking you need to know the “words” and “grammar” of this language.</li>
 </ol>
-<ol style="list-style-type: lower-roman">
-<li><p><em>2.1 Environment</em> tab- gives you the names of all the (data) objects that you have defined during your current <code>R</code> session, including number of observations and rows in those objects. We learn more about objects later.</p></li>
-<li><p><em>2.2 History</em> tab- shows you a history of all the code you have previously evaluated in the main console. One of the key advantages of doing data analysis this way - with code versus with a point and click interface like Excel or ArcGIS is that you are producing a written record of every step you take in the analysis. First time around it will take you time to write these instructions, it may be slower than pointing and clicking. And unlike with pointing and clicking you need to know the “words” and “grammar” of this language.</p></li>
-</ol>
-<ol start="3" style="list-style-type: decimal">
-<li><p><strong>Main console</strong>: this is considered <code>R's</code> heart, and it is where <code>R</code> evaluates the codes that you run. You can type your codes directly in the console, but for the sake of good habits, type them in the script and data view so you can save a record of them. Only type and run code from here if you want to debug or do some quick analysis.</p></li>
-<li><p><strong>File directory, Plots, Packages, Help</strong>:</p></li>
-</ol>
-<ol style="list-style-type: lower-roman">
-<li><p><em>4.1 Files</em> tab- allows you to see the files in the folder that is currently set as your working directory.</p></li>
+<p>Window 3. <strong>Main console</strong>: this is considered <code>R's</code> heart, and it is where <code>R</code> evaluates the codes that you run. You can type your codes directly in the console, but for the sake of good habits, type them in the script and data view so you can save a record of them. Only type and run code from here if you want to debug or do some quick analysis.</p>
+<p>Window 4. <strong>File directory, Plots, Packages, Help</strong>:
+a) <em>4.1 Files</em> tab- allows you to see the files in the folder that is currently set as your working directory.</p>
+<ol start="2" style="list-style-type: lower-alpha">
 <li><p><em>4.2 Plots</em> tab- you will see any data visualizations that you produce here. You have not produced any yet, so it is empty now.</p></li>
 <li><p><em>4.3 Packages</em> tab- you will see the packages that are currently available to install. We will explain what these are soon, but know that they are an essential feature when working with <code>R</code>.</p></li>
 <li><p><em>4.4 Help</em> tab- you can access further information on the various packages.</p></li>
 </ol>
-<div id="activity-4-interacting-with-the-4-panes" class="section level4" number="1.2.1.1">
-<h4><span class="header-section-number">1.2.1.1</span> Activity 4: Interacting with the 4 panes</h4>
+</div>
+<div id="activity-4-interacting-with-the-4-panes" class="section level3 hasAnchor" number="1.2.3">
+<h3><span class="header-section-number">1.2.3</span> Activity 4: Interacting with the 4 panes<a href="a-first-lesson-about-r.html#activity-4-interacting-with-the-4-panes" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>In the previous activity, you opened up the ‘script’ pane. We now write some code in it, and see what happens.</p>
 <p>To do this, go to your open version of <code>R Studio</code>, and type in the script pane the following:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="a-first-lesson-about-r.html#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="st">&quot;Hello world!&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="a-first-lesson-about-r.html#cb1-1" tabindex="-1"></a><span class="fu">print</span>(<span class="st">&quot;Hello world!&quot;</span>)</span></code></pre></div>
 <p>When you have typed this, you will have typed your first bit of code. Yet nothing is happening? That is because you also have to <strong>RUN</strong> the code.</p>
 <p>You can do this by highlighting the code you wish to run, and clicking on ‘run’ in the top right hand corner:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="a-first-lesson-about-r.html#cb2-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">include_graphics</span>(<span class="st">&#39;img/run_hello_world.gif&#39;</span>)</span></code></pre></div>
 <p><img src="img/run_hello_world.gif" width="400px" /></p>
 <p>When you ‘run’ the code, it will print the text ‘Hello World!’ in the bottom pane, which is the <strong>console</strong>. That means you have written and executed your first line of code.</p>
 <p>In the rest of the session, we will be unpacking how this all works, and getting more familiar and comfortable with using <code>R Studio</code>.</p>
@@ -517,161 +542,165 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>The advantage of doing analysis this way is that once you have written your instructions and saved them in a file, you will be able to share it with others and run it every time you want in a matter of seconds. This creates a <em>reproducible</em> record of your analysis: something that your collaborators or someone else anywhere (including your future self, the one that will have forgotten how to do the stuff) could run and get the same results than you did at some point earlier. This makes science more transparent and transparency brings with it many advantages. For example, it makes your research more trustworthy. Don’t underestimate how critical this is. <strong>Reproducibility</strong> is becoming a key criteria to assess good quality research. The University of Manchester <a href="https://www.staffnet.manchester.ac.uk/news/display/?id=25496">just joined the UK Reproducibility Network</a>, and is promoting this good practice. If you’re interested you can join <a href="https://research-it.manchester.ac.uk/news/2019/05/30/uom-open-science-working-group/">the Open Science working group</a> or the reading club <a href="https://reproducibilitea.org/journal-clubs/#Manchester">ReproducibiliTea</a>. You can read up on reproducibility and its importance <a href="http://theconversation.com/the-science-reproducibility-crisis-and-what-can-be-done-about-it-74198">here</a> or get Stuart Richie’s book <a href="https://www.goodreads.com/book/show/52199285-science-fictions">Science Fictions</a> for an engaging further read.</p>
 </div>
 </div>
-</div>
-<div id="customising-the-rstudio-look" class="section level2" number="1.3">
-<h2><span class="header-section-number">1.3</span> Customising the RStudio look</h2>
+<div id="customising-the-rstudio-look" class="section level2 hasAnchor" number="1.3">
+<h2><span class="header-section-number">1.3</span> Customising the RStudio look<a href="a-first-lesson-about-r.html#customising-the-rstudio-look" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>R Studio allows you to customise the way it looks. Working with white backgrounds is not generally a good idea if you care about your eyesight. If you don’t want to end up with dry eyes not only it is good you follow the 20-20-20 rule (every 20 minutes look for 20 seconds to an object located 20 feet away from you), but it may also be a good idea to use more eye friendly screen displays.</p>
 <p>Click in the <em>Tools</em> menu and select <em>Global options</em>. This will open up a pop up window with various options. Select <em>Appearance</em>. In this section you can change the font type and size, but also the kind of theme background that R will use in the various windows.</p>
 <p><img src="img/tools_global_options.png" /></p>
 <p>You can make any changes you’d like to here, including the theme background that <code>R</code> will use as the interface.</p>
-<p>For example, you may choose a darker theme like ‘tomorrow night bright.’</p>
+<p>For example, you may choose a darker theme like ‘tomorrow night bright’.</p>
 <p><img src="img/appearance_choose_tomorrow_night_bright.png" /></p>
 <p><img src="img/consoleresults.png" />
-As indicated above, the window in the bottom left corner is the main <strong>console</strong>.You will see that the words “I love maps” appear printed there. If rather than using R Studio you were working directly from R, that’s all you would get: the main console where you can write code interactively (rather than all the different windows you see in R Studio). You can write your code directly in the main console and execute it line by line in an interactive fashion. However, we will be running code from scripts, so that you get used to the idea of properly documenting all the steps you take,</p>
-<div id="functions" class="section level3" number="1.3.1">
-<h3><span class="header-section-number">1.3.1</span> Functions</h3>
+As indicated above, the window in the bottom left corner is the main <strong>console</strong>.You will see that the words “I hate computers” appear printed there. If rather than using R Studio you were working directly from R, that’s all you would get: the main console where you can write code interactively (rather than all the different windows you see in R Studio). You can write your code directly in the main console and execute it line by line in an interactive fashion. However, we will be running code from scripts, so that you get used to the idea of properly documenting all the steps you take.</p>
+<div id="functions" class="section level3 hasAnchor" number="1.3.1">
+<h3><span class="header-section-number">1.3.1</span> Functions<a href="a-first-lesson-about-r.html#functions" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p><strong>Functions</strong> <em>do</em> things. They are called by a certain name, usually a name which represents what they do, and they are followed by brackets <code>()</code>. Within the brackets, you can put whatever it is that you want the function to work with. For example, the code we wrote in Activity 4 was the <code>print()</code> function. This function told <code>R</code> to print into the console whatever we put in the brackets (“Hello World!”).</p>
-<p>Same idea with a personalised greeting: if you want to print ‘Hello Reka,’ you will need to have “Hello Reka” inside the brackets:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="a-first-lesson-about-r.html#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="st">&quot;Hello Reka&quot;</span>)</span></code></pre></div>
-<pre><code>## [1] &quot;Hello Reka&quot;</code></pre>
+<p>Same idea with a personalised greeting: if you want to print ‘Hello Manchester’, you will need to have “Hello Manchester” inside the brackets:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="a-first-lesson-about-r.html#cb2-1" tabindex="-1"></a><span class="fu">print</span>(<span class="st">&quot;Hello Manchester&quot;</span>)</span></code></pre></div>
+<pre><code>## [1] &quot;Hello Manchester&quot;</code></pre>
 <p>There are so many functions in <code>R</code>. We will be learning many of them throughout our class. <code>Print</code> is fun, but most of the time, we will be using functions to help us with our data analysis. For example, getting the minimum, maximum, or mean of a list of numbers. <code>R</code> does this using functions in a very similar way.</p>
 <p>For example, if we have a bunch of numbers, we just find the appropriate function to get the summary we want:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="a-first-lesson-about-r.html#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(<span class="dv">10</span>, <span class="dv">34</span>, <span class="dv">5</span>, <span class="dv">3</span>, <span class="dv">77</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="a-first-lesson-about-r.html#cb4-1" tabindex="-1"></a><span class="fu">mean</span>(<span class="dv">10</span>, <span class="dv">34</span>, <span class="dv">5</span>, <span class="dv">3</span>, <span class="dv">77</span>)</span></code></pre></div>
 <pre><code>## [1] 10</code></pre>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="a-first-lesson-about-r.html#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">min</span>(<span class="dv">10</span>, <span class="dv">34</span>, <span class="dv">5</span>, <span class="dv">3</span>, <span class="dv">77</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="a-first-lesson-about-r.html#cb6-1" tabindex="-1"></a><span class="fu">min</span>(<span class="dv">10</span>, <span class="dv">34</span>, <span class="dv">5</span>, <span class="dv">3</span>, <span class="dv">77</span>)</span></code></pre></div>
 <pre><code>## [1] 3</code></pre>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="a-first-lesson-about-r.html#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">max</span>(<span class="dv">10</span>, <span class="dv">34</span>, <span class="dv">5</span>, <span class="dv">3</span>, <span class="dv">77</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="a-first-lesson-about-r.html#cb8-1" tabindex="-1"></a><span class="fu">max</span>(<span class="dv">10</span>, <span class="dv">34</span>, <span class="dv">5</span>, <span class="dv">3</span>, <span class="dv">77</span>)</span></code></pre></div>
 <pre><code>## [1] 77</code></pre>
-<p>How can you find the function you need? Throughout this class, you will learn a list that appears at the top of each lesson. A recommendation is to also create a ‘function cookbook,’ where you write down a list of functions, what the functions do, and some examples. Here is an example:</p>
+<p>How can you find the function you need? Throughout this class, you will learn a list that appears at the top of each lesson. A recommendation is to also create a ‘function cookbook’, where you write down a list of functions, what the functions do, and some examples. Here is an example:</p>
 <p><img src="img/fn_cookbook.png" /></p>
 <p>You can use google to make your cookbook, and the website <a href="https://stackoverflow.com/">stackoverflow</a>, in particular, can help you find the function you need. But be wary, especially in the beginning, that you understand what the function does. There can be several different functions for the same action. One good approach is to add a function of interest to your cookbook and ask the teaching team about what it does, and how it might be different to other functions that do the same thing.</p>
-<div id="activity-5-play-around-with-functions" class="section level4" number="1.3.1.1">
-<h4><span class="header-section-number">1.3.1.1</span> Activity 5: Play around with functions</h4>
+<div id="activity-5-play-around-with-functions" class="section level4 hasAnchor" number="1.3.1.1">
+<h4><span class="header-section-number">1.3.1.1</span> Activity 5: Play around with functions<a href="a-first-lesson-about-r.html#activity-5-play-around-with-functions" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>Have a guess (or google) about what you think is the function to get the median. Once you have your answer, speak to the person next to you. Then, use it to get the median of the numbers 10, 34, 5, 3, 77.</p>
 <p>The answer is further below, after the note:</p>
 <p><strong>NOTE:</strong> <code>R</code> is case-sensitive! For example:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="a-first-lesson-about-r.html#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculating the logarithm </span></span>
-<span id="cb11-2"><a href="a-first-lesson-about-r.html#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">Log</span>(<span class="dv">100</span>)</span>
-<span id="cb11-3"><a href="a-first-lesson-about-r.html#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-4"><a href="a-first-lesson-about-r.html#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co"># ERROR!</span></span></code></pre></div>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="a-first-lesson-about-r.html#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Instead, it should be:</span></span>
-<span id="cb12-2"><a href="a-first-lesson-about-r.html#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">log</span>(<span class="dv">100</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="a-first-lesson-about-r.html#cb10-1" tabindex="-1"></a><span class="co"># Calculating the logarithm </span></span>
+<span id="cb10-2"><a href="a-first-lesson-about-r.html#cb10-2" tabindex="-1"></a><span class="fu">Log</span>(<span class="dv">100</span>)</span>
+<span id="cb10-3"><a href="a-first-lesson-about-r.html#cb10-3" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="a-first-lesson-about-r.html#cb10-4" tabindex="-1"></a><span class="co"># ERROR!</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="a-first-lesson-about-r.html#cb11-1" tabindex="-1"></a><span class="co"># Instead, it should be:</span></span>
+<span id="cb11-2"><a href="a-first-lesson-about-r.html#cb11-2" tabindex="-1"></a><span class="fu">log</span>(<span class="dv">100</span>)</span></code></pre></div>
 <pre><code>## [1] 4.60517</code></pre>
-<p>Okay, now you know these, the answer to Activity 6 was…</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="a-first-lesson-about-r.html#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">median</span>(<span class="dv">10</span>, <span class="dv">34</span>, <span class="dv">5</span>, <span class="dv">3</span>, <span class="dv">77</span>)</span></code></pre></div>
+<p>Okay, now you know these, the answer to Activity 5 was…</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="a-first-lesson-about-r.html#cb13-1" tabindex="-1"></a><span class="fu">median</span>(<span class="dv">10</span>, <span class="dv">34</span>, <span class="dv">5</span>, <span class="dv">3</span>, <span class="dv">77</span>)</span></code></pre></div>
 <pre><code>## [1] 10</code></pre>
 <p>Now let us move on to our second key topic: objects!</p>
 </div>
 </div>
-<div id="objects" class="section level3" number="1.3.2">
-<h3><span class="header-section-number">1.3.2</span> Objects</h3>
-<p>Everything that exists in <code>R</code> is an <strong>object</strong>. Think of objects as boxes where you put things in. Imagine a big, empty cardboard box. We can create this big empty box in R by simply giving it a name. Usually, you want your object/box to have a good descriptive name, which will tell people what is in it. Imagine moving house. If you have a cardboard box full of places, you might want to label it “plates.” That way, when carrying, you know to be careful, and when unpacking, you know its contents will go in the kitchen. On the other hand, if you named it “box1,” then this is a lot less helpful when it comes to unpacking.</p>
-<div id="activity-6-creating-an-object" class="section level4" number="1.3.2.1">
-<h4><span class="header-section-number">1.3.2.1</span> Activity 6: Creating an object</h4>
-<p>Let us create an object called ‘plates.’ To do this, you go to your script, and type ‘plates.’</p>
-<p><img src="img/plates.png" /></p>
-<p>But if you run this code, you will get an error. Let’s see:</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="a-first-lesson-about-r.html#cb16-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">include_graphics</span>(<span class="st">&#39;img/error_no_plates.gif&#39;</span>)</span></code></pre></div>
+<div id="objects" class="section level3 hasAnchor" number="1.3.2">
+<h3><span class="header-section-number">1.3.2</span> Objects<a href="a-first-lesson-about-r.html#objects" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Everything that exists in <code>R</code> is an <strong>object</strong>. Think of objects as boxes where you put things in. Imagine a big, empty cardboard box. We can create this big empty box in R by simply giving it a name. Usually, you want your object/box to have a good descriptive name, which will tell people what is in it. Imagine moving house. If you have a cardboard box full of places, you might want to label it “plates”. That way, when carrying, you know to be careful, and when unpacking, you know its contents will go in the kitchen. On the other hand, if you named it “box1”, then this is a lot less helpful when it comes to unpacking.</p>
+<div id="activity-6-creating-an-object" class="section level4 hasAnchor" number="1.3.2.1">
+<h4><span class="header-section-number">1.3.2.1</span> Activity 6: Creating an object<a href="a-first-lesson-about-r.html#activity-6-creating-an-object" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>Let us create an object called ‘plates’. To do this, you go to your script, and type ‘plates’.</p>
+<p><img src="img/plates.png" />
+But if you run this code, you will get an error. Let’s see:</p>
 <p><img src="img/error_no_plates.gif" width="400px" /></p>
-<p>You see the error ‘Error! Object plates not found.’ This is because you have not yet put anything inside the plates ‘box.’ Remember objects are like boxes,so there must be something inside our object ‘plates.’ In order for this object to exist, you have to put something inside it, or in <code>R</code>-speak <em>assign it some value</em>.</p>
+<p>You see the error ‘Error! Object plates not found’. This is because you have not yet put anything inside the plates ‘box’. Remember objects are like boxes,so there must be something inside our object ‘plates’. In order for this object to exist, you have to put something inside it, or in <code>R</code>-speak <em>assign it some value</em>.</p>
 <p>Therefore, we make an object by using an <em>assignment operator</em> ( <code>&lt;-</code> ). In other words, we assign something to an object (i.e., put something in the box). For example:</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="a-first-lesson-about-r.html#cb17-1" aria-hidden="true" tabindex="-1"></a>plates <span class="ot">&lt;-</span> <span class="st">&quot;yellow plate&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="a-first-lesson-about-r.html#cb15-1" tabindex="-1"></a>plates <span class="ot">&lt;-</span> <span class="st">&quot;yellow plate&quot;</span></span></code></pre></div>
 <p>Now if we run this, we will see no error message, but instead, we will see the <code>plates</code> object appear in our <em>environment pane</em>:</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="a-first-lesson-about-r.html#cb18-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">include_graphics</span>(<span class="st">&#39;img/assign_plates.gif&#39;</span>)</span></code></pre></div>
 <p><img src="img/assign_plates.gif" width="400px" /></p>
 <p>Here are some more examples to illustrate:</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="a-first-lesson-about-r.html#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Putting &#39;10&#39; in the &#39;a&#39; box</span></span>
-<span id="cb19-2"><a href="a-first-lesson-about-r.html#cb19-2" aria-hidden="true" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="dv">10</span></span>
-<span id="cb19-3"><a href="a-first-lesson-about-r.html#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-4"><a href="a-first-lesson-about-r.html#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Putting &#39;Hello!&#39; in the &#39;abc123&#39; box</span></span>
-<span id="cb19-5"><a href="a-first-lesson-about-r.html#cb19-5" aria-hidden="true" tabindex="-1"></a>abc123 <span class="ot">&lt;-</span> <span class="st">&quot;Hello!&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="a-first-lesson-about-r.html#cb16-1" tabindex="-1"></a><span class="co"># Putting &#39;10&#39; in the &#39;a&#39; box</span></span>
+<span id="cb16-2"><a href="a-first-lesson-about-r.html#cb16-2" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb16-3"><a href="a-first-lesson-about-r.html#cb16-3" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="a-first-lesson-about-r.html#cb16-4" tabindex="-1"></a><span class="co"># Putting &#39;Hello!&#39; in the &#39;abc123&#39; box</span></span>
+<span id="cb16-5"><a href="a-first-lesson-about-r.html#cb16-5" tabindex="-1"></a>abc123 <span class="ot">&lt;-</span> <span class="st">&quot;Hello!&quot;</span></span></code></pre></div>
 <p>In these examples, we are putting the value of <code>10</code> into the object <code>a</code>, and the value of ‘Hello!’ into the object <code>abc123</code>.</p>
 <p>Earlier, we introduced you to the Environment and History pane. We mentioned that it lists objects you defined. After making the ‘a’ and ‘abc123’ objects, they should appear in that very pane under the <code>Environment</code> tab.</p>
 </div>
-<div id="types-of-objects" class="section level4" number="1.3.2.2">
-<h4><span class="header-section-number">1.3.2.2</span> Types of objects</h4>
+<div id="types-of-objects" class="section level4 hasAnchor" number="1.3.2.2">
+<h4><span class="header-section-number">1.3.2.2</span> Types of objects<a href="a-first-lesson-about-r.html#types-of-objects" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>Why are objects important? We will be storing everything in our data analysis process in these objects. Depending on what is inside them, they can become a different type of object. Here are some examples:</p>
 <p><strong>Data structures</strong> are important objects that store your data, and there are five main types but we focus on three for this course:</p>
 <ol style="list-style-type: decimal">
 <li><em>(atomic) vector</em>: an ordered set of elements that are of the same <em>class</em>. Vectors are a basic data structure in <code>R</code>. Below are five different classes of vectors:</li>
 </ol>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="a-first-lesson-about-r.html#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. numeric vector with three elements</span></span>
-<span id="cb20-2"><a href="a-first-lesson-about-r.html#cb20-2" aria-hidden="true" tabindex="-1"></a>my_1st_vector <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">8.9</span>, <span class="fl">0.6</span>) </span>
-<span id="cb20-3"><a href="a-first-lesson-about-r.html#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-4"><a href="a-first-lesson-about-r.html#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. integer vector with addition of L at the end of the value</span></span>
-<span id="cb20-5"><a href="a-first-lesson-about-r.html#cb20-5" aria-hidden="true" tabindex="-1"></a>my_2nd_vector <span class="ot">&lt;-</span> <span class="fu">c</span>(1L, 2L, 3L)  </span>
-<span id="cb20-6"><a href="a-first-lesson-about-r.html#cb20-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-7"><a href="a-first-lesson-about-r.html#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. logical vector</span></span>
-<span id="cb20-8"><a href="a-first-lesson-about-r.html#cb20-8" aria-hidden="true" tabindex="-1"></a>my_3rd_vector <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="cn">TRUE</span>, <span class="cn">FALSE</span>, <span class="cn">FALSE</span>) </span>
-<span id="cb20-9"><a href="a-first-lesson-about-r.html#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="co"># &#39;my_4th_vector&#39; creates a logical vector using abbreviations of True and False, but you should use the full words instead</span></span>
-<span id="cb20-10"><a href="a-first-lesson-about-r.html#cb20-10" aria-hidden="true" tabindex="-1"></a>my_4th_vector <span class="ot">&lt;-</span> <span class="fu">c</span>(T, F) </span>
-<span id="cb20-11"><a href="a-first-lesson-about-r.html#cb20-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-12"><a href="a-first-lesson-about-r.html#cb20-12" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. character vector</span></span>
-<span id="cb20-13"><a href="a-first-lesson-about-r.html#cb20-13" aria-hidden="true" tabindex="-1"></a>my_5th_vector <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>, <span class="st">&quot;c&quot;</span>) </span>
-<span id="cb20-14"><a href="a-first-lesson-about-r.html#cb20-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-15"><a href="a-first-lesson-about-r.html#cb20-15" aria-hidden="true" tabindex="-1"></a><span class="co"># 5. complex vector (we will not use this for our class)</span></span>
-<span id="cb20-16"><a href="a-first-lesson-about-r.html#cb20-16" aria-hidden="true" tabindex="-1"></a>my_6th_vector <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">+</span>0i, <span class="dv">2</span><span class="sc">+</span>4i) </span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="a-first-lesson-about-r.html#cb17-1" tabindex="-1"></a><span class="co"># 1. numeric vector with three elements</span></span>
+<span id="cb17-2"><a href="a-first-lesson-about-r.html#cb17-2" tabindex="-1"></a>my_1st_vector <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">8.9</span>, <span class="fl">0.6</span>) </span>
+<span id="cb17-3"><a href="a-first-lesson-about-r.html#cb17-3" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="a-first-lesson-about-r.html#cb17-4" tabindex="-1"></a><span class="co"># 2. integer vector with addition of L at the end of the value</span></span>
+<span id="cb17-5"><a href="a-first-lesson-about-r.html#cb17-5" tabindex="-1"></a>my_2nd_vector <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span><span class="dt">L</span>, <span class="dv">2</span><span class="dt">L</span>, <span class="dv">3</span><span class="dt">L</span>)  </span>
+<span id="cb17-6"><a href="a-first-lesson-about-r.html#cb17-6" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="a-first-lesson-about-r.html#cb17-7" tabindex="-1"></a><span class="co"># 3. logical vector</span></span>
+<span id="cb17-8"><a href="a-first-lesson-about-r.html#cb17-8" tabindex="-1"></a>my_3rd_vector <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="cn">TRUE</span>, <span class="cn">FALSE</span>, <span class="cn">FALSE</span>) </span>
+<span id="cb17-9"><a href="a-first-lesson-about-r.html#cb17-9" tabindex="-1"></a></span>
+<span id="cb17-10"><a href="a-first-lesson-about-r.html#cb17-10" tabindex="-1"></a><span class="co"># &#39;my_4th_vector&#39; creates a logical vector using abbreviations of True and False, but you should use the full words instead</span></span>
+<span id="cb17-11"><a href="a-first-lesson-about-r.html#cb17-11" tabindex="-1"></a>my_4th_vector <span class="ot">&lt;-</span> <span class="fu">c</span>(T, F) </span>
+<span id="cb17-12"><a href="a-first-lesson-about-r.html#cb17-12" tabindex="-1"></a></span>
+<span id="cb17-13"><a href="a-first-lesson-about-r.html#cb17-13" tabindex="-1"></a><span class="co"># 4. character vector</span></span>
+<span id="cb17-14"><a href="a-first-lesson-about-r.html#cb17-14" tabindex="-1"></a>my_5th_vector <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>, <span class="st">&quot;c&quot;</span>) </span>
+<span id="cb17-15"><a href="a-first-lesson-about-r.html#cb17-15" tabindex="-1"></a></span>
+<span id="cb17-16"><a href="a-first-lesson-about-r.html#cb17-16" tabindex="-1"></a><span class="co"># 5. complex vector (we will not use this for our class)</span></span>
+<span id="cb17-17"><a href="a-first-lesson-about-r.html#cb17-17" tabindex="-1"></a>my_6th_vector <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">+</span><span class="dv">0</span><span class="dt">i</span>, <span class="dv">2</span><span class="sc">+</span><span class="dv">4</span><span class="dt">i</span>) </span></code></pre></div>
 <ol start="2" style="list-style-type: decimal">
 <li><em>lists</em>: technically they, too, are vectors but they are more complex because they are not restricted on the length, structure, or class of the included elements. For example, to create a list containing strings, numbers, vectors and a logical, use the <code>list()</code> function, and inside the brackets, put everything tat you want to combine into a list:</li>
 </ol>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="a-first-lesson-about-r.html#cb21-1" aria-hidden="true" tabindex="-1"></a>list_data <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="st">&quot;teal&quot;</span>, <span class="st">&quot;sky blue&quot;</span>, <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">5</span>, <span class="dv">10</span>), <span class="cn">TRUE</span>, <span class="fl">68.26</span>, <span class="fl">95.46</span>, <span class="fl">99.7</span>) </span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="a-first-lesson-about-r.html#cb18-1" tabindex="-1"></a>list_data <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="st">&quot;teal&quot;</span>, <span class="st">&quot;sky blue&quot;</span>, <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">5</span>, <span class="dv">10</span>), <span class="cn">TRUE</span>, <span class="fl">68.26</span>, <span class="fl">95.46</span>, <span class="fl">99.7</span>) </span></code></pre></div>
 <p>Above, we created <code>list_data</code>, an object that contains all those things that we put inside the <code>list()</code> function. This function serves to create a list from combining everything that is put inside its brackets.</p>
 <p>Use the <code>class()</code> function to confirm that the objects have been defined as a list</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="a-first-lesson-about-r.html#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(list_data)</span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="a-first-lesson-about-r.html#cb19-1" tabindex="-1"></a><span class="fu">class</span>(list_data)</span></code></pre></div>
 <pre><code>## [1] &quot;list&quot;</code></pre>
 <ol start="3" style="list-style-type: decimal">
 <li><em>data frames</em>: also stores elements but differ from lists because they are defined by their number of columns and rows; the vectors (columns) must be of the same length. Data frames can contain different classes but each column must be of the same class. For example, if you want to combine some related vectors to make a data frame on violent American cities, use the function <code>data.frame()</code>:</li>
 </ol>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="a-first-lesson-about-r.html#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Making some relevant vectors</span></span>
-<span id="cb24-2"><a href="a-first-lesson-about-r.html#cb24-2" aria-hidden="true" tabindex="-1"></a>TopVioCities <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;St. Louis&quot;</span>, <span class="st">&quot;Detroit&quot;</span>, <span class="st">&quot;Baltimore&quot;</span>) <span class="co"># some violent US cities</span></span>
-<span id="cb24-3"><a href="a-first-lesson-about-r.html#cb24-3" aria-hidden="true" tabindex="-1"></a>VioRatePer1k <span class="ot">=</span> <span class="fu">c</span>(<span class="fl">20.8</span>, <span class="fl">20.6</span>, <span class="fl">20.3</span>) <span class="co"># their violence rates per 1,000 persons</span></span>
-<span id="cb24-4"><a href="a-first-lesson-about-r.html#cb24-4" aria-hidden="true" tabindex="-1"></a>State <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Missouri&quot;</span>, <span class="st">&quot;Michigan&quot;</span>, <span class="st">&quot;Maryland&quot;</span>) <span class="co"># in what states are these cities found</span></span>
-<span id="cb24-5"><a href="a-first-lesson-about-r.html#cb24-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-6"><a href="a-first-lesson-about-r.html#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="co">#Join them to make a data frame called &#39;df&#39;</span></span>
-<span id="cb24-7"><a href="a-first-lesson-about-r.html#cb24-7" aria-hidden="true" tabindex="-1"></a>df<span class="ot">&lt;-</span><span class="fu">data.frame</span>(TopVioCities, VioRatePer1k, State)</span></code></pre></div>
-<p>We can then view the data frame, ‘df,’ with the <code>View()</code> function:</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="a-first-lesson-about-r.html#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">View</span>(df)</span></code></pre></div>
+<p><img src="img/df.png" /></p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="a-first-lesson-about-r.html#cb21-1" tabindex="-1"></a><span class="co"># Making some relevant vectors</span></span>
+<span id="cb21-2"><a href="a-first-lesson-about-r.html#cb21-2" tabindex="-1"></a>TopVioCities <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;St. Louis&quot;</span>, <span class="st">&quot;Detroit&quot;</span>, <span class="st">&quot;Baltimore&quot;</span>) <span class="co"># some violent US cities</span></span>
+<span id="cb21-3"><a href="a-first-lesson-about-r.html#cb21-3" tabindex="-1"></a>VioRatePer1k <span class="ot">=</span> <span class="fu">c</span>(<span class="fl">20.8</span>, <span class="fl">20.6</span>, <span class="fl">20.3</span>) <span class="co"># their violence rates per 1,000 persons</span></span>
+<span id="cb21-4"><a href="a-first-lesson-about-r.html#cb21-4" tabindex="-1"></a>State <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Missouri&quot;</span>, <span class="st">&quot;Michigan&quot;</span>, <span class="st">&quot;Maryland&quot;</span>) <span class="co"># in what states are these cities found</span></span>
+<span id="cb21-5"><a href="a-first-lesson-about-r.html#cb21-5" tabindex="-1"></a></span>
+<span id="cb21-6"><a href="a-first-lesson-about-r.html#cb21-6" tabindex="-1"></a><span class="co">#Join them to make a data frame called &#39;df&#39;</span></span>
+<span id="cb21-7"><a href="a-first-lesson-about-r.html#cb21-7" tabindex="-1"></a>df<span class="ot">&lt;-</span><span class="fu">data.frame</span>(TopVioCities, VioRatePer1k, State)</span></code></pre></div>
+<p>We can then view the data frame, ‘df’, with the <code>View()</code> function:</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="a-first-lesson-about-r.html#cb22-1" tabindex="-1"></a><span class="fu">View</span>(df)</span></code></pre></div>
 </div>
-<div id="activity-7-doing-things-to-objects" class="section level4" number="1.3.2.3">
-<h4><span class="header-section-number">1.3.2.3</span> Activity 7: Doing things to objects</h4>
+<div id="activity-7-doing-things-to-objects" class="section level4 hasAnchor" number="1.3.2.3">
+<h4><span class="header-section-number">1.3.2.3</span> Activity 7: Doing things to objects<a href="a-first-lesson-about-r.html#activity-7-doing-things-to-objects" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>We have learned what functions are (i.e., things that do things) and what are objects (i.e., the boxes that hold things). We also saw some functions which helped us create objects. Functions can also do things to objects. For example, we saw the function <code>class()</code> that told us about what kind of object list_data was, and <code>View()</code> which allowed us to have a look at our dataframe we called <code>df</code>.</p>
 <p>Let us look back at our <code>plates</code> object. Remember it was the object that held our kitchen items. We added ‘yellow plate’ to it. Now let us add some more items and let us use the concatenate <code>c()</code> function for this again:</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="a-first-lesson-about-r.html#cb26-1" aria-hidden="true" tabindex="-1"></a>plates <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;yellow plate&quot;</span>, <span class="st">&quot;purple plate&quot;</span>, <span class="st">&quot;silver plate&quot;</span>, <span class="st">&quot;orange bowl&quot;</span>)</span></code></pre></div>
-<p>Let us say that we suddenly forgot what was in our object called ‘plates.’ Like what we learned earlier, we use the function <code>print()</code> to see what is inside this object:</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="a-first-lesson-about-r.html#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(plates)</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="a-first-lesson-about-r.html#cb23-1" tabindex="-1"></a>plates <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;yellow plate&quot;</span>, <span class="st">&quot;purple plate&quot;</span>, <span class="st">&quot;silver plate&quot;</span>, <span class="st">&quot;orange bowl&quot;</span>)</span></code></pre></div>
+<p>Let us say that we suddenly forgot what was in our object called ‘plates’. Like what we learned earlier, we use the function <code>print()</code> to see what is inside this object:</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="a-first-lesson-about-r.html#cb24-1" tabindex="-1"></a><span class="fu">print</span>(plates)</span></code></pre></div>
 <pre><code>## [1] &quot;yellow plate&quot; &quot;purple plate&quot; &quot;silver plate&quot; &quot;orange bowl&quot;</code></pre>
-<p>This can apply to obtaining the mean, the minimum, and maximum. You could assign those statistics to an object this time:</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="a-first-lesson-about-r.html#cb29-1" aria-hidden="true" tabindex="-1"></a>nums <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">34</span>, <span class="dv">5</span>, <span class="dv">3</span>, <span class="dv">77</span>)</span></code></pre></div>
+<p>This can apply to creating <code>nums</code> object and then obtaining the mean, the minimum, and maximum.</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="a-first-lesson-about-r.html#cb26-1" tabindex="-1"></a>nums <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">34</span>, <span class="dv">5</span>, <span class="dv">3</span>, <span class="dv">77</span>)</span></code></pre></div>
 <p>Now if we want to know the mean, we can take the mean of the object <code>nums</code>, which we just created:</p>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="a-first-lesson-about-r.html#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(nums)</span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="a-first-lesson-about-r.html#cb27-1" tabindex="-1"></a><span class="fu">mean</span>(nums)</span></code></pre></div>
 <pre><code>## [1] 25.8</code></pre>
 <p>The object we will use most frequently though is data frames. These hold your data in a format whereby each column represents a variable, and each row an observation.</p>
 <p>Just earlier, we had created a dataframe called <code>df</code> previously. If you have not yet copied this over into your own <code>R Studio</code>, do this now. You should have the object <code>df</code> in your environment. When you run <code>View(df)</code>, you should see this dataset:</p>
-<p><img src="img/df_view.png" /></p>
-<p>To do something to an entire dataframe, we would use the name of the object (<code>df</code>) to refer to it. In the case of the <code>View()</code> function, we want to see the whole thing, so we will call <code>View(df)</code>. On the other hand, if we want to refer to only one variable in the data, (remember back to term 1 - each varible is held in each column) there is a special notation to do this.</p>
+<p><img src="img/df_view.png" />
+To do something to an entire dataframe, we would use the name of the object (<code>df</code>) to refer to it. In the case of the <code>View()</code> function, we want to see the whole thing, so we will call <code>View(df)</code>. On the other hand, if we want to refer to only one variable in the data, (remember back to term 1 - each varible is held in each column) there is a special notation to do this.</p>
 <p>To refer to a variable (column) inside a dataframe, you use:</p>
-<p><span class="math inline">\(dataframe name + \$ + variable name\)</span></p>
+<p><strong>dataframe name + $ + variable name/column</strong></p>
 <p>For example, to refer to the variable <code>VioRatePer1k</code>, we use the notation <code>df$VioRatePer1k</code>.</p>
-<p>And if we wanted to View only that column, we use:</p>
-<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="a-first-lesson-about-r.html#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">View</span>(df<span class="sc">$</span>VioRatePer1k)</span></code></pre></div>
-<p>You should see:</p>
-<p><img src="img/view_col_only.png" /></p>
 <p>Say we wanted to know the mean violence rate across our units of analysis, the cities, for example, we would take the numeric column to calculate this:</p>
-<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="a-first-lesson-about-r.html#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(df<span class="sc">$</span>VioRatePer1k)</span></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="a-first-lesson-about-r.html#cb29-1" tabindex="-1"></a><span class="fu">mean</span>(df<span class="sc">$</span>VioRatePer1k)</span></code></pre></div>
 <pre><code>## [1] 20.56667</code></pre>
+<p>You can also use the following syntax to select specific columns in a dataframe:</p>
+<ul>
+<li>select columns by name: df[c(‘TopVioCities’, ‘VioRatePer1k’, ‘State’)]</li>
+<li>select columns by index: df[c(1, 2, 3)]</li>
+</ul>
+<p>If we wanted to View only <code>VioRatePer1k</code> column, we use:</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="a-first-lesson-about-r.html#cb31-1" tabindex="-1"></a><span class="fu">View</span>(df[<span class="fu">c</span>(<span class="dv">2</span>)]) <span class="co">#If you want to view only one variable, you can remove concatenate, View(df[2])</span></span></code></pre></div>
+<p>You should see:
+<img src="img/view_col_only.png" /></p>
 </div>
 </div>
 </div>
-<div id="packages" class="section level2" number="1.4">
-<h2><span class="header-section-number">1.4</span> Packages</h2>
-<p><strong>Packages</strong> are a very important element of <code>R</code>.</p>
-<p>Packages are elements that add the functionality of R. What most packages do is they introduce new functions that allow you to ask R to do new different things. Anybody can write a package, so consequently R packages vary on quality and complexity. You can find packages in different places, as well, from official repositories (which means they have passed a minimum of quality control), something called Git Hub (a webpage where software developers post work in progress), to personal webpages (danger danger!).</p>
+<div id="packages" class="section level2 hasAnchor" number="1.4">
+<h2><span class="header-section-number">1.4</span> Packages<a href="a-first-lesson-about-r.html#packages" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p><strong>Packages</strong> are a very important element of <code>R</code>.
+Packages are elements that add the functionality of R. What most packages do is they introduce new functions that allow you to ask R to do new different things. Anybody can write a package, so consequently R packages vary on quality and complexity. You can find packages in different places, as well, from official repositories (which means they have passed a minimum of quality control), something called Git Hub (a webpage where software developers post work in progress), to personal webpages (danger danger!).</p>
 <p>Throughout the course, and hopefully afterwards, you will find yourself installing numerous open source software packages that allow <code>R</code> to do new and different things. There are loads of packages out there. In early 2020, there were over 150,000 packages available. Anyone can write one, so you will need to be careful on which ones you use as the quality can vary. Official repositories, like <a href="https://cran.r-project.org/">CRAN</a>, are your best bet for packages as they will have passed some quality controls.</p>
 <p>You can see what packages are available in your local install by looking at the <em>packages</em> tab in the <em>File directory, Plots, Packages</em> pane.</p>
-<p><img src="img/packages.png" style="width:35.0%" /></p>
-<p>A number of the packages we will use belong to a set of packages called <strong>tidyverse</strong>. These packages help make your data tidy. According to Statistician and Chief Scientist at <code>RStudio</code>, Hadley Wickham, transforming your data into <em>tidy data</em> is one of the most important steps of the data analysis process. It will ensure your data are in the format you need to conduct your analyses. We will also be using the simple features package <strong>sf</strong> and many more associated with spatial data analysis.</p>
+<p><img src="img/packages.png" style="width:35.0%" />
+A number of the packages we will use belong to a set of packages called <strong>tidyverse</strong>. These packages help make your data tidy. According to Statistician and Chief Scientist at <code>RStudio</code>, Hadley Wickham, transforming your data into <em>tidy data</em> is one of the most important steps of the data analysis process. It will ensure your data are in the format you need to conduct your analyses. We will also be using the simple features package <strong>sf</strong> and many more associated with spatial data analysis.</p>
 <p>Packages can be installed using the <code>install.packages()</code> function. Remember that while you only need to install packages once, they need to be loaded with the <code>library()</code>function each time you open up <code>RStudio</code>. Let us install the package <code>dplyr</code> from <code>tidyverse</code> and load it:</p>
-<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="a-first-lesson-about-r.html#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="a-first-lesson-about-r.html#cb32-1" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code></pre></div>
 <pre><code>## 
 ## Attaching package: &#39;dplyr&#39;</code></pre>
 <pre><code>## The following objects are masked from &#39;package:stats&#39;:
@@ -688,26 +717,26 @@ As indicated above, the window in the bottom left corner is the main <strong>con
 <p>Click in the name <em>dplyr</em>. You will see that R Studio has now brought you to the Help tab. Here is where you find the help files for this package, including all the available documentation.</p>
 <p>Every beginner in R will find these help files a bit confusing. But after a while, their format and structure will begin to make sense to you. Click where it says <em>User guides, package vignettes, and other documentation</em>. Documentation in R has become much better since people started to write <strong>vignettes</strong> for their packages. They are little tutorials that explain with examples what each package does. Click in the <em>cowsay::cowsay_tutorial</em> that you see listed here (the html link). What you will find there is an html file that gives you a detailed tutorial on this package. You don’t need to read it now, but remember that this is one way to find help when using R. You will learn to love vignettes.</p>
 </div>
-<div id="exploring-data" class="section level2" number="1.5">
-<h2><span class="header-section-number">1.5</span> Exploring data</h2>
+<div id="exploring-data" class="section level2 hasAnchor" number="1.5">
+<h2><span class="header-section-number">1.5</span> Exploring data<a href="a-first-lesson-about-r.html#exploring-data" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Now that we know the basic component, let’s play around with using R as we will throughout the course, for some data analysis.</p>
 <p>We will get some data by installing a package which has data in it as well as functions, and then go on to produce some basic summaries. This should give some practice!</p>
-<div id="activity-8-playing-around-with-data" class="section level3" number="1.5.1">
-<h3><span class="header-section-number">1.5.1</span> Activity 8: Playing around with data</h3>
+<div id="activity-8-playing-around-with-data" class="section level3 hasAnchor" number="1.5.1">
+<h3><span class="header-section-number">1.5.1</span> Activity 8: Playing around with data<a href="a-first-lesson-about-r.html#activity-8-playing-around-with-data" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>We are going to look at some data that are part of the <em>fivethirtyeight</em> package. This package contains data sets and code behind the stories in <a href="http://fivethirtyeight.com/">this particular online newspaper</a>. This package is not part of the base installation of R, so you will need to install it first. I won’t give you the code for it. See if you can figure it out by looking at previous examples. Discuss in small groups what you think the code will be.</p>
 <p>Done? Ok, now we are going to look at the data sets that are included in this package. Remember first we have to load the package if we want to use it:</p>
-<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="a-first-lesson-about-r.html#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;fivethirtyeight&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="a-first-lesson-about-r.html#cb36-1" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;fivethirtyeight&quot;</span>)</span></code></pre></div>
 <pre><code>## Some larger datasets need to be installed separately, like senators and
 ## house_district_forecast. To install these, we recommend you install the
 ## fivethirtyeightdata package by running:
 ## install.packages(&#39;fivethirtyeightdata&#39;, repos =
 ## &#39;https://fivethirtyeightdata.github.io/drat/&#39;, type = &#39;source&#39;)</code></pre>
-<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="a-first-lesson-about-r.html#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="at">package=</span><span class="st">&quot;fivethirtyeight&quot;</span>) <span class="co">#This function will return all the data frames that are available in the named package.</span></span></code></pre></div>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="a-first-lesson-about-r.html#cb38-1" tabindex="-1"></a><span class="fu">data</span>(<span class="at">package=</span><span class="st">&quot;fivethirtyeight&quot;</span>) <span class="co">#This function will return all the data frames that are available in the named package.</span></span></code></pre></div>
 <p>Notice that this package has some data sets that relate to stories covered in this newspaper that had a criminological angle. Let’s look for example at the <code>hate_crimes</code> data set. How do you that? First we have to load the data frame into our global environment. To do so use the following code:</p>
-<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="a-first-lesson-about-r.html#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;hate_crimes&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="a-first-lesson-about-r.html#cb39-1" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;hate_crimes&quot;</span>)</span></code></pre></div>
 <p>This function will search among all the <em>loaded</em> packages and locate the <code>hate_crimes</code> data set. Notice that it now appears in the global environment, although it also says “promise” next to it. To see the data in full you need to do something to it first. So let’s do that.</p>
 <p>Every object in R can have <strong>attributes</strong>. These are: names; dimensions (for matrices and arrays: number of rows and columns) and dimensions names; class of object (numeric, character, etc.); length (for a vector this will be the number of elements in the vector); and other user-defined. You can access the attributes of an object using the <code>attributes()</code> function. Let’s query R for the attributes of this data frame.</p>
-<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="a-first-lesson-about-r.html#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">attributes</span>(hate_crimes)</span></code></pre></div>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="a-first-lesson-about-r.html#cb40-1" tabindex="-1"></a><span class="fu">attributes</span>(hate_crimes)</span></code></pre></div>
 <pre><code>## $row.names
 ##  [1]  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25
 ## [26] 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50
@@ -729,15 +758,15 @@ As indicated above, the window in the bottom left corner is the main <strong>con
 <p>Ok, let’s now have a quick look at the data. There are so many different ways of producing summary stats for data stored in R that is impossible to cover them all! We will just introduce a few functions that you may find useful for summarising data. Before we do any of that it is important you get a sense for what is available in this data set. Go to the help tab and in the search box input the name of the data frame, this will take you to the documentation for this data frame. Here you can see a list of the available variables.</p>
 <p><img src="img/codebook.png" /></p>
 <p>Let’s start with the <em>mean</em>. This function takes as an argument the numeric variable for which you want to obtain the mean. You have done this above, so it should be familiar now! If you want to obtain the mean of the variable that gives us the proportion of people that voted for Donald Trump you can use the following expression:</p>
-<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="a-first-lesson-about-r.html#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(hate_crimes<span class="sc">$</span>share_vote_trump)</span></code></pre></div>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="a-first-lesson-about-r.html#cb42-1" tabindex="-1"></a><span class="fu">mean</span>(hate_crimes<span class="sc">$</span>share_vote_trump)</span></code></pre></div>
 <pre><code>## [1] 0.49</code></pre>
 <p>Another function you may want to use with numeric variables is <code>summary()</code>:</p>
-<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="a-first-lesson-about-r.html#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(hate_crimes<span class="sc">$</span>share_vote_trump)</span></code></pre></div>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="a-first-lesson-about-r.html#cb44-1" tabindex="-1"></a><span class="fu">summary</span>(hate_crimes<span class="sc">$</span>share_vote_trump)</span></code></pre></div>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ##   0.040   0.415   0.490   0.490   0.575   0.700</code></pre>
 <p>This gives you the five number summary (minimum, first quartile, median, third quartile, and maximum, plus the mean and the count of missing values if there are any).</p>
 <p>You don’t have to specify a variable you can ask for these summaries from the whole data frame:</p>
-<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="a-first-lesson-about-r.html#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(hate_crimes)</span></code></pre></div>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="a-first-lesson-about-r.html#cb46-1" tabindex="-1"></a><span class="fu">summary</span>(hate_crimes)</span></code></pre></div>
 <pre><code>##     state           state_abbrev       median_house_inc share_unemp_seas 
 ##  Length:51          Length:51          Min.   :35521    Min.   :0.02800  
 ##  Class :character   Class :character   1st Qu.:48657    1st Qu.:0.04200  
@@ -773,37 +802,39 @@ As indicated above, the window in the bottom left corner is the main <strong>con
 <p>There are multiple ways of getting results in R. Particularly for basic and intermediate-level statistical analysis many core functions and packages can give you the answer that you are looking for. For example, there are a variety of packages that allow you to look at summary statistics using functions defined within those packages. You will need to install these packages before you can use them.</p>
 <p>I am only going to introduce one of them here <code>skimr</code>. You will need to install it before anything else.</p>
 <p>Once you have loaded the <em>skimr</em> package you can use it. Its main function is <em>skim</em>. Like <em>summary</em> for data frames, skim presents results for all the columns and the statistics will depend on the class of the variable.</p>
-<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="a-first-lesson-about-r.html#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">skim</span>(hate_crimes)</span></code></pre></div>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="a-first-lesson-about-r.html#cb48-1" tabindex="-1"></a><span class="fu">skim</span>(hate_crimes)</span></code></pre></div>
 <p>Hopefully in your statistical modules you had taken previously, you have learned some things about how to graphically display variables. So you may have some memory about the amount of work involved with this. Hopefully R will offer some respite. Of course, there are many different ways of producing graphics in R. In this course we rely on a package called <em>ggplot2</em>, which is part of the tidyverse set of packages mentioned earlier.</p>
-<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="a-first-lesson-about-r.html#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span></code></pre></div>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="a-first-lesson-about-r.html#cb49-1" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span></code></pre></div>
 <p>Then we will use one of its functions to create a scatterplot.</p>
-<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="a-first-lesson-about-r.html#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(hate_crimes, <span class="fu">aes</span>(<span class="at">x=</span>share_vote_trump, <span class="at">y=</span>avg_hatecrimes_per_100k_fbi)) <span class="sc">+</span></span>
-<span id="cb53-2"><a href="a-first-lesson-about-r.html#cb53-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">shape=</span><span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb53-3"><a href="a-first-lesson-about-r.html#cb53-3" aria-hidden="true" tabindex="-1"></a>     <span class="fu">geom_smooth</span>(<span class="at">method=</span>lm)</span></code></pre></div>
-<pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
-<pre><code>## Warning: Removed 1 rows containing non-finite values (stat_smooth).</code></pre>
-<pre><code>## Warning: Removed 1 rows containing missing values (geom_point).</code></pre>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="a-first-lesson-about-r.html#cb50-1" tabindex="-1"></a><span class="fu">ggplot</span>(hate_crimes, <span class="fu">aes</span>(<span class="at">x=</span>share_vote_trump, <span class="at">y=</span>avg_hatecrimes_per_100k_fbi)) <span class="sc">+</span></span>
+<span id="cb50-2"><a href="a-first-lesson-about-r.html#cb50-2" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">shape=</span><span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb50-3"><a href="a-first-lesson-about-r.html#cb50-3" tabindex="-1"></a>     <span class="fu">geom_smooth</span>(<span class="at">method=</span>lm)</span></code></pre></div>
+<pre><code>## `geom_smooth()` using formula = &#39;y ~ x&#39;</code></pre>
+<pre><code>## Warning: Removed 1 row containing non-finite outside the scale range
+## (`stat_smooth()`).</code></pre>
+<pre><code>## Warning: Removed 1 row containing missing values or values outside the scale
+## range (`geom_point()`).</code></pre>
 <p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>
 <p>What do you think this graphic is telling you? Discuss with the person next to you.</p>
 <p>Graphing is very powerful in R, and much of the spatial visualisation we will produce throughout the module will build on this. If you are not already familiar with this, I recommend a read of the data visualisation chapter of R for Data Science <a href="https://r4ds.had.co.nz/data-visualisation.html">https://r4ds.had.co.nz/data-visualisation.html</a></p>
 </div>
 </div>
-<div id="getting-organised-r-projects" class="section level2" number="1.6">
-<h2><span class="header-section-number">1.6</span> Getting organised: R Projects</h2>
+<div id="getting-organised-r-projects" class="section level2 hasAnchor" number="1.6">
+<h2><span class="header-section-number">1.6</span> Getting organised: R Projects<a href="a-first-lesson-about-r.html#getting-organised-r-projects" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>One thing that can help you tremendously throughout this module is keeping your code organised.R Studio helps with this by virtue of something called <strong>R Projects</strong>.</p>
 <p>Technically, a R Studio project is just a directory with the name of the project, and a few files and folders created by R Studio for internal purposes. This is where you should hold your scripts, your data, and reports. You can manage this folder with your own operating system manager (discussed earlier, e.g., Windows) or through the R Studio file manager (that you access in the bottom right corner set of windows in R Studio).</p>
 <p>When a project is reopened, R Studio opens every file and data view that was open when the project was closed last time around. Trust me, this is a really helpful thing! If you create a project for this module, you can keep everything in once place, and refer back to your old code and your learnings throughout the module.</p>
-<div id="activity-9-saving-your-work-and-projects" class="section level4" number="1.6.0.1">
-<h4><span class="header-section-number">1.6.0.1</span> Activity 9: Saving your work and projects</h4>
-<p>First things first, hopefully you have already created a separate folder on your desktop, or dropbox, or something like this. Now save the script you’ve been working on into this folder. By clicking on “File” and “Save as….”</p>
-<p><img src="img/save_script_as.png" /></p>
-<p>Then navigate to your folder for this module, and for your script make sure to give it some meaningful name like week1lab.R or something like this. Then click ‘save.’</p>
-<p><img src="img/rename_and_save.png" /></p>
-<p>Now, go back to “File” and select “New project…”</p>
+<div id="activity-9-saving-your-work-and-projects" class="section level4 hasAnchor" number="1.6.0.1">
+<h4><span class="header-section-number">1.6.0.1</span> Activity 9: Saving your work and projects<a href="a-first-lesson-about-r.html#activity-9-saving-your-work-and-projects" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>First things first, hopefully you have already created a separate folder on your desktop, or dropbox, or something like this. Now save the script you’ve been working on into this folder. By clicking on “File” and “Save as…”.</p>
+<p><img src="img/save_script_as.png" />
+Then navigate to your folder for this module, and for your script make sure to give it some meaningful name like week1lab.R or something like this. Then click ‘save’.</p>
+<p><img src="img/rename_and_save.png" />
+Now, go back to “File” and select “New project…”</p>
 <p><img src="img/file_newproj.png" /></p>
-<p>Then in the options that appear choose “Existing Directory.” This is because you already have a folder for this work, this is where you saved your script just before. For me this was my folder called ‘crime_mapping’ you saw above.</p>
+<p>Then in the options that appear choose “Existing Directory”. This is because you already have a folder for this work, this is where you saved your script just before. For me this was my folder called ‘crime_mapping’ you saw above.</p>
 <p><img src="img/existing_dir.png" /></p>
-<p>So select ‘Existing Directory,’ and on the next page use the “Browse” button to select this folder (the directory) where you saved the script earlier. Once you have done this, click on ‘Create Project’ on the bottom.</p>
+<p>So select ‘Existing Directory’, and on the next page use the “Browse” button to select this folder (the directory) where you saved the script earlier. Once you have done this, click on ‘Create Project’ on the bottom.</p>
 <p>This will now open up a new R Studio window with your project. In the future, you can start right back up where you finished last time by navigating to the .Rproj file, and double clicking it. It helps you keep everything in one place, and lets R read everything from that folder.</p>
 <p>With simple projects a single script file and a data file is all you may have. But with more complex projects, things can rapidly become messy. So you may want to create subdirectories within this project folder. I typically use the following structure in my own work to put all files of a certain type in the same subdirectory:</p>
 <ul>
@@ -830,7 +861,6 @@ As indicated above, the window in the bottom left corner is the main <strong>con
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
-<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
 <script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
@@ -870,6 +900,10 @@ gitbook.start({
 "text": null
 },
 "download": ["crime_mapping_textbook.pdf", "crime_mapping_textbook.epub"],
+"search": {
+"engine": "fuse",
+"options": null
+},
 "toc": {
 "collapse": "subsection"
 }
@@ -883,7 +917,7 @@ gitbook.start({
     var script = document.createElement("script");
     script.type = "text/javascript";
     var src = "true";
-    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
     if (location.protocol !== "file:")
       if (/^https?:/.test(src))
         src = src.replace(/^https?:/, '');

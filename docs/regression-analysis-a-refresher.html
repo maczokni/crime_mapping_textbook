@@ -508,11 +508,11 @@ div.csl-indent {
 <div class="sourceCode" id="cb384"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb384-1"><a href="regression-analysis-a-refresher.html#cb384-1" tabindex="-1"></a><span class="fu">ggplot</span>(ncovr, <span class="fu">aes</span>(<span class="at">x =</span> HR90)) <span class="sc">+</span> </span>
 <span id="cb384-2"><a href="regression-analysis-a-refresher.html#cb384-2" tabindex="-1"></a>  <span class="fu">geom_histogram</span>()</span></code></pre></div>
 <pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-233-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-232-1.png" width="672" /></p>
 <p>We can also look at other variables in our data set. You may wish to use the <code>skim()</code> function from the <code>skimr</code> package maybe, which we introduced all the way back in the first lab!. Once one has gone through the process of exploring the data in this way for all the variables you want to work with, you can start exploring bivariate associations with your dependent variable (also called response or outcome variable). In this case, our outcome variable is homicide rate in the 90s, which we explored in the histogram above (<code>HR90</code>). As an illustration, you could explore the association with resource deprivation (<em>RD90</em>), a measure of the level of concentrated disadvantage or social exclusion in an area, via a scatterplot:</p>
 <div class="sourceCode" id="cb386"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb386-1"><a href="regression-analysis-a-refresher.html#cb386-1" tabindex="-1"></a><span class="fu">ggplot</span>(ncovr, <span class="fu">aes</span>(<span class="at">x =</span> RD90, <span class="at">y =</span> HR90)) <span class="sc">+</span></span>
 <span id="cb386-2"><a href="regression-analysis-a-refresher.html#cb386-2" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha=</span>.<span class="dv">2</span>) </span></code></pre></div>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-234-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-233-1.png" width="672" /></p>
 <p>What do you think when looking at this scatterplot? Is there a relationship between the variables? Does it look as if individuals that have a high score on the X axis also have a high score on the Y axis? Or viceversa?</p>
 </div>
 </div>
@@ -526,7 +526,7 @@ div.csl-indent {
 <span id="cb387-3"><a href="regression-analysis-a-refresher.html#cb387-3" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="fu">median</span>(ncovr<span class="sc">$</span>HR90), <span class="at">linetype =</span> <span class="st">&quot;dashed&quot;</span>, <span class="at">linewidth =</span> <span class="dv">1</span>, <span class="at">color=</span><span class="st">&quot;red&quot;</span>) <span class="sc">+</span> <span class="co"># median = 4.377</span></span>
 <span id="cb387-4"><a href="regression-analysis-a-refresher.html#cb387-4" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="fu">mean</span>(ncovr<span class="sc">$</span>HR90), <span class="at">linetype =</span> <span class="st">&quot;dashed&quot;</span>, <span class="at">linewidth =</span> <span class="dv">1</span>, <span class="at">color=</span><span class="st">&quot;blue&quot;</span>) <span class="sc">+</span> <span class="co"># mean = 6.183</span></span>
 <span id="cb387-5"><a href="regression-analysis-a-refresher.html#cb387-5" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">&quot;Density estimate, mean and median of homicide rate 1990&quot;</span>)</span></code></pre></div>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-235-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-234-1.png" width="672" /></p>
 <div class="sourceCode" id="cb388"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb388-1"><a href="regression-analysis-a-refresher.html#cb388-1" tabindex="-1"></a><span class="fu">summary</span>(ncovr<span class="sc">$</span>HR90)</span></code></pre></div>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ##   0.000   1.334   4.377   6.183   8.938  71.378</code></pre>
@@ -539,17 +539,17 @@ div.csl-indent {
 ## This warning is displayed once every 8 hours.
 ## Call `lifecycle::last_lifecycle_warnings()` to see where this
 ## warning was generated.</code></pre>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-237-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-236-1.png" width="672" /></p>
 <p>Linear regression tackles this problem using a slightly different approach. Rather than focusing on the conditional mean (smoothed or not), it draws a straight line that tries to capture the trend in the data. If we focus in the region of the scatterplot that are less sparse we see that this is an upward trend, suggesting that as resource deprivation increases so does the homicide rate.</p>
 <p>Simple linear regression draws a single straight line of predicted values as the model for the data. This line would be a <strong>model</strong>, a <em>simplification</em> of the real world like any other model (e.g., a toy pistol, an architectural drawing, a subway map), that assumes that there is approximately a linear relationship between X and Y. Let’s draw the regression line:</p>
 <div class="sourceCode" id="cb391"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb391-1"><a href="regression-analysis-a-refresher.html#cb391-1" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> ncovr, <span class="fu">aes</span>(<span class="at">x =</span> RD90, <span class="at">y =</span> HR90)) <span class="sc">+</span></span>
 <span id="cb391-2"><a href="regression-analysis-a-refresher.html#cb391-2" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> .<span class="dv">2</span>) <span class="sc">+</span></span>
 <span id="cb391-3"><a href="regression-analysis-a-refresher.html#cb391-3" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">color =</span> <span class="st">&quot;red&quot;</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="co">#This ask for a geom with the regression line, method=lm asks for the linear regression line, se=FALSE ask for just the line to be printed but not the standard error, the other arguments specify the color and thickness of the line</span></span></code></pre></div>
 <pre><code>## `geom_smooth()` using formula = &#39;y ~ x&#39;</code></pre>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-238-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-237-1.png" width="672" /></p>
 <p>What that line is doing is giving you guesses (predictions) for the values of homicide based in the information that we have about the level of resource deprivation. It gives you one possible guess for the value of homicide for every possible value of resource deprivation and links them all together in a straight line.</p>
 <p>The linear model then is a model that takes the form of the equation of a straight line through the data. The line does not go through all the points. In fact, you can see that it is a slightly less accurate representation of the (smoothed) conditional means:</p>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-239-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-238-1.png" width="672" /></p>
 <p>Our regression line underpredicts at low levels of resource deprivation and does not seem to capture well the variability at higher levels of resource deprivation. But imperfect as a model as it might be it simplifies well the overall growing trend for homicide as resource deprivation increases.</p>
 <p>As De Veaux et al (2012: 179) highlight: “like all models of the real world, the line will be wrong, wrong in the sense that it can’t match reality exactly. But it can help us understand how the variables are associated”. A map is never a perfect representation of the world, the same happens with statistical models. Yet, as with maps, models can be helpful.</p>
 </div>
@@ -689,7 +689,7 @@ div.csl-indent {
 <div class="sourceCode" id="cb414"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb414-1"><a href="regression-analysis-a-refresher.html#cb414-1" tabindex="-1"></a><span class="co">#We use the as.factor function to tell R that SOUTH is a categorical variable</span></span>
 <span id="cb414-2"><a href="regression-analysis-a-refresher.html#cb414-2" tabindex="-1"></a>fit_2 <span class="ot">&lt;-</span> <span class="fu">lm</span>(HR90 <span class="sc">~</span> <span class="fu">as.factor</span>(SOUTH), <span class="at">data=</span>ncovr)</span></code></pre></div>
 <p>Notice that there is nothing different in how we ask for the model. And see below the regression line:</p>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-250-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-249-1.png" width="672" /></p>
 <p>Although in the plot we still see a line, what we are really estimating here is the average of HR90 for each of the two categories.
 Let’s have a look at the results:</p>
 <div class="sourceCode" id="cb415"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb415-1"><a href="regression-analysis-a-refresher.html#cb415-1" tabindex="-1"></a><span class="fu">summary</span>(fit_2)</span></code></pre></div>
@@ -784,7 +784,7 @@ Let’s have a look at the results:</p>
 <p>Let’s try with a more complex example:</p>
 <div class="sourceCode" id="cb424"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb424-1"><a href="regression-analysis-a-refresher.html#cb424-1" tabindex="-1"></a>fit_4 <span class="ot">&lt;-</span> <span class="fu">lm</span>(HR90 <span class="sc">~</span> RD90 <span class="sc">+</span> SOUTH_f <span class="sc">+</span> DV90 <span class="sc">+</span> MA90 <span class="sc">+</span> PS90, <span class="at">data=</span>ncovr)</span>
 <span id="cb424-2"><a href="regression-analysis-a-refresher.html#cb424-2" tabindex="-1"></a><span class="fu">plot_model</span>(fit_4, <span class="at">breakLabelsAt =</span> <span class="dv">30</span>)</span></code></pre></div>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-255-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-254-1.png" width="672" /></p>
 <p>What you see plotted here is the point estimates (the circles), the confidence intervals around those estimates (the longer the line the less precise the estimate), and the colours represent whether the effect is negative (red) or positive (blue). There are other packages that also provide similar functionality, like the <code>dotwhisker</code> package that you may want to explore, see more details <a href="https://cran.r-project.org/web/packages/dotwhisker/vignettes/dotwhisker-vignette.html">here</a>.</p>
 <p>The <code>sjPlot</code> package also allows you to produce html tables for more professional presentation of your regression tables. For this we use the <code>tab_model()</code> function. This kind of tabulation may be particularly helpful for your final assignment.</p>
 <div class="sourceCode" id="cb425"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb425-1"><a href="regression-analysis-a-refresher.html#cb425-1" tabindex="-1"></a><span class="fu">tab_model</span>(fit_4)</span></code></pre></div>
@@ -1167,7 +1167,7 @@ R<sup>2</sup> / R<sup>2</sup> adjusted
 <p>Visual display of the effects of the variables in the model are particularly helpful. The <code>effects</code> package allows us to produce plots to visualise these relationships (when adjusting for the other variables in the model). Here’s an example going back to our model fit_3 which contained <em>SOUTH</em> and <em>RD90</em> predictor variables:</p>
 <div class="sourceCode" id="cb428"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb428-1"><a href="regression-analysis-a-refresher.html#cb428-1" tabindex="-1"></a><span class="fu">library</span>(effects)</span>
 <span id="cb428-2"><a href="regression-analysis-a-refresher.html#cb428-2" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">allEffects</span>(fit_3), <span class="at">ask=</span><span class="cn">FALSE</span>)</span></code></pre></div>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-259-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-258-1.png" width="672" /></p>
 <p>Notice that the line has a confidence interval drawn around it and that the predicted means for southern and northern counties (when controlling for <em>RD90</em>) also have a confidence interval.</p>
 </div>
 </div>
@@ -1248,7 +1248,7 @@ R<sup>2</sup> / R<sup>2</sup> adjusted
 <p>You see here that essentially you have only two inputs (resource deprivation and south) but several regression coefficients. Gelman and Hill (2007) suggest reserving the term input for the variables encoding the information and to use the term predictor to refer to each of the terms in the model. So here we have two inputs and three predictors (one for SOUTH, another for resource deprivation, and a final one for the interaction effect).</p>
 <p>In this case the test for the interaction effect is significant, which suggests there is such an interaction. Let’s visualise the results with the <code>effects</code> package:</p>
 <div class="sourceCode" id="cb435"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb435-1"><a href="regression-analysis-a-refresher.html#cb435-1" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">allEffects</span>(fit_5), <span class="at">ask=</span><span class="cn">FALSE</span>)</span></code></pre></div>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-263-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-262-1.png" width="672" /></p>
 <p>Notice that essentially what we are doing is running two regression lines and testing whether the slope is different for the two groups. The intercept is different, we know that Southern counties are more violent, but what we are testing here is whether the level of homicide goes up in a steeper fashion (and in the same direction) for one or the other group as the level of resource deprivation goes up. We see that’s the case here. The estimated lines are almost parallel, but the slope is a bit more steep in the Southern counties. In southern counties, resource deprivation seems to have more of an impact on homicide than in northern counties.</p>
 <p>A word of warning, the moment you introduce an interaction effect the meaning of the coefficients for the other predictors changes (what is often referred as to the “main effects” as opposed to the interaction effect). You cannot retain the interpretation we introduced earlier. Now, for example, the coefficient for the <code>SOUTH</code> variable relates the marginal effect of this variable when <code>RD90</code> equals zero. The typical table of results helps you to understand whether the effects are significant but offers little of interest that will help you to meaningfully interpret what the effects are. For this, it’s better that you use some of the graphical displays we have covered.</p>
 <p>Essentially what happens is that the regression coefficients that get printed are interpretable only for certain groups. So now:</p>
@@ -1294,7 +1294,7 @@ R<sup>2</sup> / R<sup>2</sup> adjusted
 <p>In r, we can use the <code>plot()</code> function on our output lm object to look through some diagnostics. This gives us 4 plots, so to show them all, we’ll use the code <code>par(mfrow = c(2, 2))</code> to split our plot window into 4 panes (remember to set back, run <code>par(mfrow = c(1, 1))</code>). For example, let’s return to <code>fit_1</code>, our very first model.</p>
 <div class="sourceCode" id="cb436"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb436-1"><a href="regression-analysis-a-refresher.html#cb436-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">2</span>))</span>
 <span id="cb436-2"><a href="regression-analysis-a-refresher.html#cb436-2" tabindex="-1"></a><span class="fu">plot</span>(fit_1)</span></code></pre></div>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-264-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-263-1.png" width="672" /></p>
 <p>The 4 plots we get are</p>
 <ul>
 <li><strong>Residuals vs Fitted</strong>. Used to check the linear relationship assumptions. A horizontal line, without distinct patterns is an indication for a linear relationship, what is good.</li>

@@ -732,15 +732,15 @@ This will be important later on when we are linking data from different projecti
 <div class="sourceCode" id="cb81"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb81-1"><a href="making-maps-in-r.html#cb81-1" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span></code></pre></div>
 <p>Data:</p>
 <div class="sourceCode" id="cb82"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb82-1"><a href="making-maps-in-r.html#cb82-1" tabindex="-1"></a><span class="fu">ggplot</span>(crimes, <span class="fu">aes</span>(<span class="at">x =</span> crime_type))</span></code></pre></div>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-36-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-35-1.png" width="672" /></p>
 <p>Geometry:</p>
 <div class="sourceCode" id="cb83"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb83-1"><a href="making-maps-in-r.html#cb83-1" tabindex="-1"></a><span class="fu">ggplot</span>(crimes, <span class="fu">aes</span>(<span class="at">x =</span> crime_type)) <span class="sc">+</span> </span>
 <span id="cb83-2"><a href="making-maps-in-r.html#cb83-2" tabindex="-1"></a>  <span class="fu">geom_bar</span>()</span></code></pre></div>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-37-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-36-1.png" width="672" /></p>
 <p>Aesthetics:</p>
 <div class="sourceCode" id="cb84"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb84-1"><a href="making-maps-in-r.html#cb84-1" tabindex="-1"></a><span class="fu">ggplot</span>(crimes, <span class="fu">aes</span>(<span class="at">x =</span> crime_type, <span class="at">fill =</span> last_outcome_category)) <span class="sc">+</span> </span>
 <span id="cb84-2"><a href="making-maps-in-r.html#cb84-2" tabindex="-1"></a>  <span class="fu">geom_bar</span>()</span></code></pre></div>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-38-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-37-1.png" width="672" /></p>
 <p>And then you could add any facets (for example if we had more than one month of data) or any statistics (for example error bars) with facet and stats layers. One more thing I do want to show is tidying up your chart, you can add theme and clean up your labels and titles and colour scheme.</p>
 <div class="sourceCode" id="cb85"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb85-1"><a href="making-maps-in-r.html#cb85-1" tabindex="-1"></a><span class="fu">ggplot</span>(crimes, <span class="fu">aes</span>(<span class="at">x =</span> crime_type, <span class="at">fill =</span> last_outcome_category)) <span class="sc">+</span> </span>
 <span id="cb85-2"><a href="making-maps-in-r.html#cb85-2" tabindex="-1"></a>  <span class="fu">geom_bar</span>() <span class="sc">+</span> </span>
@@ -749,7 +749,7 @@ This will be important later on when we are linking data from different projecti
 <span id="cb85-5"><a href="making-maps-in-r.html#cb85-5" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">&quot;Crime Type&quot;</span>) <span class="sc">+</span> </span>
 <span id="cb85-6"><a href="making-maps-in-r.html#cb85-6" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">&quot;Number of cases&quot;</span>) <span class="sc">+</span> </span>
 <span id="cb85-7"><a href="making-maps-in-r.html#cb85-7" tabindex="-1"></a>  <span class="fu">scale_fill_brewer</span>(<span class="at">type =</span> <span class="st">&quot;qual&quot;</span>, <span class="at">palette =</span> <span class="dv">3</span>, <span class="at">name =</span> <span class="st">&quot;Outcome&quot;</span>)</span></code></pre></div>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-39-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-38-1.png" width="672" /></p>
 <p>This is not the greatest graph you’ll ever see, but it illustrates the process. Do read up on ggplot2 for example in Hadley Wickham’s book R4DS <a href="https://r4ds.had.co.nz/data-visualisation.html">chapter on data visualisation</a>.</p>
 <p>So how can we use this for spatial data? We can use the <code>geom_sf()</code> function to do so.</p>
 </div>
@@ -758,7 +758,7 @@ This will be important later on when we are linking data from different projecti
 <p>Using geom_sf is slightly different to other geometries, for example how we used <code>geom_bar()</code> above. First we initiate the plot with the <code>ggplot()</code> function but don’t include the data in there. Instead, it is in the geometry where we add the data. And second we don’t need to specify the mapping of x and y. Since this is in the geometry column of our spatial object. Like so:</p>
 <div class="sourceCode" id="cb86"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb86-1"><a href="making-maps-in-r.html#cb86-1" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span> </span>
 <span id="cb86-2"><a href="making-maps-in-r.html#cb86-2" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> crimes_sf)</span></code></pre></div>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-40-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-39-1.png" width="672" /></p>
 <p>And here we have a map of each point in our data set, each recorded crime in June 2019 in Greater Manchester.</p>
 <p>Would you call this a map though? While it is presenting spatial data, there is not a lot of meaning being communicated. Point maps generally can be messy and their uses are specific to certain situations and cases, usually when you have fewer points, but here, these points are especially devoid of any meaning, as they are floating in a graph grid. SO let’s give it a basemap.</p>
 <p>We can do this by adding a layer to our graph object. Specifically we will use the <code>annotation_map_tile()</code> from the <code>ggspatial</code> package. This provides us with a static Open Street Map layer behind our data, giving it (some) more context.</p>
@@ -769,7 +769,7 @@ This will be important later on when we are linking data from different projecti
 <span id="cb88-2"><a href="making-maps-in-r.html#cb88-2" tabindex="-1"></a> <span class="fu">annotation_map_tile</span>() <span class="sc">+</span></span>
 <span id="cb88-3"><a href="making-maps-in-r.html#cb88-3" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> crimes_sf)</span></code></pre></div>
 <pre><code>## Zoom: 9</code></pre>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-42-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-41-1.png" width="672" /></p>
 <p>So what you see above is what we can call a <strong>basemap</strong>. The term basemap is seen often in GIS and refers to a collection of GIS data and/or orthorectified imagery that form the background setting for a map. The function of the basemap is to provide background detail necessary to orient the location of the map. Basemaps also add to the aesthetic appeal of a map.</p>
 <p>In the lecture and some readings these are described as <em>reference maps</em>. We often may want to use these reference maps as <strong>basemaps</strong> for our thematic and point maps. They may give us context and help with the interpretation. You can see above that you are seeing the <em>Open Street Map</em> Basemap. This is one option but there are others.</p>
 <p>Anyway let’s leave out points for now, and move on to how we might map our lines and polygons.</p>
@@ -866,7 +866,7 @@ Contains OS data © Crown copyright [and database right] (year)”</p>
 <p>And of course, since it’s spatial data, you can map it using the geom_sf() function, as we did with our points:</p>
 <div class="sourceCode" id="cb96"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb96-1"><a href="making-maps-in-r.html#cb96-1" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span> </span>
 <span id="cb96-2"><a href="making-maps-in-r.html#cb96-2" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> manchester_lsoa)</span></code></pre></div>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-48-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-47-1.png" width="672" /></p>
 <p>Great, we now have an outline of the LSOAs in Manchester. Notice how the shape is different to that of the points in our crime data. Why do you think this is? Discuss your thoughts with your neighbour. Or one of the teaching team. Don’t be shy!</p>
 </div>
 <div id="activity-8-data-wrangling-with-dplyr" class="section level4 hasAnchor" number="2.4.2.3">
@@ -930,18 +930,18 @@ Contains OS data © Crown copyright [and database right] (year)”</p>
 <p>Remember our original empty map:</p>
 <div class="sourceCode" id="cb104"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb104-1"><a href="making-maps-in-r.html#cb104-1" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span> </span>
 <span id="cb104-2"><a href="making-maps-in-r.html#cb104-2" tabindex="-1"></a><span class="fu">geom_sf</span>(<span class="at">data =</span> manchester_lsoa)</span></code></pre></div>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-55-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-54-1.png" width="672" /></p>
 <p>Well now, since we have the column (variable) for number of crimes here, we can use that to share the polygons based on how many crimes there are in each LSOA. We can do this by specifying the <code>fill=</code> parameter of the <code>geom_sf</code> function.</p>
 <div class="sourceCode" id="cb105"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb105-1"><a href="making-maps-in-r.html#cb105-1" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span> </span>
 <span id="cb105-2"><a href="making-maps-in-r.html#cb105-2" tabindex="-1"></a><span class="fu">geom_sf</span>(<span class="at">data =</span> manchester_lsoa, <span class="fu">aes</span>(<span class="at">fill =</span> count))</span></code></pre></div>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-56-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-55-1.png" width="672" /></p>
 <p>We can add a basemap, and adjust the colour scheme, and even the opacity to see under our shape files.</p>
 <div class="sourceCode" id="cb106"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb106-1"><a href="making-maps-in-r.html#cb106-1" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span> </span>
 <span id="cb106-2"><a href="making-maps-in-r.html#cb106-2" tabindex="-1"></a>  <span class="fu">annotation_map_tile</span>() <span class="sc">+</span>  <span class="co"># add basemap</span></span>
 <span id="cb106-3"><a href="making-maps-in-r.html#cb106-3" tabindex="-1"></a><span class="fu">geom_sf</span>(<span class="at">data =</span> manchester_lsoa, <span class="fu">aes</span>(<span class="at">fill =</span> count), <span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span> <span class="co"># alpha sets the opacity</span></span>
 <span id="cb106-4"><a href="making-maps-in-r.html#cb106-4" tabindex="-1"></a>  <span class="fu">scale_fill_gradient2</span>(<span class="at">name =</span><span class="st">&quot;Number of crimes&quot;</span>) <span class="co">#use scale_fill_gradient2() for a different palette and name the variable on the legend</span></span></code></pre></div>
 <pre><code>## Zoom: 10</code></pre>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-57-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-56-1.png" width="672" /></p>
 <!-- And we can even add some interactivity! -->
 <!-- ```{r} -->
 <!-- tmap_mode("view") -->

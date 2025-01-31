@@ -485,7 +485,7 @@ div.csl-indent {
 <span id="cb449-3"><a href="spatial-regression-models.html#cb449-3" tabindex="-1"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.1</span>) <span class="sc">+</span></span>
 <span id="cb449-4"><a href="spatial-regression-models.html#cb449-4" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">&quot;Homicide Rate across US Counties, 1990&quot;</span>, <span class="at">main.title.size =</span> <span class="fl">0.7</span> ,</span>
 <span id="cb449-5"><a href="spatial-regression-models.html#cb449-5" tabindex="-1"></a>            <span class="at">legend.position =</span> <span class="fu">c</span>(<span class="st">&quot;right&quot;</span>, <span class="st">&quot;bottom&quot;</span>), <span class="at">legend.title.size =</span> <span class="fl">0.8</span>)</span></code></pre></div>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-269-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-268-1.png" width="672" /></p>
 <p>Do you think there is spatial patterning for homicide?</p>
 </div>
 <div id="looking-at-the-residuals-and-testing-for-spatial-autocorrelation-in-regression" class="section level2 hasAnchor" number="9.2">
@@ -520,7 +520,7 @@ div.csl-indent {
 <span id="cb455-6"><a href="spatial-regression-models.html#cb455-6" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">&quot;Residuals&quot;</span>, <span class="at">main.title.size =</span> <span class="fl">0.7</span> ,</span>
 <span id="cb455-7"><a href="spatial-regression-models.html#cb455-7" tabindex="-1"></a>            <span class="at">legend.position =</span> <span class="fu">c</span>(<span class="st">&quot;right&quot;</span>, <span class="st">&quot;bottom&quot;</span>), <span class="at">legend.title.size =</span> <span class="fl">0.8</span>)</span></code></pre></div>
 <pre><code>## Variable(s) &quot;sd_breaks&quot; contains positive and negative values, so midpoint is set to 0. Set midpoint = NA to show the full spectrum of the color palette.</code></pre>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-274-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-273-1.png" width="672" /></p>
 <p>Notice the spatial patterning of areas of over-prediction (negative residuals, or blue tones) and under-prediction (positive residuals, or brown tones). This visual inspection of the residuals is telling you that spatial autocorrelation may be present here. This, however, would require a more formal test.</p>
 </div>
 <div id="activity-2-spatial-autocorrelation-again" class="section level3 hasAnchor" number="9.2.2">
@@ -583,7 +583,7 @@ div.csl-indent {
 <p>Look at the residual map we produced earlier. Do you think that the residuals look different in the South and in the North? If the pattern is not clear to you, you may want to run other forms of visualisation.</p>
 <div class="sourceCode" id="cb462"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb462-1"><a href="spatial-regression-models.html#cb462-1" tabindex="-1"></a><span class="fu">ggplot</span>(ncovr_sf, <span class="fu">aes</span>(<span class="at">x =</span> res_fit1, <span class="at">colour =</span> <span class="fu">as.factor</span>(SOUTH))) <span class="sc">+</span> </span>
 <span id="cb462-2"><a href="spatial-regression-models.html#cb462-2" tabindex="-1"></a>  <span class="fu">geom_density</span>() </span></code></pre></div>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-278-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-277-1.png" width="672" /></p>
 <p>What do you see in this plot? And, critically, what does it mean? What is this telling you about the predicted values that result from our model? (Remember what a residual is: the difference between the observed values and the predicted values).</p>
 <p>There are formal tests that one can use to further explore these issues. The paper by Bollen et al. (2001) mentions them (Chow tests). But those are beyond the scope of this course. Sufficient to say that, as Bollen et al. (2001), we are going to split our analysis and run them separately for the Southern and the Northern states. We have covered the <code>filter()</code> function from <code>dplyr</code> to split datasets based on values of a variable. But to split <code>sf</code> objects it is better to rely on the more generic subset function, since <code>filter()</code> doesn’t accommodate well the column with the geographic information that <code>sf</code> provides.</p>
 <div class="sourceCode" id="cb463"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb463-1"><a href="spatial-regression-models.html#cb463-1" tabindex="-1"></a>ncovr_s_sf <span class="ot">&lt;-</span> <span class="fu">subset</span>(ncovr_sf, SOUTH <span class="sc">==</span> <span class="dv">1</span>)</span>
@@ -960,7 +960,7 @@ div.csl-indent {
 <span id="cb495-2"><a href="spatial-regression-models.html#cb495-2" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="st">&quot;n&quot;</span>) <span class="sc">+</span></span>
 <span id="cb495-3"><a href="spatial-regression-models.html#cb495-3" tabindex="-1"></a>  <span class="fu">tm_borders</span>() <span class="sc">+</span></span>
 <span id="cb495-4"><a href="spatial-regression-models.html#cb495-4" tabindex="-1"></a>  <span class="fu">tm_facets</span>(<span class="st">&quot;month&quot;</span>, <span class="at">free.coords=</span><span class="cn">FALSE</span>)</span></code></pre></div>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-298-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-297-1.png" width="672" /></p>
 <p>We can now see how ASB varies across the months, and start to think about how this might change over seasons for example with seasonal patterns in routine activities!</p>
 <p><em>PS: you can also use the <code>facet_wrap()</code> and <code>facet_grid()</code> functions in <code>ggplot2</code> package if you prefer - remember there are always many ways to solve the same problem in R!</em></p>
 <p>Pretty cool though, eh? Well just wait until the next section…!</p>

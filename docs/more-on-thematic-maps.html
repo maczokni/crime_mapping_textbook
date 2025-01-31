@@ -585,8 +585,8 @@ As a default, R will install all the dependencies for a package when we install 
 <span id="cb244-16"><a href="more-on-thematic-maps.html#cb244-16" tabindex="-1"></a>            <span class="at">legend.title.size =</span> <span class="fl">0.8</span>, <span class="at">legend.text.size =</span> <span class="fl">0.5</span>)</span>
 <span id="cb244-17"><a href="more-on-thematic-maps.html#cb244-17" tabindex="-1"></a></span>
 <span id="cb244-18"><a href="more-on-thematic-maps.html#cb244-18" tabindex="-1"></a><span class="fu">tmap_arrange</span>(map1, map2) </span></code></pre></div>
-<div class="figure"><span style="display:block;" id="fig:unnamed-chunk-153"></span>
-<img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-153-1.png" alt="Two shaded maps of counties in the United States. Both maps use five shades of red, getting darker to represent higher values, the first one corresponding to 'Raw rate', the second to 'Local Smooth', according to their legends. The first map is more blotchy than the second, with some lighter counties amidst darker red ones, and vice versa. The second map has much clearer contiguous blocks sharing the same colour. In both maps, the southeast has the most concentration of dark red, with some patches in the south and southwest." width="672" />
+<div class="figure"><span style="display:block;" id="fig:unnamed-chunk-152"></span>
+<img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-152-1.png" alt="Two shaded maps of counties in the United States. Both maps use five shades of red, getting darker to represent higher values, the first one corresponding to 'Raw rate', the second to 'Local Smooth', according to their legends. The first map is more blotchy than the second, with some lighter counties amidst darker red ones, and vice versa. The second map has much clearer contiguous blocks sharing the same colour. In both maps, the southeast has the most concentration of dark red, with some patches in the south and southwest." width="672" />
 <p class="caption">
 Figure 5.1: Compare raw and smoothed rates across counties in the USA
 </p>
@@ -598,8 +598,8 @@ Figure 5.1: Compare raw and smoothed rates across counties in the USA
 <span id="cb245-4"><a href="more-on-thematic-maps.html#cb245-4" tabindex="-1"></a>        <span class="at">names =</span> <span class="fu">c</span>(<span class="st">&quot;Raw rate&quot;</span>, </span>
 <span id="cb245-5"><a href="more-on-thematic-maps.html#cb245-5" tabindex="-1"></a>                  <span class="st">&quot;Local base smoother&quot;</span>),</span>
 <span id="cb245-6"><a href="more-on-thematic-maps.html#cb245-6" tabindex="-1"></a>        <span class="at">ylab =</span> <span class="st">&quot;Rates&quot;</span>)</span></code></pre></div>
-<div class="figure"><span style="display:block;" id="fig:unnamed-chunk-154"></span>
-<img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-154-1.png" alt="A box plot titled 'Different rates of homicide per hundred thousand people'. The vertical axis is labeled 'Rates', ranging from zero to nearly one hundred. Two datasets are depicted, 'Raw rate', and 'Local base smoother'. The first, 'Raw rate', has many more outliers above the maximum, which is marked around nineteen. The outliers are numerous until fourty, sparse until sixty, and one reaches nearly one hundred. On the other hand, 'Local base smoother' has much fewer outliers, and they are all close to the maximum, perhaps five units above at most." width="384" />
+<div class="figure"><span style="display:block;" id="fig:unnamed-chunk-153"></span>
+<img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-153-1.png" alt="A box plot titled 'Different rates of homicide per hundred thousand people'. The vertical axis is labeled 'Rates', ranging from zero to nearly one hundred. Two datasets are depicted, 'Raw rate', and 'Local base smoother'. The first, 'Raw rate', has many more outliers above the maximum, which is marked around nineteen. The outliers are numerous until fourty, sparse until sixty, and one reaches nearly one hundred. On the other hand, 'Local base smoother' has much fewer outliers, and they are all close to the maximum, perhaps five units above at most." width="384" />
 <p class="caption">
 Figure 5.2: Boxplots to compare variation in rates
 </p>
@@ -674,7 +674,7 @@ Figure 5.2: Boxplots to compare variation in rates
 <div class="sourceCode" id="cb250"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb250-1"><a href="more-on-thematic-maps.html#cb250-1" tabindex="-1"></a><span class="fu">ggplot</span>(sf_mcr_asb, <span class="fu">aes</span>(lng, lat)) <span class="sc">+</span>                        <span class="co">#define data and variables for x and y axes</span></span>
 <span id="cb250-2"><a href="more-on-thematic-maps.html#cb250-2" tabindex="-1"></a>  <span class="fu">stat_binhex</span>() <span class="sc">+</span>                                                         <span class="co">#add binhex layer (hexbin)</span></span>
 <span id="cb250-3"><a href="more-on-thematic-maps.html#cb250-3" tabindex="-1"></a>  <span class="fu">scale_fill_gradientn</span>(<span class="at">colours =</span> <span class="fu">c</span>(<span class="st">&quot;white&quot;</span>,<span class="st">&quot;red&quot;</span>), <span class="at">name =</span> <span class="st">&quot;Frequency&quot;</span>)    <span class="co">#add shading based on number of ASB incidents</span></span></code></pre></div>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-159-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-158-1.png" width="672" /></p>
 <p>Neat, but doesn’t quite tell us <em>where</em> that really dark hexbon actually is. So it would be much better if we could do this with a basemap as the background, rather than our grey ggplot theme.</p>
 <p>Now, we can apply the same code as we used above, for the ggplot, to this ggmap, to add our hexbins on top of this basemap:</p>
 <div class="sourceCode" id="cb251"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb251-1"><a href="more-on-thematic-maps.html#cb251-1" tabindex="-1"></a><span class="fu">ggplot</span>(sf_mcr_asb, <span class="fu">aes</span>(<span class="at">x =</span> lng, <span class="at">y =</span> lat)) <span class="sc">+</span></span>
@@ -682,7 +682,7 @@ Figure 5.2: Boxplots to compare variation in rates
 <span id="cb251-3"><a href="more-on-thematic-maps.html#cb251-3" tabindex="-1"></a>  <span class="fu">stat_binhex</span>(<span class="at">alpha=</span><span class="fl">0.7</span>) <span class="sc">+</span>                                                <span class="co">#add binhex layer (hexbin)</span></span>
 <span id="cb251-4"><a href="more-on-thematic-maps.html#cb251-4" tabindex="-1"></a>  <span class="fu">scale_fill_gradientn</span>(<span class="at">colours =</span> <span class="fu">c</span>(<span class="st">&quot;white&quot;</span>,<span class="st">&quot;red&quot;</span>), <span class="at">name =</span> <span class="st">&quot;Frequency&quot;</span>)    <span class="co">#add shading based on number of ASB incidents</span></span></code></pre></div>
 <pre><code>## Zoom: 10</code></pre>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-160-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-159-1.png" width="672" /></p>
 <p>Now this should give you some more context! Woo!</p>
 <p>So I mentioned we’d go over some reasons why you should consider aggregating into a hexagon grid rather than other shape:</p>
 <ul>
@@ -708,7 +708,7 @@ Figure 5.2: Boxplots to compare variation in rates
 <span id="cb253-4"><a href="more-on-thematic-maps.html#cb253-4" tabindex="-1"></a>  <span class="fu">scale_fill_gradientn</span>(<span class="at">colours =</span> <span class="fu">c</span>(<span class="st">&quot;white&quot;</span>,<span class="st">&quot;red&quot;</span>), </span>
 <span id="cb253-5"><a href="more-on-thematic-maps.html#cb253-5" tabindex="-1"></a>                       <span class="at">name =</span> <span class="st">&quot;Frequency&quot;</span>) </span></code></pre></div>
 <pre><code>## Zoom: 10</code></pre>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-161-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-160-1.png" width="672" /></p>
 <ol start="2" style="list-style-type: lower-alpha">
 <li>hexagonal binning:</li>
 </ol>
@@ -718,7 +718,7 @@ Figure 5.2: Boxplots to compare variation in rates
 <span id="cb255-4"><a href="more-on-thematic-maps.html#cb255-4" tabindex="-1"></a>  <span class="fu">scale_fill_gradientn</span>(<span class="at">colours =</span> <span class="fu">c</span>(<span class="st">&quot;white&quot;</span>,<span class="st">&quot;red&quot;</span>), </span>
 <span id="cb255-5"><a href="more-on-thematic-maps.html#cb255-5" tabindex="-1"></a>                       <span class="at">name =</span> <span class="st">&quot;Frequency&quot;</span>)</span></code></pre></div>
 <pre><code>## Zoom: 10</code></pre>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-162-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-161-1.png" width="672" /></p>
 <ol start="3" style="list-style-type: lower-alpha">
 <li>a simple “heatmap” (we will discuss these more thoroughly next week):</li>
 </ol>
@@ -736,7 +736,7 @@ Figure 5.2: Boxplots to compare variation in rates
 ## Call `lifecycle::last_lifecycle_warnings()` to see where this
 ## warning was generated.</code></pre>
 <pre><code>## Zoom: 11</code></pre>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-163-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-162-1.png" width="672" /></p>
 <p>Look at the difference between the three maps (hex, rectangle, and density). How would your conclusions change if you were given these maps? Would you make different decisions about where to place your booths for the days of action? Why or why not? Discuss.</p>
 </div>
 <div id="multivariate-binning" class="section level3 hasAnchor" number="5.3.5">
@@ -846,7 +846,7 @@ aggregation.</li>
 <p>Now we can have a look at these data:</p>
 <div class="sourceCode" id="cb265"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb265-1"><a href="more-on-thematic-maps.html#cb265-1" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
 <span id="cb265-2"><a href="more-on-thematic-maps.html#cb265-2" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> eu_sf, <span class="fu">aes</span>(<span class="at">fill =</span> Pct_Leave)) </span></code></pre></div>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-167-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-166-1.png" width="672" /></p>
 <p>We can see that in smaller LAs we don’t even really see the result, as the boundary lines pretty much cover everything. Hmm. Now what we can do is transform the shapes.</p>
 <div id="activity-9-cartograms" class="section level3 hasAnchor" number="5.5.1">
 <h3><span class="header-section-number">5.5.1</span> Activity 9: Cartograms<a href="more-on-thematic-maps.html#activity-9-cartograms" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -868,7 +868,7 @@ aggregation.</li>
 <div class="sourceCode" id="cb269"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb269-1"><a href="more-on-thematic-maps.html#cb269-1" tabindex="-1"></a><span class="co"># plot the percentage voting leave onto our cartogram</span></span>
 <span id="cb269-2"><a href="more-on-thematic-maps.html#cb269-2" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
 <span id="cb269-3"><a href="more-on-thematic-maps.html#cb269-3" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> eu_cartogram, <span class="fu">aes</span>(<span class="at">fill =</span> Pct_Leave)) </span></code></pre></div>
-<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-171-1.png" width="672" /></p>
+<p><img src="crime_mapping_textbook_files/figure-html/unnamed-chunk-170-1.png" width="672" /></p>
 <p>We can now see London much better, and see that darker coloured cluster where much smaller percentage of people voted leave.</p>
 <p>Okay that’s probably enough for the day. Nice work crime mappers!</p>
 </div>

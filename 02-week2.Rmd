@@ -398,6 +398,19 @@ And then use the `annotation_map_tile()` function, making sure to place it befor
 ggplot() + 
  annotation_map_tile() +
   geom_sf(data = crimes_sf)
+
+```
+
+
+***NOTE:*** if you get an error, read it first. If it says something like you are missing a package (e.g. 'prettymapr') then install that package!
+
+If that doesn't solve the problem, try the following code instead:
+
+```{r, eval = FALSE}
+
+ggplot() +
+  ggspatial::annotation_map_tile(cachedir = system.file("rosm.cache", package = "ggspatial")) +
+   geom_sf(data = crimes_sf)
 ```
 
 So what you see above is what we can call a **basemap**. The term basemap is seen often in GIS and refers to a collection of GIS data and/or orthorectified imagery that form the background setting for a map. The function of the basemap is to provide background detail necessary to orient the location of the map. Basemaps also add to the aesthetic appeal of a map. 

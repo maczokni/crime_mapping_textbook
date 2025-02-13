@@ -45,7 +45,7 @@ tm_shape(ncovr_sf) +
     fill.scale = tm_scale_intervals(style = "quantile", values = "brewer.reds"),
     fill.legend = tm_legend(title = "Homicide Rate (Quantiles)")
   ) +
-  tm_borders(fill_alpha = 0.1) +
+  tm_borders(col_alpha = 0.1) +
   tm_title("Homicide Rate across US Counties, 1990", size = 0.7) +
   tm_legend(position = c("right", "bottom"), title.size = 0.8)
 ```
@@ -106,7 +106,7 @@ tm_shape(ncovr_sf) +
     fill.scale = tm_scale_intervals(style = "fixed", breaks = my_breaks, values = "brewer.RdBu"),
     fill.legend = tm_legend(title = "Residuals")
   ) +
-  tm_borders(fill_alpha = 0.1) +
+  tm_borders(col_alpha = 0.1) +
   tm_title("Residuals", size = 0.7) +
   tm_legend(position = c("right", "bottom"), title.size = 0.8)
 

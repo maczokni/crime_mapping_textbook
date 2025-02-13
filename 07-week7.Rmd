@@ -105,7 +105,7 @@ burglaries_per_lsoa <- rename(burglaries_per_lsoa, burglary = n)
 tm_shape(burglaries_per_lsoa) + 
   tm_fill("burglary", 
           fill.scale = tm_scale_intervals(style = "quantile", values = "brewer.reds")) +
-  tm_borders(alpha = 0.1) +
+  tm_borders(col_alpha = 0.1) +
   tm_title("Burglary counts", size = 0.7) + 
   tm_legend(position = c("right", "bottom"), title.size = 0.8)
 
@@ -364,7 +364,7 @@ tm_shape(burglaries_per_lsoa) +
     "burglary",
     fill.scale = tm_scale_intervals(style = "quantile", values = "brewer.reds")
   ) +
-  tm_borders(fill_alpha = 0.1) +
+  tm_borders(col_alpha = 0.1) +
   tm_title("Burglary counts", size = 0.7) +
   tm_legend(position = c("right", "bottom"), title.size = 0.8)
 

@@ -118,7 +118,7 @@ As you can see here, the look is a bit cleaner. We don't need to get rid of the 
 ```{r}
 tm_shape(manchester_crime_lsoa) + 
   tm_fill("count") +
-  tm_borders(fill_alpha = 0.1)
+  tm_borders(col_alpha = 0.1)
 ```
 
 The alpha parameter that we are inserting within `tm_borders()` controls the transparency of the borders, we can go from 0 (totally transparent) to 1 (not transparent). You can play around with this value and see the results.
@@ -130,7 +130,7 @@ Notice as well that the legend in this map is (a) not very informative and (b) l
 ```{r}
 tm_shape(manchester_crime_lsoa) + 
   tm_fill("count") +
-  tm_borders(fill_alpha = 0.1) +
+  tm_borders(col_alpha = 0.1) +
   tm_title(text = "Crime in Manchester City, June/2019", size = 0.7 ) +
   tm_legend(title = "Crime counts", position = c("right", "bottom"), title.size = 0.8)
 ```
@@ -149,7 +149,7 @@ See how the map changes.
 
 tm_shape(manchester_crime_lsoa) + 
   tm_fill("count") +
-  tm_borders(fill_alpha = 0.1) +
+  tm_borders(col_alpha = 0.1) +
   tm_title(text = "Crime in Manchester City, June/2019", size = 0.7 ) +
   tm_legend(title = "Crime counts", position = c("right", "bottom"), title.size = 0.8)
 

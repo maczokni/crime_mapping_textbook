@@ -34,6 +34,7 @@ library(janitor)
 library(hexbin)
 library(ggspatial)
 library(geogrid)
+library(geodaData)
 ```
 
 Some of the above are new packages we will use for the first time this week. Remember, if you don't already have these you will need to install them. 
@@ -78,298 +79,168 @@ library(pacman)
 p_load(cartogram, DCluster, dplyr, geogrid, ggplot2,  ggspatial, hexbin, janitor, sf, sp, spdep, tmap, readxl, readr)
 ```
 
-### Activity 1: Getting some messy data
+## Smoothing rates: adjusting for small sample noise
 
-So far, we've really been spoilt by using neat and easy-to-access data typical of 'western' countries. This week we will have a little exercise in using data when there may not be such clear ways to access neat and tidy data. Specifically, we're going to look at some data from India! We'll be using two datasets:
+In week 3 we discussed how to map rates. It seems a fairly straightforward issue: you calculate a rate by dividing your numerator (e.g., number of crimes) by an appropriately selected denominator (e.g., daytime population). You get your variable with the relevant rate and you map it using a choropleth map. However, things are not always that simple. 
 
-* A shapefile of India (including boundaries of 'states' and 'districts')
-* District-level data on households and crop yields
+Rates are funny animals. @Gelman_1999 go so far as to suggest that all maps of rates are misleading. The problem at hand is well known in spatial epidemiology: "plotting observed rates can have serious drawbacks when sample sizes vary by area, since very high (and low) observed rates are found disproportionately in poorly-sampled areas" [@Gelman_1999, p. 3221]. There is associated noise for those areas where the denominators give us a small sample size. And it is hard to solve this problem.
 
-First of all, a number of the big universities in the US have repositories (online collections) of GIS data (like shapefiles). There are a few of them that have India shapefiles ([Harvard](https://gis2.harvard.edu/resources/data/india-gis-data), [Stanford](https://geodata.mit.edu/?f%5Bdc_format_s%5D%5B%5D=Shapefile&f%5Bdct_provenance_s%5D%5B%5D=Stanford&per_page=50&q=india)) but you need to request access to them for research purposes. If you're doing your own research and need the shapefile of a country, it's worth looking on these repositories for it. You can then email them to request access and usually they'll give access no problem if you're using it for research. But for now, I've already requested access and downloaded the India shapefiles, but please note that these shapefiles are for the purposes of this workshop only. Here's the link to download the [shapefiles](https://www.dropbox.com/scl/fo/5y9ru2a5ycr097w7uivl9/h?dl=0&rlkey=o440r4caf38orvfufjf4wtp6b)
+Let's illustrate with an example. We are going to use historic data on homicide across US counties. The dataset was used as the basis for the study by @Baller_2001. It contains data on homicide counts and rates for various decades across the US, as well as information on structural factors often thought to be associated with violence. The data is freely available through the webpage of Geoda, a clever point-and-click interface developed by Luc Anselin (a spatial econometrician and coauthor of the above paper) and his team, to make spatial analysis accessible. It is also available as one of the datasets in the `geodaData` package.
 
-TIP: Use this button to select all files at once, then just hit 'Download'!
-![](img/select_all.png)
-
-*(if you are struggling with this, the files are in a .zip file on Blackboard as well)*
-
-You'll notice that there are different shapefiles there, download them all for now. We will use them to demonstrate a good example of the problems you encounter when researching countries with less infrastructure. The UK has these 'LSOA's we covered previously, which are areas that don't change over time. In India, districts (like counties) are merged and split quite frequently and entire states (collections of districts) can merge and split too! So each shapefile we've downloaded will have different boundaries and different names for districts - so which one do we use?!
-
-#### Activity 2: Getting some crop data (attributes)
-
-You may be in a situation like the one described above, and you might want to consider for yourself - how can you decide what is the best shapefile to use? Well the answer will really depend on your data set! What is it that you want to represent, and what is the best matched shapefile for the job?
-
-One way of deciding is to match each shapefile up with our data (like we did for crime in Manchester before) and checking which shapefile has the most matching district and state names with the dataset. So we'll start by downloading the dataset.
-
-There's an amazing dataset called VDSA (Village Dynamics in South Asia) which covers much of India, containing both agricultural and socio-economic information. Unfortunately, the website interface isn't great and downloading the data requires you to make a free account and download individual files for each state, which is a massive faff. So instead, I've already downloaded the crop production data for just one state, **Bihar**, and you can download it [here](https://www.dropbox.com/s/jr9w7ejdqrft59p/Bihar.xlsx?dl=1) (this too is also on BlackBoard)
-
-Great, now let's read that data into R and have a look!
-
-Just like we read '.csv' files with read.csv, we can read '.xlsx' (Excel) files with the `read_xlsx()` function from the `readxl` package:
+To read data available in a library we have loaded, we can use the `data()` function. If we check the `class()` of this object, we will see it was already stored in `geodaData` as a `sf` object.
 
 ```{r}
-#option 1: import data
-yield_data <- read_xlsx('data/Bihar.xlsx')
-glimpse(yield_data)
+
+data("ncovr")
+class(ncovr)
 ```
 
-```{r, eval=FALSE}
-#option 2: import data
-#Alternatively, you can download Bihar.xlsx from where we saved the data
-#Important! note that I store it in on my Data folder You HAVE TO change that if needed.
-download.file("https://www.dropbox.com/s/dddf1tjqg0l51gp/Bihar.zip?dl=1" , 
-              destfile="/data/Bihar.zip")
-#Important! note that I extract file to the data folder. you HATE TO change exdir (the directory to extract files to)
-unzip("/data/Bihar.zip", exdir = "/data/")
-yield_data <- read_xlsx("data/Bihar.xlsx")
-```
-
-After looking at the yield data, you can see it's quite massive! Each column represents the production in weight ('_TQ' columns) and the area farmed ('_TA' columns) for each crop, per district, per year. That's too much information for us! We just want rice production and area, so we'll use the 'select' function to just pick the columns we want: names of states and districts, the year, and the rice information.
+Let's look at the "ncvor" data. We can start by looking at the homicide rate for 1960.
 
 ```{r}
-yield_data <- clean_names(yield_data)
-yield_data <- yield_data %>%
-  dplyr::select(stname, distname, year, rice_ta, rice_tq)
+summary(ncovr$HR60)
 ```
 
-### Activity 3: Comparing shapefiles
-
-Now we've read in our rice yield data, we can test which shapefile will work best with the district names in our yield data. For this, we'll use a basic 'for' loop which will test each shapefile (1951/61/71/81/91/2001) individually. This will show us which shapefile has the most matching district names (across India) with the yield data. Don't worry about loops in R, they're something you can learn if you're interested but otherwise you can copy + paste the code below - so long as you understand what it's doing overall. Chris' advanced R will cover loops this week. N.B. You may need to change 'shapefile_location <- ' to tell R where you have saved your shapefiles!
+We can see that the county with the highest homicide rate in the 1960s had a rate of `r max(ncovr$HR60)` homicides per 100,000 individuals. That is very high. Just to put it into context in the UK the homicide rate is about 0.92 per 100,000 individuals. Where is that place? I can tell you it is a place called Borden. Check it out:
 
 ```{r}
-# Make a list of years between 1951 and 2001 at intervals every 10 years and store them as
-# characters instead of numbers (so we can use them as names of files in the loop)
-shapefile_years <- lapply(seq(1951, 2001, 10), as.character)
+borden <- filter(ncovr, NAME == "Borden")
+borden$HR60
 
-# Get a list of district names in the yield data to compare to each shapefile
-yield_dist_names <- make_clean_names(unique(yield_data$distname))
-
-# Prepare an output variable
-district_match_results <- tibble(shapefile_year = character(),
-                                 district_match_percent = numeric())
-
-# Loop through each item in the 'shapefile_years' list and call each item 'each_year'
-for (each_year in shapefile_years){
-  
-  # Change this if you need to, give the path to the directory with your shapefiles in
-  shapefile_location <- 'data/IndiaBoundaryData/'
-  
-  # Read in each shapefile
-  each_shapefile <- st_read(paste0(shapefile_location, each_year, '.shp'))
-  
-  # Get lists of each shapefile's district names
-  shpfile_dist_names <- make_clean_names(unique(each_shapefile$NAME))
-  
-  # Get the percentage of matching district names between yield data and each shpfile
-  dist_match <- round(length(dplyr::intersect(yield_dist_names, shpfile_dist_names))/length(yield_dist_names)*100, 0)
-  
-  # Store results in output variable
-  district_match_results <- bind_rows(district_match_results, tibble(shapefile_year = each_year, 
-                                                                     district_match_percent = dist_match))
-  
-}
 ```
 
-And now to check the output to see which shapefile has the highest proportion of district name matches:
+[Borden county](https://en.wikipedia.org/wiki/Borden_County,_Texas) is in Texas. You may be thinking “Texas Chainsaw Massacre” perhaps? No, not really. Ed Gein, who inspired the film, was based and operated in Wisconsin. Borden's claim to fame is rather more prosaic: it was named after Gail Borden, the inventor of condensed milk. So, what’s going on here? Why do we have a homicide rate in Borden that makes it look like a war zone? Is it that it is only one of the six counties where alcohol is banned in Texas?
+
+To get to the bottom of this, we can look at the variable `HC60` which tells us about the homicide *count* in Borden: 
 
 ```{r}
-print(district_match_results)
-
-# And plot it with ggplot
-ggplot(district_match_results) +
-  geom_bar(aes(x = shapefile_year, y = district_match_percent), stat = 'identity')
+borden$HC60
 ```
 
-So, before continuing you should look at the table and graph you've just made and decide which shapefile we should use now. Which one will be the best for representing your attribute table? 
-
-### Activity 4: Joining datasets
-
-One last thing before we can continue mapping - joining our yield and shapefile datasets together! Some name cleaning is required first, to make sure they match up. Hopefully you found before that the 1971 shapefile has the highest percentage of district name matches with our yield data - so we'll read that one in now:
+What? A total homicide count of 1. How can a county with just one homicide have a rate that makes it look like the most dangerous place in the US? To answer this, let's look at the population of Borden county in the 1960s, contained in the `PO60` variable. 
 
 ```{r}
-# Read in the 1971 shapefile
-shapefile <- st_read('data/IndiaBoundaryData/1971.shp')
-
-# Clean the shapefile state and district names
-shapefile <- janitor::clean_names(shapefile)
-shapefile$name <- make_clean_names(shapefile$name)
-shapefile$state_ut <- tolower(shapefile$state_ut)
-
-# Clean the yield data's state and district names in the same way
-# Using allow_dupes = TRUE means that repeated district names are not made into unique names
-yield_data$distname <- make_clean_names(tolower(yield_data$distname), allow_dupes = TRUE)
-yield_data$stname <- tolower(yield_data$stname)
-
-# Join the two datasets together, the 'by' argument in right_join describes which columns
-# are equivalent in each dataset
-district_yields <- shapefile %>%
-  right_join(yield_data, by = c('name' = 'distname', 'state_ut' = 'stname')) %>%
-  dplyr::select(year, name, state_ut, rice_ta, rice_tq) %>% # 'select' only selects the columns we're interested in (specify select from dplyr!)
-  mutate(rice_yield = rice_tq/rice_ta) %>%
-  rename(district = name,
-         state = state_ut)
-
-# Check output
-head(district_yields)
+borden$PO60
 ```
 
-## Mapping rates, learning from yield mapping
-
-In previous sessions we discussed how to map rates. It seems a fairly straightforward issue, you calculate a rate by dividing your numerator (eg: number of crimes or rice production) by your denominator (eg: daytime population or farming area). You get your variable with the relevant rate and you map it using a choropleth map. However, things are not always that simple. Rates are funny animals. This popped up in your preparation material as the problem "insensitivity to sample size" and we will demonstrate in the next activity. 
-
-### Activity 5: The case of Saharsa
-
-Let's look at our yield data, here yield means the amount of rice produced (in tonnes, 1 tonne = 1000kg) per hectare (a square of land with 100 metre-long sides) of rice farmland. 
+Well, there were about `r borden$PO60` people living there. It is among some of the least populous counties in our data: 
 
 ```{r}
-summary(district_yields$rice_yield)
+summary(ncovr$PO60)
+
 ```
 
-We can see that the district with the highest rice production rate in 1971 had a rate of 55,423 kilograms of rice for each 100,000m$^2$ area. That's really high! Where is that place? I can tell you it's a place call Saharsa. Check it out:
+If you contrast that population count with the population of the average county in the US, that's tiny. One homicide in such a small place can end up producing a big rate. Remember that the rate is simply dividing the number of relevant events by the exposure variable (in this case, population) and multiplying by a constant (in this case, 100,000 since we expressed crime rates in those terms). Most times Borden looks like a very peaceful place:
 
 ```{r}
-# This will show us the row with the highest yield
-district_yields %>% filter(rice_yield == max(rice_yield)) 
-
-# Subset the 'Saharsa' district data
-saharsa <- subset(district_yields, district == "saharsa")
+borden$HR70
+borden$HR80
+borden$HR90
 ```
 
-[Saharsa district](https://en.wikipedia.org/wiki/Saharsa_district) in Bihar, India is known for high quality corn, much of which is exported out here to the UK! But Saharsa isn't particularly known for its great rice production. So, what’s going on here? Why do we have a high production rate (yield) in Saharsa that makes it look like the rice capital of India?
+It has a homicide rate of 0 in most decades. But it only takes one homicide and, bang, it goes top of the league. So a standard map of rates is bound to be noisy. There is the instability that is introduced by virtue of having areas that may be sparsely populated and in which one single event, like in this case, will produce a very noticeable change in the rate. 
 
-Well, we can see from the output above that this happened in 1971 in Saharsa, so let's map out the yields of all districts in Bihar in 1971 to investigate:
+In fact, if you look at the counties with the highest homicide rate in the "ncovr" dataset, you will notice all of them are places like Borden, areas that are sparsely populated, not because they are that dangerous, but because of the instability of rates. Conversely, the same happens with those places with the lowest rate. They tend to be areas with a very small sample size.
 
-(note for the next part with neighbours to work we have to remove the one polygon with the empty geometry with `st_is_empty()`
+This is a problem that was first noted by epidemiologists doing disease mapping. But a number of other disciplines have now noted this and used some of the approaches developed by public health researchers that confronted this problem when producing maps of disease (*aside*: techniques and approaches used by spatial epidemiologists are very similar to those used by criminologists, in case you ever think of changing careers or need inspiration for how to solve a crime analysis problem).
+
+One way of dealing with this is by **smoothing** or **shrinking** the rates. This basically, as the word implies, aims for a smoother representation that avoids hard spikes associated with random noise. There are different ways of doing that. Some ways use a non-spatial approach to smoothing, using something called a **empirical Bayesian smoother**. How does this work? This approach takes the raw rates and tries to “shrink” them towards the overall average. What does this mean? Essentially, we compute a weighted average between the raw rate for each area and the global average across all areas, with weights proportional to the underlying population at risk. What this procedure does is  adjusting considerably (brought closer to the global average) the rates of smaller areas (those with a small population at risk), whereas the rates for the larger areas will barely change.
+
+Here we are going to introduce the approach implemented in `DCluster`, a package developed for epidemiological research and detection of clusters of disease. Specifically, we can implement the `empbaysmooth()` function which creates a smooth relative risks from a set of expected and observed number of cases using a Poisson-Gamma model as proposed by @Clayton_1987.  The function  `empbaysmooth()` expects two parameters, the **expected** value and the **observed** value. Let's define them first.
+
 
 ```{r}
-# remove district with empty geometry
-district_yields <- district_yields %>% filter(!st_is_empty(.))
-
-bihar_1971 <- filter(district_yields, year == '1971')
-
-tm_shape(bihar_1971)+
-  tm_fill('rice_yield')
+#First we define the observed number of cases
+ncovr$observed <- ncovr$HC60
+#To compute the expected number of cases through indirect standardisation
+#we need the overall incidence ratio
+overall_incidence_ratio <- sum(ncovr$HC60)/sum(ncovr$PO60)
+#The expected number of cases can then be obtained by multiplying the overall
+#incidence rate by the population
+ncovr$expected <- ncovr$PO60 * overall_incidence_ratio
 ```
 
-Saharsa is the darkly-shaded district in the top-right, it stands out massively from all other districts! Let's plot the following year, 1972, for comparison:
+With this parameters we can obtain the raw relative risk:
 
 ```{r}
-bihar_1972 <- filter(district_yields, year == '1972')
-
-tm_shape(bihar_1972)+
-  tm_fill('rice_yield')
+ncovr$raw_risk <- ncovr$observed / ncovr$expected
+summary(ncovr$raw_risk)
 ```
 
-Now Saharsa is in the lowest yield bracket - 0.2 to 0.4, pretty far off 5.5! Why does its yield value swing so far?
+And then estimate the smoothed relative risk:
 
 ```{r}
-print(filter(district_yields, district == 'saharsa', year == '1971') %>% pull(rice_ta))
+res <- empbaysmooth(ncovr$observed, ncovr$expected)
 
-area_comparison <- district_yields %>%
-  group_by(district) %>%
-  summarise(mean_area = mean(rice_ta)) %>%
-  dplyr::select(district, mean_area)
-
-ggplot(area_comparison) + 
-  geom_col(aes(x = district, y = mean_area)) + 
-  coord_flip()
 ```
 
-Although it doesn't have the smallest rice farmland area, Saharsa's rice land is pretty small. Remember that the rate is simply dividing the number of relevant events (rice production) by the exposure variable (in this case area of rice farmland). Most times Saharsa has very low yields ( < 1 tonne per hectare):
+In the new object we generated, which is a list, you have an element which contains the computed rates. We can add those to our dataset:
 
 ```{r}
-saharsa_rice_yield <- filter(district_yields, district == 'saharsa')
-
-ggplot(saharsa_rice_yield) +
-  geom_col(aes(x = year, y = rice_yield)) +
-  labs(x = "Year", y = "Saharsa rice yield")
+ncovr$H60EBS <- res$smthrr
+summary(ncovr$H60EBS)
 ```
 
-Saharsa's rice production is around 130 tonnes in most years. But it only takes one good year of rice growth and, bang, it goes to the top of the league. So a standard map of rates is bound to be noisy. There is the instability that is introduced by virtue of having areas that may be sparsely populated and in which one single event, like in this case a bumper crop, will produce a very noticeable change in the rate. In fact, if you look at the counties with the highest yields in the yield dataset you will notice all of them are places like Saharsa, areas that have small areas of rice farmland (RICE_TA). So they have high yields not because they produce massive amounts of rice, but because of the instability of rates.
+We can observe that the dispersion narrows significantly and that there are fewer observations with extreme values once we use this smoother.
 
-This is a problem that was first noted by epidemiologists doing disease mapping. But a number of other disciplines have now noted this and used some of the approaches developed by public health researchers that confronted this problem when producing maps of disease (techniques and approaches used by spatial epidemiologists are very similar to those used by criminologists -in case you ever think of changing careers or need inspiration for how to solve a crime analysis problem).
+Instead of shrinking to the global relative risk, we can shrink to a relative rate based on the neighbours of each county. Shrinking to the global risk ignores the spatial dimension of the phenomenon being mapped out and may mask existing heterogeneity. If instead of shrinking to a global risk, we shrink to a local rate, we may be able to take unobserved heterogeneity into account. @Marshall_1991 proposed a local smoother estimator in which the crude rate is shrunk towards a local, "neighbourhood", rate. To compute this, we need the list of neighbours that surround each county (we will discuss this code in Chapter 11, so for now just trust we are computing the rate of the areas that surround each country):
 
-### Activity 6: Smoothing as a way to address insensitivity to sample size
+```{r, message=FALSE, warning=FALSE}
+ncovr_sp <- as(ncovr, "Spatial")
+w_nb <- poly2nb(ncovr_sp, row.names=ncovr_sp$FIPSNO)
+eb2 <- EBlocal(ncovr$HC60, ncovr$PO60, w_nb)
+ncovr$HR60EBSL <- eb2$est * 100000
 
-One way of dealing with this is by **smoothing** the rates. This basically as the word implies aims for a smoother representation that avoids hard spikes associated with random noise. There are different ways of doing that. Some ways use a non-spatial approach to smoothing, using something called a **empirical bayesian smoother**. How does this work? This approach takes the raw rates and tries to “shrink” them towards the overall average. 
-
-The formal logic behind the idea of smoothing is situated in a Bayesian framework, in which the distribution of a random variable is updated after observing data. In the Empirical Bayes approach, values for $\alpha$ and $\beta$ of the prior Gamma distribution are estimated from the actual data. The smoothed rate is then expressed as a weighted average of the crude rate and the prior estimate. 
-
-What does this mean? Essentially, we compute a weighted average between the raw rate for each area and the global average across all areas, with weights proportional to the underlying population at risk. What this procedure does is to have the rates of smaller areas (those with a small population at risk) to have their rates adjusted considerably (brought closer to the global average), whereas the rates for the larger areas will barely change.
-
-Here we are going to introduce the approach implemented in `DCluster`, a package developed for epidemiological research and detection of [clusters of disease](https://www.r-project.org/conferences/DSC-2003/Proceedings/GomezRubioEtAl.pdf).
-
-Specifically, we use the `empbaysmooth(Observed, Expected)` function, where we specify two values, the **expected** value (the global average) and the **observed** value (the rate we actually see). 
-
-```{r}
-res <- empbaysmooth(bihar_1971$rice_yield, bihar_1971$rice_ta*(sum(bihar_1971$rice_yield)/sum(bihar_1971$rice_ta)))
 ```
 
-In the new object we generate, which is a list, you have an element which contains the computed rates. We can add those to our dataset:
+We can now plot the maps and compare them:
 
-```{r}
-bihar_1971$rice_yieldEBS <- res$smthrr
+```{r, message=FALSE, warning=FALSE, fig.cap='Compare raw and smoothed rates across counties in the USA', fig.alt="Two shaded maps of counties in the United States. Both maps use five shades of red, getting darker to represent higher values, the first one corresponding to 'Raw rate', the second to 'Local Smooth', according to their legends. The first map is more blotchy than the second, with some lighter counties amidst darker red ones, and vice versa. The second map has much clearer contiguous blocks sharing the same colour. In both maps, the southeast has the most concentration of dark red, with some patches in the south and southwest."}
+tmap_mode("plot")
+
+map1 <-  tm_shape(ncovr) +
+  tm_fill(
+    "HR60",
+    fill.scale = tm_scale_intervals(style="quantile", values = "brewer.reds"),
+    fill.legend = tm_legend(
+      title = "Raw rate",
+      position = c("left", "bottom"),
+      title.size = 0.8,
+      text.size = 0.5
+    )
+  ) +
+  tm_title("Raw rate") 
+
+map2 <- tm_shape(ncovr) +
+  tm_fill(
+    "HR60EBSL",
+    fill.scale = tm_scale_intervals(style = "quantile", values = "brewer.reds"),
+    fill.legend = tm_legend(
+      title = "Local Smooth",
+      position = c("left", "bottom"),
+      title.size = 0.8,
+      text.size = 0.5
+    )
+  ) +
+  tm_title("Local Smooth")
+
+tmap_arrange(map1, map2) 
 ```
 
-**Alternatively** instead of shrinking to the global rate, we can shrink to a rate based on the neighbours of each county. In this case, instead of shrinking to a global rate, we shrink to a *local rate*. We then may be able to take unobserved heterogeneity into account. For this we need the list of neighbours, therefore we can compute the rate of the areas that surround each county:
+Notice that the quantiles are not the same, so that will make your comparison difficult. Let's look at a boxplot of these variables. In the map of raw rates, we have the most variation. 
 
-```{r}
-bihar_1971 <- bihar_1971 %>% mutate(neighbour = st_intersects(.))
-
-#create the list of neighbours
-w_sf <- list()
-w_sf <- bihar_1971$neighbour
-class(w_sf) <- "nb"
+```{r, fig.cap='Boxplots to compare variation in rates', fig.width=4, fig.alt="A box plot titled 'Different rates of homicide per hundred thousand people'. The vertical axis is labeled 'Rates', ranging from zero to nearly one hundred. Two datasets are depicted, 'Raw rate', and 'Local base smoother'. The first, 'Raw rate', has many more outliers above the maximum, which is marked around nineteen. The outliers are numerous until fourty, sparse until sixty, and one reaches nearly one hundred. On the other hand, 'Local base smoother' has much fewer outliers, and they are all close to the maximum, perhaps five units above at most."}
+#Boxplots with base R graphics
+boxplot(ncovr$HR60, ncovr$HR60EBSL,
+        main = "Homicide per 100,000 people",
+        names = c("Raw rate", 
+                  "Local base smoother"),
+        ylab = "Rates")
 ```
 
-```{r, echo=FALSE}
-bihar_1971 <- bihar_1971 %>% mutate(neighbour = st_intersects(.))
+The range for the raw rates is nearly 93. Much of the variation in observed homicide rates by county is attributable to statistical noise due to the small number of (observed and expected) homicides in low-population counties. Because of this noise, a disproportionate fraction of low-population counties are observed to have extremely high (or low) homicide rates when compared to typical counties in the United States. With smoothing, we reduce this problem, and if you contrast the maps you will see how this results in a clearer and smoother spatial pattern for the rate that is estimated borrowing information from their neighbours. 
 
-#option 2: to create the list of neighbours
-as.nb.sgbp <- function(x, ...) {
-  attrs <- attributes(x)
-  x <- lapply(x, function(i) { if(length(i) == 0L) 0L else i } )
-  attributes(x) <- attrs
-  class(x) <- "nb"
-  x
-  } 
-w_sf <- as.nb.sgbp(bihar_1971$neighbour)
-```
-
-And now that we have the list of neighbours, we can use the `EBlocal()` function, and here specify the count of cases (observed), the population at risk (or rice_TA in the case of our crop yields) and then finally the neighbours list we just created above (`w_sf`). The object produced (`eb2`) consists of two columns - the raw rates (equivalent to the `rice_yield` we already calculated) and the newly estimated rates:
-
-```{r}
-eb2 <- EBlocal(bihar_1971$rice_tq, bihar_1971$rice_ta, w_sf)
-bihar_1971$rice_yieldEBSL <- eb2$est 
-bihar_1971$neighbour <- NULL
-```
-
-We can now plot the maps and compare them :
-
-```{r}
-current_style <- tmap_style("col_blind")
-#map1: rice_yield, raw value
-map1 <- tm_shape(bihar_1971) + 
-  tm_fill("rice_yield", style="quantile", title = "Raw rate", palette = "Reds") +
-  tm_layout(legend.position = c("left", "bottom"), 
-            legend.title.size = 0.8,
-            legend.text.size = 0.5)
-#map2: rice_yieldEBS, global
-map2<- tm_shape(bihar_1971) + 
-  tm_fill("rice_yieldEBS", style="quantile", title = "EB Smooth", palette = "Reds") +
-  tm_layout(legend.position = c("left", "bottom"), 
-            legend.title.size = 0.8,
-            legend.text.size = 0.5)
-#map3: rice_yieldEBSL, local
-map3<- tm_shape(bihar_1971) + 
-  tm_fill("rice_yieldEBSL", style="quantile", title = "Local Smooth", palette = "Reds") +
-  tm_layout(legend.position = c("left", "bottom"), 
-            legend.title.size = 0.8,
-            legend.text.size = 0.5)
-
-tmap_arrange(map1, map2, map3) 
-```
-
-Notice that the quantiles are not the same, so that will make your comparison difficult!
+So to smooth or not too smooth? Clearly we can see how smoothing stabilises the rates and removes noise. But as @Gelman_1999 suggests this introduces other artifacts and autocorrelation into our estimates. Some people are also not too keen on maps of statistically adjusted estimates. Yet, the conclusions one can derive from mapping raw rates (*when* the denominator varies significantly and we have areas with small sample size) means that smoothing is often a preferable alternative [@Waller_2004]. The problem we have with maps of estimates is that we need information about the variability and it is hard to map this out in a convenient way [@Gelman_1999]. @Lawson_2006, in relation to the similar problem of disease mapping, suggests that "at the minimum any map of relative risk for a disease should be accompanied with information pertaining to estimates of rates within each region as well as estimates of variability within each region" (p. 38), whereas "at the other extreme it could be recommended that such maps be only used as a presentational aid, and not as a fundamental decision-making tool" (p. 38).  
 
 ## Binning points
 
@@ -442,22 +313,6 @@ sf_mcr_asb<- st_as_sf(mcr_asb, coords = c("Longitude", "Latitude"),
                        crs = 4326, agr = "constant", remove = FALSE) %>% 
   rename(lng = Longitude,
          lat = Latitude)
-```
-
-```{r, echo=FALSE}
-#To do this, we can use a bespoke function, `sfc_as_cols()` created by [Josh M. London](https://github.com/jmlondon) in response to this [issue opened on github for the sf package](https://github.com/r-spatial/sf/issues/231). 
-sfc_as_cols <- function(x, names = c("x","y")) {
-  stopifnot(inherits(x,"sf") && inherits(sf::st_geometry(x),"sfc_POINT"))
-  ret <- sf::st_coordinates(x)
-  ret <- tibble::as_tibble(ret)
-  stopifnot(length(names) == ncol(ret))
-  x <- x[ , !names(x) %in% names]
-  ret <- setNames(ret,names)
-  dplyr::bind_cols(x,ret)
-}
-#To do this, we can use a bespoke function, `sfc_as_cols()` created by [Josh M. London](https://github.com/jmlondon) in response to this [issue opened on github for the sf package](https://github.com/r-spatial/sf/issues/231). 
-#Now finally, let's use this function we just created to extract the coords to some columns. So in this function, we have to pass as parameters the name of the dataframe, ma_spatial in our case, and also what we want the column to be called in a concatenated list (created with the `c()` function). Let's call these "lng" and "lat":
-#ma_spatial <- sfc_as_cols(ma_spatial, c("lng", "lat"))
 ```
 
 As a first step, we can plot asb in the borough of Manchester using simple ggplot! Remember the data visualisation session from weeks ago? We discussed how ggplot is such a great tool for building visualisations, because you can apply whatever geometry best suits your data. So for us to just have a look at the hexbinned version of our point data of antisocial behaviour, we can use the `stat_binhex()` function. We can also recreate the thematic map element, as we can use the frequency of points in each hex to shade each hexbin from white (least number of incidents) to red (most nuber of incidents). 

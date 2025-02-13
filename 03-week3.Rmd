@@ -41,8 +41,8 @@ download.file("https://www.dropbox.com/s/h5c1okn4m6t3rqe/BoundaryData.zip?dl=1" 
               mode = "wb") # write binary data
 
 #Important! note that I extract file to the data/BoundaryData folder. You HAVE TO change exdir (the directory to extract files to)
-unzip("data/BoundaryData.zip", exdir = "data/BoundaryData")
-manchester_lsoa <- st_read("data/BoundaryData/BoundaryData/england_lsoa_2011.shp")
+unzip("data/BoundaryData.zip", exdir = "data")
+manchester_lsoa <- st_read("data/BoundaryData/england_lsoa_2011.shp")
 ```
 
 Once you import the data, let's count the number of crimes in each LSOA units like what we did in the week 2.
@@ -118,38 +118,51 @@ As you can see here, the look is a bit cleaner. We don't need to get rid of the 
 ```{r}
 tm_shape(manchester_crime_lsoa) + 
   tm_fill("count") +
-  tm_borders(alpha = 0.1)
+  tm_borders(col_alpha = 0.1)
 ```
 
 The alpha parameter that we are inserting within `tm_borders()` controls the transparency of the borders, we can go from 0 (totally transparent) to 1 (not transparent). You can play around with this value and see the results.
 
 Notice in the last few maps we did not have to specify whether we wanted the map to be static or interactive. When you use `tmap`, R will remember the mode you want to use. So once you specify `tmap_mode("plot")`, all the subsequent maps will be static. It is only when you want to change this behaviour that you would need another `tmap_mode` call.
 
-Notice as well that the legend in this map is (a) not very informative and (b) located in a place that is less than optimal, since it covers part of the map. We can add a title within the `tm_fill` to clarify what count is and we can use the `tm_layout()` function to control the appearance of the legend. This later function `tm_layout` allows you to think about many of the more general cosmetics of the map.
+Notice as well that the legend in this map is (a) not very informative and (b) located in a place that is less than optimal, since it covers part of the map. We can add a title within the `tm_title()` to clarify what count is and we can use the `tm_legend()` function to control the appearance of the legend. This later function `tm_legend()` allows you to think about many of the more general cosmetics of the map.
 
 ```{r}
 tm_shape(manchester_crime_lsoa) + 
-  tm_fill("count", title = "Crime counts") +
-  tm_borders(alpha = 0.1) +
-  tm_layout(main.title = "Crime in Manchester City, June/2019", main.title.size = 0.7 ,
-            legend.position = c("right", "bottom"), legend.title.size = 0.8)
+  tm_fill("count") +
+  tm_borders(col_alpha = 0.1) +
+  tm_title(text = "Crime in Manchester City, June/2019", size = 0.7 ) +
+  tm_legend(title = "Crime counts", position = c("right", "bottom"), title.size = 0.8)
 ```
 
-We are also going to change the current style of the maps by making them more friendly to colour blind people. We can use the tmap_style() function to do so.
+We can also change the cstyle of the maps by making them more friendly to colour blind people, or to see what they will look like printed by using the "bw" theme (black and white). 
 
 ```{r}
-current_style <- tmap_style("col_blind")
+
+current_style <- tmap_style("bw")
+
 ```
 
 See how the map changes.
 
 ```{r}
+
 tm_shape(manchester_crime_lsoa) + 
-  tm_fill("count", title = "Crime counts") +
-  tm_borders(alpha = 0.1) +
-  tm_layout(main.title = "Crime in Manchester City, June/2019", main.title.size = 0.7 ,
-            legend.position = c("right", "bottom"), legend.title.size = 0.8)
+  tm_fill("count") +
+  tm_borders(col_alpha = 0.1) +
+  tm_title(text = "Crime in Manchester City, June/2019", size = 0.7 ) +
+  tm_legend(title = "Crime counts", position = c("right", "bottom"), title.size = 0.8)
+
 ```
+
+Let's go back to the default for now ("white"):
+
+```{r}
+
+current_style <- tmap_style("white")
+
+```
+
 
 ## Classification systems for thematic maps
 
@@ -180,42 +193,62 @@ For each map, instead of visualising them one by one, just assign them to a new 
 So let's make *map1*. This will create a thematic map using equal intervals:
 
 ```{r}
-map1 <- tm_shape(manchester_crime_lsoa) +             #use tm_shape function to specify spatial object
-  tm_fill("count", style="equal", title = "Equal") +  #use tm_fill to specify variable, classification method, and give the map a title
-  tm_layout(legend.position = c("right", "bottom"),   #use tm_layout to make the legend look nice
-            legend.title.size = 0.8,
-            legend.text.size = 0.5)
+map1 <- tm_shape(manchester_crime_lsoa) +  # Specify spatial object
+  tm_fill("count", fill.scale = tm_scale_intervals(style="equal")) +  # Define fill variable and classification
+  tm_title("Equal") + 
+  tm_legend(
+    position = c("right", "bottom"),
+    title.size = 0.8,
+    text.size = 0.5
+  )  # Adjust legend properties
+
 ```
 
 Now create *map2*, with the jenks method often preferred by geographers:
 
 ```{r}
-map2 <- tm_shape(manchester_crime_lsoa) + 
-  tm_fill("count", style="jenks", title = "Jenks") +
-  tm_layout(legend.position = c("right", "bottom"), 
-            legend.title.size = 0.8,
-            legend.text.size = 0.5)
+map2 <- tm_shape(manchester_crime_lsoa) +  # Specify spatial object
+  tm_fill("count", fill.scale = tm_scale_intervals(style="jenks")) +  # Define fill variable and classification
+  tm_title("Jenks") + 
+  tm_legend(
+    position = c("right", "bottom"),
+    title.size = 0.8,
+    text.size = 0.5
+  )  # Adjust legend properties
+
 ```
 
 Now create *map3*, with the quantile method often preferred by epidemiologists:
 
+
 ```{r}
-map3 <- tm_shape(manchester_crime_lsoa) + 
-  tm_fill("count", style="quantile", title = "Quantile") +
-  tm_layout(legend.position = c("right", "bottom"), 
-            legend.title.size = 0.8,
-            legend.text.size = 0.5)
+
+map3 <- tm_shape(manchester_crime_lsoa) +
+  tm_fill("count", fill.scale = tm_scale_intervals(style="quantile")) +
+  tm_title("Quantile") + 
+  tm_legend(
+    position = c("right", "bottom"),
+    title.size = 0.8,
+    text.size = 0.5
+  )  
+
+
 ```
+
+This is neat as you can specify many things, for example the number of groups to split your data into. 
 
 And finally make *map4*, standard deviation map, which maps the values of our variable to distance to the mean value.
 
 ```{r}
-map4 <- tm_shape(manchester_crime_lsoa) + 
-  tm_fill("count", style="sd", title = "Standard Deviation") +
-  tm_borders(alpha=0.1) +
-  tm_layout(legend.position = c("right", "bottom"), 
-            legend.title.size = 0.8,
-            legend.text.size = 0.5)
+map4 <- tm_shape(manchester_crime_lsoa) +
+  tm_fill("count", fill.scale = tm_scale_intervals(style="sd")) +
+  tm_title("Standard Deviation") + 
+  tm_legend(
+    position = c("right", "bottom"),
+    title.size = 0.8,
+    text.size = 0.5
+  )
+
 ```
 
 Notice that we are not plotting the maps, we are storing them into R objects (map1 to map4). This way they are saved, and you can call them later, which is what we need in order to plot them together using the `tmap_arrange()` function. 
@@ -246,15 +279,18 @@ tm_shape(manchester_crime_lsoa) +
   tm_bubbles("count")
 ```
 
-First thing you see is that we loose the context (provided by the polygon borders) that we had earlier. The `border.lwd` argument set to NA in the `tm_symbols()` is asking R not to draw a border to the circles. Whereas `tm_borders()` brings back a layer with the borders of the polygons representing the different LSOAs in Manchester city. Notice how I am modifying the transparency of the borders with the alpha parameter.
+First thing you see is that we loose the context (provided by the polygon borders) that we had earlier. The `border.lwd` argument set to NA in the `tm_symbols()` is asking R not to draw a border to the circles. Whereas `tm_borders()` brings back a layer with the borders of the polygons representing the different LSOAs in Manchester city. Notice how I am modifying the transparency of the borders with the `col_alpha` parameter.
 
 ```{r}
 tm_shape(manchester_crime_lsoa) +                         #use tm_shape function to specify spatial object
-  tm_bubbles("count", border.lwd=NA) +              #use tm_bubbles to add the bubble visualisation, but set the 'border.lwd' parameter to NA, meaning no symbol borders are drawn
-  tm_borders(alpha=0.1) +                           #add the LSOA border outlines using tm_borders, but set their transparency using the alpha parameter (0 is totally transparent, 1 is not at all)
-  tm_layout(legend.position = c("right", "bottom"), #use tm_layout to make the legend look nice
-            legend.title.size = 0.8,
-            legend.text.size = 0.5)
+  tm_bubbles("count", border.lwd = NA) +              #use tm_bubbles to add the bubble visualisation, but set the 'border.lwd' parameter to NA, meaning no symbol borders are drawn
+  tm_borders(col_alpha = 0.1) +                           #add the LSOA border outlines using tm_borders, but set their transparency using the cl_alpha parameter (0 is totally transparent, 1 is not at all)
+  tm_layout(
+    legend.position = c("right", "bottom"),
+    #use tm_layout to make the legend look nice
+    legend.title.size = 0.8,
+    legend.text.size = 0.5
+  )
 ```
 
 ## Mapping rates rather than counts
@@ -355,22 +391,51 @@ tmaptools::palette_explorer()
 Pick the ones you like, and use them. Here I will use Blues, Greens and Reds
 
 ```{r}
-crime_count_map <- tm_shape(manchester_crime_lsoa) + 
-  tm_fill("count", style="quantile", palette= "Blues", title = "Crime count") +
-  tm_layout(panel.labels = "Crime count", legend.position = c("right", "bottom"),
-            legend.title.size = 0.8, legend.text.size = 0.5)
 
-res_pop_map <- tm_shape(manchester_crime_lsoa) + 
-  tm_fill("respop", style="quantile", palette= "Greens", title = "Residential population") +
-  tm_layout(panel.labels = "Residential population", legend.position = c("right", "bottom"),
-            legend.title.size = 0.8, legend.text.size = 0.5)
+
+####
+
+crime_count_map <- tm_shape(manchester_crime_lsoa) +
+  tm_fill(
+    "count",
+    fill.scale = tm_scale_intervals(values = "brewer.blues"),
+    fill.legend = tm_legend(
+      title = "Number of crimes",
+      position = c("right", "bottom"),
+      title.size = 0.8,
+      text.size = 0.5
+    )
+  ) +
+  tm_title("Crime count") 
+
+res_pop_map <- tm_shape(manchester_crime_lsoa) +
+  tm_fill(
+    "respop",
+    fill.scale = tm_scale_intervals(values = "brewer.greens"),
+    fill.legend = tm_legend(
+      title = "Crimes per 100000 residents",
+      position = c("right", "bottom"),
+      title.size = 0.8,
+      text.size = 0.5
+    )
+  ) +
+  tm_title("Residential population") 
+  
 
 crime_rate_map <- tm_shape(manchester_crime_lsoa) + 
-  tm_fill("crimr1", style="quantile", palette= "Reds", title = "Crime rate") +
-  tm_layout(panel.labels = "Crime per 100,000 population", legend.position = c("right", "bottom"),
-            legend.title.size = 0.8, legend.text.size = 0.5)
+  tm_fill("crimr1", fill.scale = tm_scale_intervals(values = "brewer.reds"), 
+          fill.legend = tm_legend(
+      title = "Crimes per 100000 daytime population",
+      position = c("right", "bottom"),
+      title.size = 0.8,
+      text.size = 0.5)) + 
+  tm_title("Crime rate") + 
+  tm_legend(position = c("right", "bottom"), title.size = 0.8, text.size = 0.5)
 
 tmap_arrange(crime_count_map, res_pop_map, crime_rate_map)
+
+
+
 ```
 
 What do you think about these three maps? How do you think this might be different if we were to look at workday population instead of residential population as a denominator? Discuss in your groups. 

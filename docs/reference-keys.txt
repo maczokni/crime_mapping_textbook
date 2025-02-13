@@ -1,3 +1,5 @@
+fig:unnamed-chunk-154
+fig:unnamed-chunk-155
 introduction
 disclaimer
 a-first-lesson-about-r
@@ -84,13 +86,7 @@ activity-6-building-buffers
 activity-7-counting-points-in-polygon
 more-on-thematic-maps
 pro-tip-do-i-need-to-install-this-package
-activity-1-getting-some-messy-data
-activity-2-getting-some-crop-data-attributes
-activity-3-comparing-shapefiles
-activity-4-joining-datasets
-mapping-rates-learning-from-yield-mapping
-activity-5-the-case-of-saharsa
-activity-6-smoothing-as-a-way-to-address-insensitivity-to-sample-size
+smoothing-rates-adjusting-for-small-sample-noise
 binning-points
 the-binning-process
 different-binning-techniques

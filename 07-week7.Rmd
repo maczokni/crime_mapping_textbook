@@ -103,10 +103,11 @@ burglaries_per_lsoa <- rename(burglaries_per_lsoa, burglary = n)
 
 #step8: Plot with tmap
 tm_shape(burglaries_per_lsoa) + 
-  tm_fill("burglary", style = "quantile", palette = "Reds") +
-  tm_borders(alpha = 0.1) +
-  tm_layout(main.title = "Burglary counts", main.title.size = 0.7 ,
-            legend.position = c("right", "bottom"), legend.title.size = 0.8)
+  tm_fill("burglary", 
+          fill.scale = tm_scale_intervals(style = "quantile", values = "brewer.reds")) +
+  tm_borders(col_alpha = 0.1) +
+  tm_title("Burglary counts", size = 0.7) + 
+  tm_legend(position = c("right", "bottom"), title.size = 0.8)
 
 #step9: remove redundant objects
 rm(burglary)
@@ -165,10 +166,16 @@ cc_burglary <- burglaries_per_lsoa[unlist(cc_intersects),]
 #Plot with tmap
 tmap_mode("view")
 tm_shape(cc_burglary) + 
-  tm_fill("burglary", style = "quantile", palette = "Reds", id="code") +
+  tm_fill(
+    "burglary",
+    fill.scale = tm_scale_intervals(style = "quantile", values = "brewer.reds"),
+    id = "code"
+  ) +
   tm_borders() +
-  tm_layout(main.title = "Burglary counts", main.title.size = 0.7, legend.title.size = 0.8) +
-  tm_view(view.legend.position = c("right", "top"))
+  tm_title("Burglary counts", size = 0.7) +
+  tm_legend(title.size = 0.8) +
+  tm_view(legend.position = c("right", "top"))
+
 ```
 
 So now we have a new spatial object `cc_burglary` with the 23 LSOA units that compose the City Centre Ward of Manchester. By focusing in a smaller subset of areas we can understand perhaps a bit better what comes next. But again we carry on. Do you perceive here some degree of spatial autocorrelation?
@@ -353,10 +360,14 @@ So this is our `burglaries_per_lsoa` object that we're referring back to. To che
 ```{r}
 tmap_mode("plot")
 tm_shape(burglaries_per_lsoa) + 
-  tm_fill("burglary", style = "quantile", palette = "Reds") +
-  tm_borders(alpha = 0.1) +
-  tm_layout(main.title = "Burglary counts", main.title.size = 0.7 ,
-            legend.position = c("right", "bottom"), legend.title.size = 0.8)
+  tm_fill(
+    "burglary",
+    fill.scale = tm_scale_intervals(style = "quantile", values = "brewer.reds")
+  ) +
+  tm_borders(col_alpha = 0.1) +
+  tm_title("Burglary counts", size = 0.7) +
+  tm_legend(position = c("right", "bottom"), title.size = 0.8)
+
 ```
 
 Looks good! Now that we have the data we can generate the weight matrix. Again, what we do here is stuff we did above for the global correlation. In fact, if you did the optional homework already, you will also have run this code.

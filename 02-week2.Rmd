@@ -398,6 +398,19 @@ And then use the `annotation_map_tile()` function, making sure to place it befor
 ggplot() + 
  annotation_map_tile() +
   geom_sf(data = crimes_sf)
+
+```
+
+
+***NOTE:*** if you get an error, read it first. If it says something like you are missing a package (e.g. 'prettymapr') then install that package!
+
+If that doesn't solve the problem, try the following code instead:
+
+```{r, eval = FALSE}
+
+ggplot() +
+  ggspatial::annotation_map_tile(cachedir = system.file("rosm.cache", package = "ggspatial")) +
+   geom_sf(data = crimes_sf)
 ```
 
 So what you see above is what we can call a **basemap**. The term basemap is seen often in GIS and refers to a collection of GIS data and/or orthorectified imagery that form the background setting for a map. The function of the basemap is to provide background detail necessary to orient the location of the map. Basemaps also add to the aesthetic appeal of a map. 
@@ -426,7 +439,7 @@ So to get some boundary data, you can use the UK Data Service website. There is 
 
 When you get to the link, you will see on the top there is some notification to help you with the boundary data selector. If in the future you are looking for boundary data and you are feeling unsure at any point, feel free to click on that note "**How to use Boundary Data Selector**" which will help to guide you. 
 
-For now, let's focus on the selector options. Here you can choose the country you want to select shapefiles for. We select "England". You can also choose the type of geography we want to use. Here we select "Statistical Building Block", as discussed above. And finally you can select when you want it for. If you are working with historical data, it makes sense to find boundaries that match the timescale for your data. Here we will be dealing with contemporary data, and therefore we want to be able to use the newest available boundary data. 
+For now, let's focus on the selector options. Here you can choose the country you want to select shapefiles for. We select "England". You can also choose the type of geography we want to use. Here we select "Statistical Building Block", as discussed above. And finally you can select when you want it for. If you are working with historical data, it makes sense to find boundaries that match the timescale for your data. Here we will be using data from pre-2021, so we will need the historic LSOAs (2011 to 2020). 
 
 ***
 

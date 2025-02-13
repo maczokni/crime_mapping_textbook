@@ -493,7 +493,7 @@ library(ggplot2)
 
 Then we will use one of its functions to create a scatterplot. 
 
-```{r}
+```{r scatterplotofhatecrimes}
 ggplot(hate_crimes, aes(x=share_vote_trump, y=avg_hatecrimes_per_100k_fbi)) +
     geom_point(shape=1) +
      geom_smooth(method=lm)

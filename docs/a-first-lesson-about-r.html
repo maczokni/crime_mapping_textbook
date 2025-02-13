@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 1 A first lesson about R | Crime Mapping in R</title>
   <meta name="description" content="Worksheets for labs of Crime Mapping course" />
-  <meta name="generator" content="bookdown 0.39 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.42 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 1 A first lesson about R | Crime Mapping in R" />
   <meta property="og:type" content="book" />
@@ -23,7 +23,7 @@
 <meta name="author" content="Reka Solymosi and Juanjo Medina" />
 
 
-<meta name="date" content="2025-02-07" />
+<meta name="date" content="2025-02-13" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -77,7 +77,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -823,11 +823,14 @@ A number of the packages we will use belong to a set of packages called <strong>
 <div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="a-first-lesson-about-r.html#cb50-1" tabindex="-1"></a><span class="fu">ggplot</span>(hate_crimes, <span class="fu">aes</span>(<span class="at">x=</span>share_vote_trump, <span class="at">y=</span>avg_hatecrimes_per_100k_fbi)) <span class="sc">+</span></span>
 <span id="cb50-2"><a href="a-first-lesson-about-r.html#cb50-2" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">shape=</span><span class="dv">1</span>) <span class="sc">+</span></span>
 <span id="cb50-3"><a href="a-first-lesson-about-r.html#cb50-3" tabindex="-1"></a>     <span class="fu">geom_smooth</span>(<span class="at">method=</span>lm)</span></code></pre></div>
-<pre><code>## `geom_smooth()` using formula = &#39;y ~ x&#39;</code></pre>
-<pre><code>## Warning: Removed 1 row containing non-finite outside the scale range
+<pre><code>## `geom_smooth()` using formula = &#39;y
+## ~ x&#39;</code></pre>
+<pre><code>## Warning: Removed 1 row containing non-finite
+## outside the scale range
 ## (`stat_smooth()`).</code></pre>
-<pre><code>## Warning: Removed 1 row containing missing values or values outside the scale range
-## (`geom_point()`).</code></pre>
+<pre><code>## Warning: Removed 1 row containing missing
+## values or values outside the scale
+## range (`geom_point()`).</code></pre>
 <p><img src="crime_mapping_textbook_files/figure-html/scatterplotofhatecrimes-1.png" width="672" /></p>
 <p>What do you think this graphic is telling you? Discuss with the person next to you.</p>
 <p>Graphing is very powerful in R, and much of the spatial visualisation we will produce throughout the module will build on this. If you are not already familiar with this, I recommend a read of the data visualisation chapter of R for Data Science <a href="https://r4ds.had.co.nz/data-visualisation.html">https://r4ds.had.co.nz/data-visualisation.html</a></p>

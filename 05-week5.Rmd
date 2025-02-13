@@ -197,21 +197,32 @@ We can now plot the maps and compare them:
 
 ```{r, message=FALSE, warning=FALSE, fig.cap='Compare raw and smoothed rates across counties in the USA', fig.alt="Two shaded maps of counties in the United States. Both maps use five shades of red, getting darker to represent higher values, the first one corresponding to 'Raw rate', the second to 'Local Smooth', according to their legends. The first map is more blotchy than the second, with some lighter counties amidst darker red ones, and vice versa. The second map has much clearer contiguous blocks sharing the same colour. In both maps, the southeast has the most concentration of dark red, with some patches in the south and southwest."}
 tmap_mode("plot")
-current_style <- tmap_style("col_blind")
 
-map1<- tm_shape(ncovr) + 
-  tm_fill("HR60", style="quantile", 
-          title = "Raw rate", 
-          palette = "Reds") +
-  tm_layout(legend.position = c("left", "bottom"), 
-            legend.title.size = 0.8, legend.text.size = 0.5)
+map1 <-  tm_shape(ncovr) +
+  tm_fill(
+    "HR60",
+    fill.scale = tm_scale_intervals(style="quantile", values = "brewer.reds"),
+    fill.legend = tm_legend(
+      title = "Raw rate",
+      position = c("left", "bottom"),
+      title.size = 0.8,
+      text.size = 0.5
+    )
+  ) +
+  tm_title("Raw rate") 
 
-map2<- tm_shape(ncovr) + 
-  tm_fill("HR60EBSL", style="quantile", 
-          title = "Local Smooth", 
-          palette = "Reds") +
-  tm_layout(legend.position = c("left", "bottom"), 
-            legend.title.size = 0.8, legend.text.size = 0.5)
+map2 <- tm_shape(ncovr) +
+  tm_fill(
+    "HR60EBSL",
+    fill.scale = tm_scale_intervals(style = "quantile", values = "brewer.reds"),
+    fill.legend = tm_legend(
+      title = "Local Smooth",
+      position = c("left", "bottom"),
+      title.size = 0.8,
+      text.size = 0.5
+    )
+  ) +
+  tm_title("Local Smooth")
 
 tmap_arrange(map1, map2) 
 ```
@@ -302,22 +313,6 @@ sf_mcr_asb<- st_as_sf(mcr_asb, coords = c("Longitude", "Latitude"),
                        crs = 4326, agr = "constant", remove = FALSE) %>% 
   rename(lng = Longitude,
          lat = Latitude)
-```
-
-```{r, echo=FALSE}
-#To do this, we can use a bespoke function, `sfc_as_cols()` created by [Josh M. London](https://github.com/jmlondon) in response to this [issue opened on github for the sf package](https://github.com/r-spatial/sf/issues/231). 
-sfc_as_cols <- function(x, names = c("x","y")) {
-  stopifnot(inherits(x,"sf") && inherits(sf::st_geometry(x),"sfc_POINT"))
-  ret <- sf::st_coordinates(x)
-  ret <- tibble::as_tibble(ret)
-  stopifnot(length(names) == ncol(ret))
-  x <- x[ , !names(x) %in% names]
-  ret <- setNames(ret,names)
-  dplyr::bind_cols(x,ret)
-}
-#To do this, we can use a bespoke function, `sfc_as_cols()` created by [Josh M. London](https://github.com/jmlondon) in response to this [issue opened on github for the sf package](https://github.com/r-spatial/sf/issues/231). 
-#Now finally, let's use this function we just created to extract the coords to some columns. So in this function, we have to pass as parameters the name of the dataframe, ma_spatial in our case, and also what we want the column to be called in a concatenated list (created with the `c()` function). Let's call these "lng" and "lat":
-#ma_spatial <- sfc_as_cols(ma_spatial, c("lng", "lat"))
 ```
 
 As a first step, we can plot asb in the borough of Manchester using simple ggplot! Remember the data visualisation session from weeks ago? We discussed how ggplot is such a great tool for building visualisations, because you can apply whatever geometry best suits your data. So for us to just have a look at the hexbinned version of our point data of antisocial behaviour, we can use the `stat_binhex()` function. We can also recreate the thematic map element, as we can use the frequency of points in each hex to shade each hexbin from white (least number of incidents) to red (most nuber of incidents). 

@@ -37,13 +37,17 @@ ncovr_sf <- st_read(shp_name)
 We can indeed represent our variable of interest using a choropleth map.
 
 ```{r}
-current_style <- tmap_style("col_blind")
+
 
 tm_shape(ncovr_sf) + 
-  tm_fill("HR90", title = "Homicide Rate (Quantiles)", style="quantile", palette = "Reds") +
-  tm_borders(alpha = 0.1) +
-  tm_layout(main.title = "Homicide Rate across US Counties, 1990", main.title.size = 0.7 ,
-            legend.position = c("right", "bottom"), legend.title.size = 0.8)
+  tm_fill(
+    "HR90",
+    fill.scale = tm_scale_intervals(style = "quantile", values = "brewer.reds"),
+    fill.legend = tm_legend(title = "Homicide Rate (Quantiles)")
+  ) +
+  tm_borders(fill_alpha = 0.1) +
+  tm_title("Homicide Rate across US Counties, 1990", size = 0.7) +
+  tm_legend(position = c("right", "bottom"), title.size = 0.8)
 ```
 
 Do you think there is spatial patterning for homicide? 
@@ -91,16 +95,21 @@ ncovr_sf$sd_breaks <- scale(ncovr_sf$res_fit1)[,1]
 summary(ncovr_sf$sd_breaks)
 ```
 
-Next we use a new style, `fixed`, within the `tm_fill` function. When we break the variable into classes using the `fixed` argument we need to specify the boundaries of the classes. We do this using the breaks argument. In this case we are going to ask R to create 7 classes based on standard deviations away from the mean. Remember that a value of 1 would be 1 standard deviation (s.d.) higher than the mean, and -1 would be one s.d. lower. If we assume normal distribution, then 68% of all counties should lie within the middle band from -1 to +1 s.d. (you can find a refresher of this [on Wikipedia](https://en.wikipedia.org/wiki/68%E2%80%9395%E2%80%9399.7_rule)).
+Next we use a new style, `fixed`, within the `tm_scale_fill` function. When we break the variable into classes using the `fixed` argument we need to specify the boundaries of the classes. We do this using the breaks argument. In this case we are going to ask R to create 7 classes based on standard deviations away from the mean. Remember that a value of 1 would be 1 standard deviation (s.d.) higher than the mean, and -1 would be one s.d. lower. If we assume normal distribution, then 68% of all counties should lie within the middle band from -1 to +1 s.d. (you can find a refresher of this [on Wikipedia](https://en.wikipedia.org/wiki/68%E2%80%9395%E2%80%9399.7_rule)).
 
 ```{r}
 my_breaks <- c(-14,-3,-2,-1,1,2,3,14)
 
 tm_shape(ncovr_sf) + 
-  tm_fill("sd_breaks", title = "Residuals", style = "fixed", breaks = my_breaks, palette = "-RdBu") +
-  tm_borders(alpha = 0.1) +
-  tm_layout(main.title = "Residuals", main.title.size = 0.7 ,
-            legend.position = c("right", "bottom"), legend.title.size = 0.8)
+  tm_fill(
+    "sd_breaks",
+    fill.scale = tm_scale_intervals(style = "fixed", breaks = my_breaks, values = "brewer.RdBu"),
+    fill.legend = tm_legend(title = "Residuals")
+  ) +
+  tm_borders(fill_alpha = 0.1) +
+  tm_title("Residuals", size = 0.7) +
+  tm_legend(position = c("right", "bottom"), title.size = 0.8)
+
 ```
 
 Notice  the  spatial  patterning  of  areas  of  over-prediction  (negative residuals,  or  blue  tones)  and under-prediction (positive residuals, or brown tones). This visual inspection of the residuals is telling you that spatial autocorrelation may be present here. This, however, would require a more formal test.
@@ -416,7 +425,8 @@ We now have a simple features object which has in the attribute tables the numbe
 tm_shape(cc_lsoas_asb) + 
   tm_fill("n") +
   tm_borders() +
-  tm_facets("month", free.coords=FALSE)
+  tm_facets(by = "month", free.coords = FALSE)
+
 ```
 
 We can now see how ASB varies across the months, and start to think about how this might change over seasons for example with seasonal patterns in routine activities!
